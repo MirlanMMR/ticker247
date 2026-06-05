@@ -145,12 +145,27 @@ object TelegramParser {
         return html
             .replace(Regex("<br\\s*/?>"), "\n")
             .replace(Regex("<[^>]+>"), "")
+            // Именованные HTML-сущности
             .replace("&amp;", "&")
             .replace("&lt;", "<")
             .replace("&gt;", ">")
             .replace("&nbsp;", " ")
             .replace("&#39;", "'")
+            .replace("&apos;", "'")
             .replace("&quot;", "\"")
+            .replace("&laquo;", "«")
+            .replace("&raquo;", "»")
+            .replace("&mdash;", "—")
+            .replace("&ndash;", "–")
+            .replace("&hellip;", "…")
+            // Числовые сущности &#33; → ! (и т.д.)
+            .replace(Regex("&#(\\d+);")) { mr ->
+                mr.groupValues[1].toIntOrNull()?.toChar()?.toString() ?: mr.value
+            }
+            // Hex сущности &#x21; → !
+            .replace(Regex("&#x([0-9a-fA-F]+);")) { mr ->
+                mr.groupValues[1].toInt(16).toChar().toString()
+            }
             .trim()
     }
 

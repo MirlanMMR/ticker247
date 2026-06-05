@@ -267,12 +267,25 @@ fun ArticleScreen(
                     Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Поделиться
+                    // Поделиться — весь текст в сообщении, не нужен Ticker
                     OutlinedButton(
                         onClick = {
-                            val text = "${item.title}\n${item.url}"
+                            val body = content?.body?.take(600) ?: item.summary.take(600)
+                            val suffix = if ((content?.body?.length ?: 0) > 600) "..." else ""
+                            val sourceLabel = if (item.source.startsWith("@")) item.source else "📰 ${item.source}"
+                            val shareText = buildString {
+                                append("⚡ ${item.title}\n\n")
+                                if (body.isNotEmpty() && body != item.title) {
+                                    append("$body$suffix\n\n")
+                                }
+                                append("$sourceLabel\n")
+                                if (item.url.isNotEmpty()) append("🔗 ${item.url}\n")
+                                append("\n📱 via Ticker 24/7")
+                            }
                             val intent = Intent(Intent.ACTION_SEND).apply {
-                                type = "text/plain"; putExtra(Intent.EXTRA_TEXT, text)
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, shareText)
+                                putExtra(Intent.EXTRA_SUBJECT, item.title)
                             }
                             context.startActivity(Intent.createChooser(intent, "Поделиться"))
                         },
