@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Левая молния — белая (INFO), чуть меньше -->
+    <path
+        android:fillColor="#BBFFFFFF"
+        android:pathData="M30,20 L20,38 H27 L25,52 L40,32 H33 Z"/>
+
+    <!-- Центральная молния — голубая (IMPORTANT), самая большая -->
+    <path
+        android:fillColor="#00D4FF"
+        android:pathData="M54,14 L41,42 H50 L48,64 L67,36 H58 Z"/>
+
+    <!-- Правая молния — оранжевая (URGENT), чуть меньше -->
+    <path
+        android:fillColor="#FF5722"
+        android:pathData="M78,20 L68,38 H75 L73,52 L88,32 H81 Z"/>
+
+    <!-- Разделитель -->
+    <path
+        android:fillColor="#44FFFFFF"
+        android:pathData="M18,70 H90 V72 H18 Z"/>
+
+    <!-- T -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M18,76 H40 V80 H31 V96 H27 V80 H18 Z"/>
+
+    <!-- 2 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M44,76 H58 V83 H48 V87 H58 V96 H44 V92 H54 V91 H44 Z"/>
+
+    <!-- 4 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M62,76 H66 V87 H72 V76 H76 V96 H72 V91 H62 Z"/>
+
+    <!-- / разделитель голубой -->
+    <path
+        android:fillColor="#00D4FF"
+        android:pathData="M78,76 H81 L84,96 H81 Z"/>
+
+    <!-- 7 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M85,76 H97 V80 L91,96 H87 L93,80 H85 Z"/>
+
+</vector>

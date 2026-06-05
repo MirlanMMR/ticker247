@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls ~/Downloads/*.png 2>/dev/null | head -10)",
+      "Bash(ls /Users/mirlanmamytov/AndroidStudioProjects/)",
+      "Bash(find /Users/mirlanmamytov -name \"build.gradle.kts\" -path \"*/app/build.gradle.kts\" 2>/dev/null | grep -v Ticker247 | head -10)",
+      "Bash(jar tf *)",
+      "Read(//Users/mirlanmamytov/Desktop/**)",
+      "Read(//Users/mirlanmamytov/**)",
+      "Bash(./gradlew signingReport)",
+      "Bash(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android)",
+      "Bash(cp ~/Downloads/google-services.json /Users/mirlanmamytov/AndroidStudioProjects/Ticker247/app/google-services.json && echo \"Заменено!\")",
+      "Bash(./gradlew clean *)",
+      "Bash(adb devices *)",
+      "Bash(~/Library/Android/sdk/platform-tools/adb logcat *)",
+      "Bash(~/Library/Android/sdk/platform-tools/adb shell *)",
+      "Bash(kill %1)",
+      "Bash(~/Library/Android/sdk/platform-tools/adb install *)",
+      "Bash(~/Library/Android/sdk/platform-tools/adb pull *)",
+      "Bash(~/Library/Android/sdk/platform-tools/adb shell uiautomator dump /sdcard/ui.xml 2>/dev/null *)",
+      "Bash(python3 -c ' *)"
+    ]
+  }
+}
