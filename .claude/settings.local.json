@@ -18,7 +18,9 @@
       "Bash(~/Library/Android/sdk/platform-tools/adb install *)",
       "Bash(~/Library/Android/sdk/platform-tools/adb pull *)",
       "Bash(~/Library/Android/sdk/platform-tools/adb shell uiautomator dump /sdcard/ui.xml 2>/dev/null *)",
-      "Bash(python3 -c ' *)"
+      "Bash(python3 -c ' *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
     ]
   }
 }

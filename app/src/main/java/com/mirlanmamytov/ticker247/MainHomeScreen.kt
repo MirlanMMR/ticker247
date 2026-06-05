@@ -2,6 +2,7 @@ package com.mirlanmamytov.ticker247
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.activity.compose.BackHandler
 import androidx.browser.customtabs.CustomTabsIntent
@@ -141,6 +142,23 @@ fun MainHomeScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
     val allItems by DataBridge.newsItemsFlow.collectAsStateWithLifecycle()
     val tickerText by DataBridge.tickerFlow.collectAsStateWithLifecycle()
 
+    // Scroll-state для отслеживания "прочитанных" новостей
+    val lazyListState = androidx.compose.foundation.lazy.rememberLazyListState()
+
+    // Когда элемент уходит за верхний край — помечаем прочитанным
+    LaunchedEffect(lazyListState.firstVisibleItemIndex) {
+        val idx = lazyListState.firstVisibleItemIndex
+        if (idx > 0) {
+            // Берём элемент что только что ушёл вверх (учитываем header items)
+            val headerCount = if (tickerText.isNotEmpty()) 3 else 2 // header + ticker + tabs
+            val newsIdx = idx - headerCount
+            if (newsIdx >= 0 && newsIdx < allItems.size) {
+                val item = allItems[newsIdx]
+                com.mirlanmamytov.ticker247.data.repository.NewsBuffer.markSeen(item.url)
+            }
+        }
+    }
+
     val filteredItems: List<NewsItem> = when (tabCategories.getOrElse(selectedTab) { "ALL" }) {
         "ALL"    -> allItems.toList()
         "URGENT" -> allItems.filter { it.category == "URGENT" }.ifEmpty {
@@ -157,7 +175,7 @@ fun MainHomeScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
     } else emptyList()
 
     Box(Modifier.fillMaxSize().background(bgColor)) {
-        LazyColumn(Modifier.fillMaxSize()) {
+        LazyColumn(Modifier.fillMaxSize(), state = lazyListState) {
             // Шапка с отступом под статус-бар
             item {
                 Row(

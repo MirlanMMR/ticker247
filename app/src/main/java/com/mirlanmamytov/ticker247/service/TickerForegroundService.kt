@@ -44,6 +44,7 @@ class TickerForegroundService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannels()
+        com.mirlanmamytov.ticker247.data.repository.NewsBuffer.init(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -188,7 +189,31 @@ class TickerForegroundService : Service() {
                         Log.d("Ticker247", "Firebase: ${firebaseItems.size} items")
                     } catch (e: Exception) { Log.e("Ticker247", "Firebase: ${e.message}") }
 
-                    Log.d("Ticker247", "allItems=${allItems.size} tickerItems=${tickerItems.size}")
+                    // 5. Телеграм-каналы — параллельно, по 5 каналов за раз
+                    try {
+                        val tgItems = com.mirlanmamytov.ticker247.network.TelegramParser.SOURCES
+                            .chunked(5) // группами по 5
+                            .flatMap { group ->
+                                group.mapNotNull { src ->
+                                    try {
+                                        val items = withContext(Dispatchers.IO) {
+                                            com.mirlanmamytov.ticker247.network.TelegramParser.fetchChannel(src)
+                                        }
+                                        items
+                                    } catch (e: Exception) { null }
+                                }.flatten()
+                            }
+                        allItems.addAll(tgItems)
+                        // Срочные из Телеграма — в тикер шторки
+                        tgItems.filter { it.priority >= 2 }.take(2)
+                            .forEach { tickerItems.add(0, "⚡ ${it.title.take(60)}") }
+                        Log.d("Ticker247", "Telegram: ${tgItems.size} items")
+                    } catch (e: Exception) { Log.e("Ticker247", "Telegram: ${e.message}") }
+
+                    // Обновляем буфер (без повторов)
+                    com.mirlanmamytov.ticker247.data.repository.NewsBuffer.addItems(allItems)
+
+                    Log.d("Ticker247", "allItems=${allItems.size} tickerItems=${tickerItems.size} buffer=${com.mirlanmamytov.ticker247.data.repository.NewsBuffer.size()}")
                     if (allItems.isEmpty()) {
                         Log.w("Ticker247", "allItems empty, skipping update")
                         delay(30_000L) // подождём 30 сек и попробуем снова
@@ -196,9 +221,10 @@ class TickerForegroundService : Service() {
                     }
 
                     withContext(Dispatchers.Main) {
-                        Log.d("Ticker247", "Updating DataBridge with ${allItems.size} items")
-                        DataBridge.setTickerAndNews(tickerItems, allItems)
-                        Log.d("Ticker247", "DataBridge updated: newsItems=${DataBridge.newsItems.size}")
+                        // Сортируем: непрочитанные первыми (как Instagram)
+                        val sortedForDisplay = com.mirlanmamytov.ticker247.data.repository.NewsBuffer.getSorted()
+                        Log.d("Ticker247", "Updating DataBridge: ${sortedForDisplay.size} items (${com.mirlanmamytov.ticker247.data.repository.NewsBuffer.unseenCount()} unseen)")
+                        DataBridge.setTickerAndNews(tickerItems, sortedForDisplay)
                     }
                 } catch (e: Exception) {
                     Log.e("Ticker247", "Fetch error: ${e.javaClass.simpleName}: ${e.message}", e)
