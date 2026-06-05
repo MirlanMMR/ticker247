@@ -80,9 +80,7 @@ fun MainHomeScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
 
     val isOnboardingDone by viewModel.isOnboardingDone.collectAsState()
     var showSettings by remember { mutableStateOf(false) }
-    var readerUrl by remember { mutableStateOf<String?>(null) }
-    var readerTitle by remember { mutableStateOf("") }
-    var readerSource by remember { mutableStateOf("") }
+    var selectedArticle by remember { mutableStateOf<NewsItem?>(null) }
     var selectedTab by remember { mutableStateOf(0) }
     val selectedCategories = remember { mutableStateListOf<MainAppCategory>() }
     var showManualSetup by remember { mutableStateOf(false) }
@@ -95,12 +93,13 @@ fun MainHomeScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
     val subColor     = if (isDark) Color(0xFF6B7280) else Color(0xFF9CA3AF)
     val accentColor  = Color(0xFF00D4FF)
 
-    // Reader
-    if (readerUrl != null) {
-        BackHandler { readerUrl = null }
-        ReaderScreen(
-            url = readerUrl!!, title = readerTitle, source = readerSource,
-            isDark = isDark, onBack = { readerUrl = null }
+    // In-App Article Reader
+    if (selectedArticle != null) {
+        BackHandler { selectedArticle = null }
+        com.mirlanmamytov.ticker247.reader.ArticleScreen(
+            item = selectedArticle!!,
+            isDark = isDark,
+            onBack = { selectedArticle = null }
         )
         return
     }
@@ -242,15 +241,13 @@ fun MainHomeScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
                 items(sorted, key = { it.url + it.title }) { item ->
                     when (item.category) {
                         "CURRENCY" -> CurrencyCard(item, isDark, textColor, subColor)
-                        "CRYPTO"   -> CryptoCard(item, isDark, textColor, subColor)
+                        "CRYPTO"   -> Box(Modifier.clickable { selectedArticle = item }) {
+                            CryptoCard(item, isDark, textColor, subColor)
+                        }
                         else -> FeedCard(item, isDark, textColor, subColor) {
-                            if (item.url.isNotEmpty()) {
-                                try {
-                                    CustomTabsIntent.Builder().setShowTitle(true).build()
-                                        .launchUrl(context, Uri.parse(item.url))
-                                } catch (e: Exception) {
-                                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(item.url)))
-                                }
+                            // Открываем in-app ридер вместо браузера
+                            selectedArticle = item
+                            if (false) { // old browser code — не удаляем, оставляем fallback
                             }
                         }
                     }
