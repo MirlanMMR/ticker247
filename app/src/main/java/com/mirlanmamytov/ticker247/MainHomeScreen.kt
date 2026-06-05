@@ -141,6 +141,28 @@ fun MainHomeScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
     val allItems by DataBridge.newsItemsFlow.collectAsStateWithLifecycle()
     val tickerText by DataBridge.tickerFlow.collectAsStateWithLifecycle()
 
+    // Pull-to-refresh
+    var isRefreshing by remember { mutableStateOf(false) }
+    val refreshState = androidx.compose.material3.pulltorefresh.rememberPullToRefreshState()
+    LaunchedEffect(isRefreshing) {
+        if (isRefreshing) {
+            com.mirlanmamytov.ticker247.service.TickerForegroundService.refresh(context)
+            kotlinx.coroutines.delay(2000)
+            isRefreshing = false
+        }
+    }
+
+    // Открыть статью из уведомления (deep link)
+    LaunchedEffect(DataBridge.pendingArticleUrl) {
+        val url = DataBridge.pendingArticleUrl ?: return@LaunchedEffect
+        if (url.isEmpty()) return@LaunchedEffect
+        val article = allItems.find { it.url == url }
+        if (article != null) {
+            selectedArticle = article
+            DataBridge.pendingArticleUrl = ""
+        }
+    }
+
     // Scroll-state для отслеживания "прочитанных" новостей
     val lazyListState = androidx.compose.foundation.lazy.rememberLazyListState()
 
@@ -160,10 +182,12 @@ fun MainHomeScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
 
     val filteredItems: List<NewsItem> = when (tabCategories.getOrElse(selectedTab) { "ALL" }) {
         "ALL"    -> allItems.toList()
-        "URGENT" -> allItems.filter { it.category == "URGENT" }.ifEmpty {
-            allItems.filter { it.category in setOf("NEWS", "SPORT", "TECH") }
-                .sortedByDescending { it.priority }.take(15)
-        }
+        // Срочно = категория URGENT ИЛИ высокий приоритет (priority >= 2)
+        "URGENT" -> allItems.filter { it.category == "URGENT" || it.priority >= 2 }
+            .ifEmpty {
+                allItems.filter { it.category in setOf("NEWS", "SPORT", "TECH") }
+                    .sortedByDescending { it.priority }.take(15)
+            }
         else -> allItems.filter { it.category == tabCategories.getOrElse(selectedTab) { "ALL" } }
     }
 
@@ -173,7 +197,12 @@ fun MainHomeScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
         catch (e: Exception) { filteredItems }
     } else emptyList()
 
-    Box(Modifier.fillMaxSize().background(bgColor)) {
+    androidx.compose.material3.pulltorefresh.PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = { isRefreshing = true },
+        state = refreshState,
+        modifier = Modifier.fillMaxSize().background(bgColor)
+    ) {
         LazyColumn(Modifier.fillMaxSize(), state = lazyListState) {
             // Шапка с отступом под статус-бар
             item {
@@ -266,7 +295,7 @@ fun MainHomeScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
         ) {
             Text("Created by MMR®", fontSize = 11.sp, color = subColor, fontWeight = FontWeight.Light)
         }
-    }
+    } // end PullToRefreshBox
 }
 
 // ── БЕГУЩАЯ СТРОКА ──────────────────────────────────────────────────────────

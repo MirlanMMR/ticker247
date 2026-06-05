@@ -40,6 +40,8 @@ class TickerForegroundService : Service() {
     )
     private var isFetchLoopRunning = false
     private var isRotationLoopRunning = false
+    // Уже завибрировавшие URGENT-посты — не вибрируем повторно
+    private val vibratedUrgentIds = mutableSetOf<String>()
 
     override fun onCreate() {
         super.onCreate()
@@ -247,8 +249,16 @@ class TickerForegroundService : Service() {
                         index++
                         val isUrgent = line.startsWith("⚡")
                         val isImportant = line.startsWith("🏆") || line.startsWith("📰")
+
+                        // ВИБРАЦИЯ: только первый раз на каждый уникальный URGENT-пост
+                        val lineKey = line.take(40)
+                        val shouldVibrate = isUrgent && lineKey !in vibratedUrgentIds
+                        if (shouldVibrate) vibratedUrgentIds.add(lineKey)
+
+                        // Повторный показ URGENT — без вибрации (используем info-канал)
                         val channelId = when {
-                            isUrgent -> "ticker_urgent"
+                            isUrgent && shouldVibrate -> "ticker_urgent"   // вибрирует один раз
+                            isUrgent -> "ticker_important"                  // повтор — тихо
                             isImportant -> "ticker_important"
                             else -> "ticker_info"
                         }
@@ -257,7 +267,18 @@ class TickerForegroundService : Service() {
                             isImportant -> R.drawable.ic_lightning_blue
                             else -> R.drawable.ic_lightning_white
                         }
-                        val notification = buildNotification(line, channelId, iconRes)
+
+                        // Находим URL статьи для deep link из уведомления
+                        val urgentItem = if (isUrgent) {
+                            DataBridge.newsItems.firstOrNull {
+                                (it.category == "URGENT" || it.priority >= 2) &&
+                                line.contains(it.title.take(30))
+                            }
+                        } else null
+
+                        val notification = buildNotificationWithUrl(
+                            line, channelId, iconRes, urgentItem?.url ?: ""
+                        )
                         getSystemService(NotificationManager::class.java)?.notify(1001, notification)
                     }
                 } catch (e: Exception) {
@@ -489,15 +510,27 @@ class TickerForegroundService : Service() {
         return rates.joinToString(" | ")
     }
 
-    private fun buildNotification(text: String, channelId: String, iconRes: Int): Notification {
+    private fun buildNotification(text: String, channelId: String, iconRes: Int): Notification =
+        buildNotificationWithUrl(text, channelId, iconRes, "")
+
+    private fun buildNotificationWithUrl(
+        text: String, channelId: String, iconRes: Int, articleUrl: String
+    ): Notification {
+        // Intent с URL статьи для открытия при тапе
+        val tapIntent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            if (articleUrl.isNotEmpty()) putExtra("article_url", articleUrl)
+        }
         val contentIntent = PendingIntent.getActivity(
-            this, 0, Intent(this, MainActivity::class.java),
+            this, articleUrl.hashCode(), tapIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         return NotificationCompat.Builder(this, channelId)
             .setSmallIcon(iconRes)
             .setContentText(text)
-            .setOngoing(true)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setOngoing(channelId == "ticker_info")  // только info — постоянное
+            .setAutoCancel(channelId != "ticker_info") // urgent/important — закрывается при тапе
             .setShowWhen(false)
             .setContentIntent(contentIntent)
             .build()

@@ -34,4 +34,7 @@ object DataBridge {
     fun setNewsItems(items: List<NewsItem>) {
         _newsItems.value = items
     }
+
+    /** URL статьи для открытия из уведомления (deep link) */
+    var pendingArticleUrl: String by mutableStateOf("")
 }

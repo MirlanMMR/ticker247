@@ -29,15 +29,25 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        val intent = Intent(this, com.mirlanmamytov.ticker247.service.TickerForegroundService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent)
-        } else {
-            startService(intent)
-        }
+        val svcIntent = Intent(this, com.mirlanmamytov.ticker247.service.TickerForegroundService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(svcIntent)
+        else startService(svcIntent)
 
-        setContent {
-            MainHomeScreen()
+        // Deep link из уведомления
+        handleNotificationIntent(intent)
+
+        setContent { MainHomeScreen() }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleNotificationIntent(intent)
+    }
+
+    private fun handleNotificationIntent(intent: Intent?) {
+        val url = intent?.getStringExtra("article_url") ?: return
+        if (url.isNotEmpty()) {
+            DataBridge.pendingArticleUrl = url
         }
     }
 }
