@@ -23,6 +23,14 @@ object ApiClient {
         .build()
         .create(CoinGeckoApi::class.java)
 
+    // CoinCap — бесплатный без ключа, заменяет CoinGecko для цен
+    val coinCap: CoinCapApi = Retrofit.Builder()
+        .baseUrl("https://api.coincap.io/v2/")
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(CoinCapApi::class.java)
+
     val nbkr: NbkrApi = Retrofit.Builder()
         .baseUrl("https://www.nbkr.kg/")
         .client(okHttpClient)

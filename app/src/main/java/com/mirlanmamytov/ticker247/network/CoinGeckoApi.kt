@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 import retrofit2.http.GET
 import retrofit2.http.Query
 
+// CoinGecko (оставляем для совместимости)
 data class CoinData(
     val id: String,
     val symbol: String,
@@ -22,11 +23,32 @@ interface CoinGeckoApi {
         @Query("sparkline") sparkline: Boolean = false,
         @Query("price_change_percentage") priceChangePercentage: String = "24h"
     ): List<CoinData>
+}
 
-    // Старый эндпоинт для бегущей строки
-    @GET("simple/price")
-    suspend fun getPrices(
-        @Query("ids") ids: String = "bitcoin,ethereum,solana",
-        @Query("vs_currencies") vsCurrencies: String = "usd"
-    ): Map<String, Map<String, Double>>
+// ── CoinCap API (бесплатный, без ключа) ──────────────────────────────────────
+
+data class CoinCapAsset(
+    val id: String,
+    val symbol: String,
+    val name: String,
+    val priceUsd: String?,
+    val changePercent24Hr: String?,
+    val marketCapUsd: String?
+) {
+    val currentPrice: Double? get() = priceUsd?.toDoubleOrNull()
+    val change24h: Double? get() = changePercent24Hr?.toDoubleOrNull()
+    // Иконки через CoinGecko CDN по symbol
+    val imageUrl: String get() = "https://assets.coincap.io/assets/icons/${symbol.lowercase()}@2x.png"
+}
+
+data class CoinCapResponse(
+    val data: List<CoinCapAsset>
+)
+
+interface CoinCapApi {
+    @GET("assets")
+    suspend fun getAssets(
+        @Query("ids") ids: String = "bitcoin,ethereum,tether,binance-coin,solana,ripple",
+        @Query("limit") limit: Int = 6
+    ): CoinCapResponse
 }

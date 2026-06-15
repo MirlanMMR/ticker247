@@ -267,20 +267,16 @@ fun ArticleScreen(
                     Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Поделиться — весь текст в сообщении, не нужен Ticker
+                    // Поделиться — полный текст статьи
                     OutlinedButton(
                         onClick = {
-                            val body = content?.body?.take(600) ?: item.summary.take(600)
-                            val suffix = if ((content?.body?.length ?: 0) > 600) "..." else ""
-                            val sourceLabel = if (item.source.startsWith("@")) item.source else "📰 ${item.source}"
+                            val body = content?.body?.take(800) ?: item.summary.take(800)
+                            val suffix = if ((content?.body?.length ?: 0) > 800) "..." else ""
                             val shareText = buildString {
-                                append("⚡ ${item.title}\n\n")
-                                if (body.isNotEmpty() && body != item.title) {
-                                    append("$body$suffix\n\n")
-                                }
-                                append("$sourceLabel\n")
-                                if (item.url.isNotEmpty()) append("🔗 ${item.url}\n")
-                                append("\n📱 via Ticker 24/7")
+                                append("${item.title}\n\n")
+                                if (body.isNotEmpty() && body != item.title) append("$body$suffix\n\n")
+                                if (item.url.startsWith("http")) append("🔗 ${item.url}\n\n")
+                                append("📲 Подписывайся: https://t.me/t247feed")
                             }
                             val intent = Intent(Intent.ACTION_SEND).apply {
                                 type = "text/plain"

@@ -155,8 +155,17 @@ object ArticleExtractor {
         ).maxByOrNull { it.text().length } ?: doc.body()
 
         // Параграфы
+        val spamPhrases = listOf(
+            "забыл пароль", "регистрация", "войти", "чужой компьютер",
+            "подписаться", "subscribe", "sign in", "log in", "cookie",
+            "javascript", "включите js", "нажмите здесь", "читайте также",
+            "поделиться", "добавить комментарий", "оставить комментарий"
+        )
         val paragraphs = contentEl.select("p, h2, h3, h4, blockquote, li")
-            .filter { it.text().trim().length > 20 }
+            .filter { el ->
+                val t = el.text().trim()
+                t.length > 20 && spamPhrases.none { t.lowercase().contains(it) }
+            }
 
         val bodyHtml = paragraphs.joinToString("\n") { el ->
             when (el.tagName()) {

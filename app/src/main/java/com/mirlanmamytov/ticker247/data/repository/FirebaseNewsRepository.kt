@@ -31,7 +31,8 @@ object FirebaseNewsRepository {
                             source = child.child("source").getValue(String::class.java) ?: "",
                             category = child.child("category").getValue(String::class.java) ?: "NEWS",
                             publishedAt = child.child("publishedAt").getValue(Long::class.java) ?: System.currentTimeMillis(),
-                            priority = child.child("priority").getValue(Int::class.java) ?: 0
+                            priority = child.child("priority").getValue(Int::class.java) ?: 0,
+                            language = child.child("language").getValue(String::class.java) ?: "ru"
                         )
                         if (item.title.isNotEmpty()) items.add(item)
                     }
@@ -74,15 +75,17 @@ object FirebaseNewsRepository {
                             else -> "🌍 ВИРАЛЬНО В МИРЕ"
                         }
                         for (child in snapshot.child(region).children) {
+                            val url = child.child("url").getValue(String::class.java) ?: ""
                             val item = NewsItem(
-                                url = child.child("url").getValue(String::class.java) ?: "",
+                                url = url,
                                 title = child.child("title").getValue(String::class.java) ?: "",
                                 summary = child.child("summary").getValue(String::class.java) ?: "",
                                 imageUrl = child.child("imageUrl").getValue(String::class.java),
                                 source = label,
                                 category = "VIRAL",
                                 publishedAt = child.child("publishedAt").getValue(Long::class.java) ?: System.currentTimeMillis(),
-                                priority = 1
+                                priority = 1,
+                                isVideo = url.contains("youtube.com") || url.contains("youtu.be")
                             )
                             if (item.title.isNotEmpty()) items.add(item)
                         }
@@ -91,6 +94,18 @@ object FirebaseNewsRepository {
                 } catch (e: Exception) {
                     cont.resume(emptyList())
                 }
+            }
+            override fun onCancelled(error: DatabaseError) { cont.resume(emptyList()) }
+        })
+    }
+
+    suspend fun fetchIndices(): List<String> = suspendCancellableCoroutine { cont ->
+        database.getReference("indices/items").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val items = snapshot.children.mapNotNull {
+                    it.child("display").getValue(String::class.java)
+                }
+                cont.resume(items)
             }
             override fun onCancelled(error: DatabaseError) { cont.resume(emptyList()) }
         })

@@ -13,10 +13,20 @@ data class NewsItem(
     val category: String,
     val publishedAt: Long = System.currentTimeMillis(),
     val priority: Int = 0,
+    // Тип контента
+    val isVideo: Boolean = false,
     // Крипта
     val cryptoName: String? = null,
     val cryptoSymbol: String? = null,
     val cryptoPrice: Double? = null,
     val cryptoChange24h: Double? = null,
-    val cryptoIconUrl: String? = null
+    val cryptoIconUrl: String? = null,
+    // Популярность — сколько источников написали об этой теме (кросс-источниковый рейтинг)
+    val sourceCount: Int = 1,
+    // Просмотры из Telegram (парсим из HTML канала)
+    val telegramViews: Int = 0,
+    // Совпадает с Google Trends KG
+    val isTrending: Boolean = false,
+    // Язык контента — для фильтрации по языку устройства
+    val language: String = "ru"
 )

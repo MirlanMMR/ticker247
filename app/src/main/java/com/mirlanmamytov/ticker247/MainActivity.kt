@@ -2,52 +2,97 @@ package com.mirlanmamytov.ticker247
 
 import android.Manifest
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import com.mirlanmamytov.ticker247.data.datastore.AppSettings
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import com.mirlanmamytov.ticker247.service.TickerForegroundService
+import com.mirlanmamytov.ticker247.ui.screens.SignInScreen
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var appSettings: AppSettings
+    private lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Переключаемся на основную тему сразу — сплэш-фон держится до первого кадра Compose
+        setTheme(R.style.Theme_Ticker247)
         super.onCreate(savedInstanceState)
+        prefs = getSharedPreferences("ticker247_prefs", MODE_PRIVATE)
+        handleDeepLink(intent)
 
-        com.mirlanmamytov.ticker247.network.ApiClient.youtubeApiKey =
-            "AIzaSyBFVBAf07C3id09M4R2qapTVMG8SKUt7Vs"
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101)
-            }
+        setContent {
+            AppRoot(
+                isFirstLaunch = prefs.getBoolean("first_launch_done", false).not(),
+                onFirstLaunchDone = {
+                    prefs.edit().putBoolean("first_launch_done", true).apply()
+                }
+            )
         }
-
-        val svcIntent = Intent(this, com.mirlanmamytov.ticker247.service.TickerForegroundService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(svcIntent)
-        else startService(svcIntent)
-
-        // Deep link из уведомления
-        handleNotificationIntent(intent)
-
-        setContent { MainHomeScreen() }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        handleNotificationIntent(intent)
+        setIntent(intent)
+        handleDeepLink(intent)
     }
 
-    private fun handleNotificationIntent(intent: Intent?) {
-        val url = intent?.getStringExtra("article_url") ?: return
-        if (url.isNotEmpty()) {
-            DataBridge.pendingArticleUrl = url
+    private fun handleDeepLink(intent: Intent?) {
+        intent?.getStringExtra("article_url")?.takeIf { it.isNotEmpty() }?.let {
+            DataBridge.pendingArticleUrl = it
         }
+        intent?.getStringExtra("open_tab")?.takeIf { it.isNotEmpty() }?.let {
+            DataBridge.pendingTab = it
+        }
+    }
+}
+
+@Composable
+fun AppRoot(
+    isFirstLaunch: Boolean,
+    onFirstLaunchDone: () -> Unit
+) {
+    val context = LocalContext.current
+    // Сплэш показываем всегда — он быстрый (1.5с) и создаёт фирменный вход в приложение
+    var showSplash by remember { mutableStateOf(true) }
+
+    // Разрешение запрашиваем ПОСЛЕ сплэша — чтобы не перекрывать экран "Тихо о важном"
+    val notifPermLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        android.util.Log.d("Ticker247", "POST_NOTIFICATIONS granted: $granted")
+    }
+
+    if (showSplash) {
+        SignInScreen(
+            isFirstLaunch = isFirstLaunch,
+            onSignedIn = {
+                onFirstLaunchDone()
+                showSplash = false
+            }
+        )
+    } else {
+        LaunchedEffect(Unit) {
+            TickerForegroundService.startService(context)
+            // Запрашиваем разрешение уже после того как главный экран отрисован
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val alreadyGranted = ContextCompat.checkSelfPermission(
+                    context, Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+                if (!alreadyGranted) {
+                    kotlinx.coroutines.delay(1500)  // даём ленте появиться
+                    notifPermLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+        }
+        MainHomeScreen()
     }
 }
