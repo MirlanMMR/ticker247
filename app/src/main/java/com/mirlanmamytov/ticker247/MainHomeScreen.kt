@@ -1230,13 +1230,26 @@ fun CryptoDetailSheet(cryptos: List<NewsItem>) {
 fun HeroCarousel(onOpenTikTok: (List<NewsItem>, Int) -> Unit) {
     val allItems by DataBridge.newsItemsFlow.collectAsState()
 
-    // Отбираем: приоритет 2+ или есть фото — только новости, без крипты/валюты
+    // Отбираем: приоритет 2+ или есть фото — только новости, без крипты/валюты/спама
     val heroItems = remember(allItems) {
         val isNews = { it: NewsItem -> it.category !in setOf("CURRENCY", "CRYPTO") && it.cryptoSymbol == null }
-        (allItems.filter { isNews(it) && (it.priority >= 2 || it.category == "URGENT") } +
-         allItems.filter { isNews(it) && it.imageUrl != null })
+        val notSpam = { it: NewsItem -> !SPAM_PATTERNS.containsMatchIn(it.title) }
+        val candidates = (allItems.filter { isNews(it) && notSpam(it) && (it.priority >= 2 || it.category == "URGENT") } +
+         allItems.filter { isNews(it) && notSpam(it) && it.imageUrl != null && !it.isVideo })
             .distinctBy { it.url.ifEmpty { it.title } }
-            .take(10)
+        // Не более 1 видео в карусели, тема-дедуп
+        val seenWords = mutableSetOf<String>()
+        var videoCount = 0
+        candidates.filter { item ->
+            val words = item.title.lowercase().split(Regex("[\\s\\-:,.!?\"']+")).filter { it.length > 4 }.toSet()
+            if (item.isVideo) {
+                if (videoCount >= 1) return@filter false
+                if (words.any { it in seenWords }) return@filter false
+                videoCount++
+            }
+            seenWords += words
+            true
+        }.take(10)
     }
 
     if (heroItems.isEmpty()) return
