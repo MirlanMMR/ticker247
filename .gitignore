@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Локальные бэкапы
+_backup_*/
+.backup_*/
