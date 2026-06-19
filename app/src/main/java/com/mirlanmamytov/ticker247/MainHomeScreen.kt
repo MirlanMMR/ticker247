@@ -224,6 +224,9 @@ private val SPAM_PATTERNS = Regex(
     """minecraft|майнкрафт|roblox|роблокс|fortnite|форtnite|gta online|""" +
     """в игре.*ограбил|ограбление в игре|игрок.*украл|украл в minecraft|""" +
     """эпичное ограбл|жителя манкрафт|жителя minecraft|""" +
+    // Музыкальные клипы и лирик-видео — не новости
+    """official music video|official video|official audio|official mv|lyric video|""" +
+    """music video|official clip|премьера клипа|""" +
     // Блогерский псевдоконтент
     """блогер.*заработал|блогер.*миллион|тиктокер|youtuber|ютубер.*скандал|""" +
     """стример.*задонатил|донат на стриме|""" +
