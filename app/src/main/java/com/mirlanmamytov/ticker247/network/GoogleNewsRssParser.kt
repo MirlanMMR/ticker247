@@ -169,7 +169,8 @@ object GoogleNewsRssParser {
             sdf.parse(s)?.time ?: System.currentTimeMillis()
         } catch (e: Exception) {
             try {
-                java.time.Instant.parse(s).toEpochMilli()
+                val sdf2 = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH)
+                sdf2.parse(s)?.time ?: System.currentTimeMillis()
             } catch (e2: Exception) {
                 System.currentTimeMillis()
             }

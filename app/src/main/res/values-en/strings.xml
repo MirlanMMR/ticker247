@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ticker 24/7</string>
+    <string name="tab_all">All</string>
+    <string name="tab_kg">🇰🇬 KG</string>
+    <string name="tab_urgent">⚡ Breaking</string>
+    <string name="tab_good">😊 Good News</string>
+    <string name="tab_stars">⭐ Stars</string>
+    <string name="tab_health">🏥 Health</string>
+    <string name="tab_money">💰 Money</string>
+    <string name="tab_life">💡 Lifestyle</string>
+    <string name="tab_world">🌍 World</string>
+    <string name="tab_news">News</string>
+    <string name="tab_sport">Sport</string>
+    <string name="tab_tech">📱 Tech</string>
+    <string name="tab_tours">✈️ Travel</string>
+    <string name="tab_currency">Currency</string>
+    <string name="tab_crypto">Crypto</string>
+    <string name="tab_culture">Cinema</string>
+    <string name="tab_auto">Auto</string>
+    <string name="tab_fashion">Fashion</string>
+    <string name="share">Share</string>
+    <string name="back">Back</string>
+    <string name="close">Close</string>
+    <string name="loading">Loading news…</string>
+    <string name="subscribe_cta">📲 Follow us: https://t.me/t247feed</string>
+    <string name="first_launch_title">First launch on this device!</string>
+    <string name="first_launch_sub">Loading the most important news from around the world…</string>
+    <string name="first_launch_note">You can close the app —\nyou won\'t miss anything.\nWe\'ll notify you.</string>
+    <string name="notif_urgent">⚡ Breaking</string>
+    <string name="notif_important">📌 Important</string>
+    <string name="headline">⚡ Top Stories</string>
+    <string name="video_load_error">Failed to load video</string>
+    <string name="feed_end_sub">new stories load automatically</string>
+</resources>

@@ -57,6 +57,7 @@ class TickerForegroundService : Service() {
         }
     }
 
+    @android.annotation.SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate() {
         super.onCreate()
         val filter = android.content.IntentFilter(ACTION_DISMISSED)
@@ -137,9 +138,9 @@ class TickerForegroundService : Service() {
 
                         // Пересобираем тикер: свежие финансы + существующие новостные заголовки
                         val tickerItems    = mutableListOf<String>()
-                    val tickerCurrency = mutableListOf<String>()
-                    val tickerFuel     = mutableListOf<String>()
-                    val tickerCrypto   = mutableListOf<String>()
+                        val tickerCurrency = mutableListOf<String>()
+                        val tickerFuel     = mutableListOf<String>()
+                        val tickerCrypto   = mutableListOf<String>()
                         newItems.firstOrNull { it.category == "CURRENCY" }?.let { cur ->
                             val parts = cur.title.split(" | ")
                             parts.firstOrNull { it.startsWith("USD") }?.let { tickerItems.add("💵 $it сом") }

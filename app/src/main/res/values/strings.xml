@@ -1,3 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Ticker 24/7</string>
+
+    <!-- Tabs -->
+    <string name="tab_all">Все</string>
+    <string name="tab_kg">🇰🇬 КГ</string>
+    <string name="tab_urgent">⚡ Срочно</string>
+    <string name="tab_good">😊 Хорошее</string>
+    <string name="tab_stars">⭐ Звёзды</string>
+    <string name="tab_health">🏥 Здоровье</string>
+    <string name="tab_money">💰 Деньги</string>
+    <string name="tab_life">💡 Лайфхак</string>
+    <string name="tab_world">🌍 Мир</string>
+    <string name="tab_news">Новости</string>
+    <string name="tab_sport">Спорт</string>
+    <string name="tab_tech">📱 Техно</string>
+    <string name="tab_tours">✈️ Туры</string>
+    <string name="tab_currency">Валюта</string>
+    <string name="tab_crypto">Крипта</string>
+    <string name="tab_culture">Кино</string>
+    <string name="tab_auto">Авто</string>
+    <string name="tab_fashion">Мода</string>
+
+    <!-- UI -->
+    <string name="share">Поделиться</string>
+    <string name="back">Назад</string>
+    <string name="close">Закрыть</string>
+    <string name="loading">Загружаем новости…</string>
+    <string name="subscribe_cta">📲 Подписывайся: https://t.me/t247feed</string>
+    <string name="first_launch_title">Первый запуск на этом устройстве!</string>
+    <string name="first_launch_sub">Загружаем самое важное со всего мира…</string>
+    <string name="first_launch_note">Можете закрыть приложение —\nвы ничего не пропустите.\nМы вас оповестим.</string>
+    <string name="notif_urgent">⚡ Срочно</string>
+    <string name="notif_important">📌 Важно</string>
+    <string name="headline">⚡ Главное</string>
+    <string name="video_load_error">Не удалось загрузить видео</string>
+    <string name="feed_end_sub">новые новости подгружаются автоматически</string>
 </resources>

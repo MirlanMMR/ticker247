@@ -17,6 +17,15 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        // Gemini API key — добавь GEMINI_API_KEY=your_key в local.properties
+        val geminiKey = rootProject.file("local.properties")
+            .takeIf { it.exists() }
+            ?.readLines()
+            ?.firstOrNull { it.startsWith("GEMINI_API_KEY=") }
+            ?.substringAfter("GEMINI_API_KEY=")
+            ?.trim() ?: ""
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiKey\"")
     }
 
     compileOptions {
@@ -30,6 +39,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
@@ -105,4 +115,7 @@ dependencies {
 
     // Google Sign-In
     implementation("com.google.android.gms:play-services-auth:21.2.0")
+
+    // YouTube Player
+    implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
 }

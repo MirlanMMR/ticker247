@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ticker 24/7</string>
+    <string name="tab_all">Todo</string>
+    <string name="tab_kg">🇰🇬 KG</string>
+    <string name="tab_urgent">⚡ Urgente</string>
+    <string name="tab_good">😊 Buenas</string>
+    <string name="tab_stars">⭐ Estrellas</string>
+    <string name="tab_health">🏥 Salud</string>
+    <string name="tab_money">💰 Dinero</string>
+    <string name="tab_life">💡 Estilo</string>
+    <string name="tab_world">🌍 Mundo</string>
+    <string name="tab_news">Noticias</string>
+    <string name="tab_sport">Deporte</string>
+    <string name="tab_tech">📱 Tecnología</string>
+    <string name="tab_tours">✈️ Viajes</string>
+    <string name="tab_currency">Divisa</string>
+    <string name="tab_crypto">Cripto</string>
+    <string name="tab_culture">Cine</string>
+    <string name="tab_auto">Autos</string>
+    <string name="tab_fashion">Moda</string>
+    <string name="share">Compartir</string>
+    <string name="back">Volver</string>
+    <string name="close">Cerrar</string>
+    <string name="loading">Cargando noticias…</string>
+    <string name="subscribe_cta">📲 Síguenos: https://t.me/t247feed</string>
+    <string name="first_launch_title">¡Primer inicio en este dispositivo!</string>
+    <string name="first_launch_sub">Cargando lo más importante del mundo…</string>
+    <string name="first_launch_note">Puedes cerrar la app —\nno te perderás nada.\nTe notificaremos.</string>
+    <string name="notif_urgent">⚡ Urgente</string>
+    <string name="notif_important">📌 Importante</string>
+    <string name="headline">⚡ Destacado</string>
+    <string name="video_load_error">No se pudo cargar el video</string>
+    <string name="feed_end_sub">las noticias se actualizan automáticamente</string>
+</resources>

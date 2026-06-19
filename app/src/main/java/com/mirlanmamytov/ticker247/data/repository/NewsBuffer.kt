@@ -13,7 +13,7 @@ import com.mirlanmamytov.ticker247.data.model.NewsItem
  */
 object NewsBuffer {
 
-    private const val MAX_BUFFER = 80           // сколько хранить в памяти
+    private const val MAX_BUFFER = 120          // сколько хранить в памяти
     private const val MAX_SEEN   = 2000         // сколько помнить "прочитанных"
     private const val PREFS_NAME = "news_buffer"
     private const val KEY_SEEN   = "seen_urls"
@@ -124,14 +124,16 @@ object NewsBuffer {
             // Исключение: если язык неизвестен ("unknown"/"other") — показываем
             run {
                 val itemLang = item.language
-                if (itemLang == "unknown" || itemLang == "other" || itemLang.isEmpty()) true
-                else if (userLang in cyrillicLangs) itemLang in cyrillicLangs
-                else itemLang == userLang
+                when {
+                    itemLang == "unknown" || itemLang == "other" || itemLang.isEmpty() -> true
+                    userLang in cyrillicLangs -> itemLang in cyrillicLangs
+                    else -> itemLang == userLang
+                }
             }
         }
         val unseen  = rest.filter { it.url !in seenUrls }.sortedByDescending { qualityScore(it) }
         val seen    = rest.filter { it.url in seenUrls  }.sortedByDescending { qualityScore(it) }
-        return finance + (unseen + seen).take(50)
+        return finance + (unseen + seen).take(80)
     }
 
     /** Помечаем новость прочитанной (когда она ушла за верхний край) */

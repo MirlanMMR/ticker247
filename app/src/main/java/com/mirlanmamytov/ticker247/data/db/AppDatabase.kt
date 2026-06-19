@@ -9,7 +9,7 @@ import com.mirlanmamytov.ticker247.data.model.YouTubeChannel
 
 @Database(
     entities = [NewsItem::class, YouTubeChannel::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

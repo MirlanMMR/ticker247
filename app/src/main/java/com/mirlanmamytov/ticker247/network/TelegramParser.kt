@@ -271,7 +271,8 @@ object TelegramParser {
 
     private fun parseDate(iso: String): Long {
         return try {
-            java.time.Instant.parse(iso).toEpochMilli()
+            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.ENGLISH)
+            sdf.parse(iso)?.time ?: System.currentTimeMillis()
         } catch (e: Exception) {
             System.currentTimeMillis()
         }

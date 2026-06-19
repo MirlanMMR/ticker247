@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Фон: индиго → фиолетовый градиент -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="135"
+                android:startColor="#1E1B4B"
+                android:centerColor="#312E81"
+                android:endColor="#4C1D95"
+                android:type="linear" />
+        </shape>
+    </item>
+
+    <!-- Логотип ⚡ по центру — белый круг + молния -->
+    <item
+        android:gravity="center"
+        android:width="120dp"
+        android:height="120dp">
+        <layer-list>
+            <!-- Круг с мягким свечением -->
+            <item>
+                <shape android:shape="oval">
+                    <solid android:color="#33A78BFA" />
+                </shape>
+            </item>
+            <item
+                android:left="8dp"
+                android:top="8dp"
+                android:right="8dp"
+                android:bottom="8dp">
+                <shape android:shape="oval">
+                    <solid android:color="#663730A3" />
+                </shape>
+            </item>
+            <item
+                android:left="16dp"
+                android:top="16dp"
+                android:right="16dp"
+                android:bottom="16dp">
+                <shape android:shape="oval">
+                    <solid android:color="#FF3730A3" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+</layer-list>

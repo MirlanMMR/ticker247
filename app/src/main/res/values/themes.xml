@@ -1,5 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Основная тема приложения -->
+    <style name="Theme.Ticker247" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">#FF1E1B4B</item>
+        <item name="android:statusBarColor">#FF1E1B4B</item>
+        <item name="android:navigationBarColor">#FF1E1B4B</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
 
-    <style name="Theme.Ticker247" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Сплэш-тема: показывается пока грузится Compose -->
+    <style name="Theme.Ticker247.Splash" parent="Theme.Ticker247">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:windowFullscreen">false</item>
+        <!-- windowSplashScreenBackground requires API 31, handled in values-v31/themes.xml -->
+    </style>
 </resources>
