@@ -1,5 +1,6 @@
 package com.mirlanmamytov.ticker247
 
+import androidx.compose.ui.res.stringResource
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -139,6 +140,27 @@ fun openYouTube(context: Context, url: String) {
     }
 }
 
+@Composable
+fun localizedFeedTabs(): List<String> = listOf(
+    stringResource(R.string.tab_all),
+    stringResource(R.string.tab_kg),
+    stringResource(R.string.tab_urgent),
+    stringResource(R.string.tab_good),
+    stringResource(R.string.tab_stars),
+    stringResource(R.string.tab_health),
+    stringResource(R.string.tab_money),
+    stringResource(R.string.tab_life),
+    stringResource(R.string.tab_world),
+    stringResource(R.string.tab_news),
+    stringResource(R.string.tab_sport),
+    stringResource(R.string.tab_tech),
+    stringResource(R.string.tab_tours),
+    stringResource(R.string.tab_currency),
+    stringResource(R.string.tab_crypto),
+    stringResource(R.string.tab_culture),
+    stringResource(R.string.tab_auto),
+    stringResource(R.string.tab_fashion),
+)
 val feedTabs      = listOf("Все", "🇰🇬 КГ", "⚡ Срочно", "😊 Хорошее", "⭐ Звёзды", "🏥 Здоровье", "💰 Деньги", "💡 Лайфхак", "🌍 Мир", "Новости", "Спорт", "📱 Техно", "✈️ Туры", "Валюта", "Крипта", "Кино", "Авто", "Мода")
 val tabCategories = listOf("ALL", "KG", "URGENT", "GOOD", "STARS", "HEALTH", "MONEY", "LIFE", "WORLD", "NEWS", "SPORT", "TECH", "TOURS", "CURRENCY", "CRYPTO", "CULTURE", "AUTO", "FASHION")
 
@@ -524,7 +546,24 @@ fun sortItems(items: List<NewsItem>, cat: String): List<NewsItem> {
         }
     )
 
-    return if (cat == "ALL") interleave(sorted) else sorted
+    // Ограничиваем видео: не более 3 в ленте, не более 1 на тему
+    val finalList = if (cat == "ALL" || cat == "URGENT") {
+        val topicWords = mutableSetOf<String>()
+        var videoCount = 0
+        sorted.filter { item ->
+            if (!item.isVideo) return@filter true
+            if (videoCount >= 3) return@filter false
+            // Тема = первые 2 значимых слова заголовка
+            val words = item.title.lowercase().split(Regex("\\s+"))
+                .filter { it.length > 4 }.take(2).joinToString(" ")
+            if (words in topicWords) return@filter false
+            if (words.isNotEmpty()) topicWords += words
+            videoCount++
+            true
+        }
+    } else sorted
+
+    return if (cat == "ALL") interleave(finalList) else finalList
 }
 
 /** Перемешивает список чтобы одинаковые источники/категории не шли подряд */
@@ -1447,13 +1486,13 @@ fun CategoryTabRow(
 private val TILE_PATTERNS = listOf(
     listOf(TileSize.LARGE),
     listOf(TileSize.MEDIUM, TileSize.MEDIUM),
-    listOf(TileSize.SMALL, TileSize.SMALL, TileSize.SMALL),
     listOf(TileSize.LARGE),
     listOf(TileSize.MEDIUM, TileSize.MEDIUM),
-    listOf(TileSize.SMALL, TileSize.SMALL, TileSize.SMALL),
     listOf(TileSize.MEDIUM, TileSize.MEDIUM),
     listOf(TileSize.LARGE),
-    listOf(TileSize.SMALL, TileSize.SMALL, TileSize.SMALL),
+    listOf(TileSize.MEDIUM, TileSize.MEDIUM),
+    listOf(TileSize.LARGE),
+    listOf(TileSize.MEDIUM, TileSize.MEDIUM),
     listOf(TileSize.MEDIUM, TileSize.MEDIUM),
 )
 
@@ -1473,6 +1512,23 @@ fun NewsTileGrid(
     val shuffledPatterns = remember {
         val daySeed = System.currentTimeMillis() / (24 * 60 * 60 * 1000)
         TILE_PATTERNS.shuffled(java.util.Random(daySeed))
+    }
+
+    // Для вкладки ALL — показываем две секции: Местные и Мировые
+    if (category == "ALL") {
+        val localItems = sorted.filter { it.scope == "local" }
+        val worldItems = sorted.filter { it.scope != "local" }
+        Column(Modifier.fillMaxWidth()) {
+            if (localItems.isNotEmpty()) {
+                ScopeSectionHeader(emoji = "📍", title = "Местные")
+                NewsTileBlock(localItems, textColor, subColor, shuffledPatterns, onOpenTikTok, adOffset = 0)
+            }
+            if (worldItems.isNotEmpty()) {
+                ScopeSectionHeader(emoji = "🌍", title = "Мировые")
+                NewsTileBlock(worldItems, textColor, subColor, shuffledPatterns, onOpenTikTok, adOffset = 3)
+            }
+        }
+        return
     }
 
     Column(Modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
@@ -1541,6 +1597,106 @@ fun NewsTileGrid(
                         Box(Modifier.weight(1f)) { LiveTile(sorted[i0], pattern[0], textColor, subColor) { onOpenTikTok(sorted, i0) } }
                         Box(Modifier.weight(1f)) { LiveTile(sorted[i1], pattern[1], textColor, subColor) { onOpenTikTok(sorted, i1) } }
                         Box(Modifier.weight(1f)) { LiveTile(sorted[i2], pattern[2], textColor, subColor) { onOpenTikTok(sorted, i2) } }
+                    }
+                    itemIdx += 3
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            rowCount++
+        }
+    }
+}
+
+// ─── Заголовок секции Местные / Мировые ──────────────────────────────────────
+
+@Composable
+fun ScopeSectionHeader(emoji: String, title: String) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp, vertical = 4.dp),
+        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+    ) {
+        Text(
+            text = "$emoji $title",
+            style = MaterialTheme.typography.titleSmall.copy(
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                letterSpacing = 0.5.sp
+            ),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+        )
+        Spacer(Modifier.width(8.dp))
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f),
+            thickness = 1.dp
+        )
+    }
+}
+
+// ─── Блок плиток без заголовка (переиспользуется для каждой секции) ───────────
+
+@Composable
+fun NewsTileBlock(
+    items: List<NewsItem>,
+    textColor: Color,
+    subColor: Color,
+    shuffledPatterns: List<List<TileSize>>,
+    onOpenTikTok: (List<NewsItem>, Int) -> Unit,
+    adOffset: Int = 0
+) {
+    Column(Modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
+        var itemIdx = 0
+        var rowCount = 0
+        while (itemIdx < items.size) {
+            val absRow = rowCount + adOffset
+            if (absRow == 4) { ContextualAdSlot(); Spacer(Modifier.height(8.dp)) }
+            if (absRow == 7) { PromoSlot(); Spacer(Modifier.height(8.dp)) }
+            if (absRow == 10) { ContextualAdSlot(); Spacer(Modifier.height(8.dp)) }
+
+            val pattern = shuffledPatterns[rowCount % shuffledPatterns.size]
+            val available = items.size - itemIdx
+
+            if (available < pattern.size) {
+                val remaining = items.subList(itemIdx, items.size)
+                if (remaining.isNotEmpty()) {
+                    if (remaining.size == 1) {
+                        val i0 = itemIdx
+                        LiveTile(remaining[0], TileSize.MEDIUM, textColor, subColor) { onOpenTikTok(items, i0) }
+                    } else {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            remaining.forEachIndexed { offset, item ->
+                                val capturedIdx = itemIdx + offset
+                                Box(Modifier.weight(1f)) {
+                                    LiveTile(item, TileSize.MEDIUM, textColor, subColor) { onOpenTikTok(items, capturedIdx) }
+                                }
+                            }
+                        }
+                    }
+                }
+                break
+            }
+
+            when (pattern.size) {
+                1 -> {
+                    val i0 = itemIdx
+                    LiveTile(items[i0], pattern[0], textColor, subColor) { onOpenTikTok(items, i0) }
+                    itemIdx++
+                }
+                2 -> {
+                    val i0 = itemIdx; val i1 = itemIdx + 1
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Box(Modifier.weight(1f)) { LiveTile(items[i0], pattern[0], textColor, subColor) { onOpenTikTok(items, i0) } }
+                        Box(Modifier.weight(1f)) { LiveTile(items[i1], pattern[1], textColor, subColor) { onOpenTikTok(items, i1) } }
+                    }
+                    itemIdx += 2
+                }
+                3 -> {
+                    val i0 = itemIdx; val i1 = itemIdx + 1; val i2 = itemIdx + 2
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Box(Modifier.weight(1f)) { LiveTile(items[i0], pattern[0], textColor, subColor) { onOpenTikTok(items, i0) } }
+                        Box(Modifier.weight(1f)) { LiveTile(items[i1], pattern[1], textColor, subColor) { onOpenTikTok(items, i1) } }
+                        Box(Modifier.weight(1f)) { LiveTile(items[i2], pattern[2], textColor, subColor) { onOpenTikTok(items, i2) } }
                     }
                     itemIdx += 3
                 }
@@ -1994,7 +2150,7 @@ fun FeedEndCard() {
                 letterSpacing = 2.sp
             )
             Text(
-                "обновляется каждые 5 минут",
+                stringResource(R.string.feed_end_sub),
                 fontSize = 10.sp,
                 color = Color.White.copy(0.5f),
                 letterSpacing = 0.5.sp

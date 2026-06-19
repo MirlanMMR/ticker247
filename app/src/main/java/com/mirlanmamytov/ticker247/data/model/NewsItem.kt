@@ -28,5 +28,7 @@ data class NewsItem(
     // Совпадает с Google Trends KG
     val isTrending: Boolean = false,
     // Язык контента — для фильтрации по языку устройства
-    val language: String = "ru"
+    val language: String = "ru",
+    // Масштаб: "local" — локальные/региональные, "world" — мировые
+    val scope: String = "world"
 )

@@ -14,10 +14,22 @@ import kotlin.coroutines.resumeWithException
 object FirebaseNewsRepository {
 
     private val database = FirebaseDatabase.getInstance("https://ticker247-default-rtdb.asia-southeast1.firebasedatabase.app")
-    private val newsRef = database.getReference("news")
+
+    private fun newsLangPath(): String {
+        val lang = java.util.Locale.getDefault().language
+        val cyrillicLangs = setOf("ru", "ky", "uk", "be", "bg", "sr", "mk")
+        return when {
+            lang in cyrillicLangs -> "news/ru"
+            lang == "es" -> "news/es"
+            lang == "pt" -> "news/pt"
+            lang == "ar" -> "news/ar"
+            lang == "en" -> "news/en"
+            else -> "news/en"  // fallback — English
+        }
+    }
 
     suspend fun fetchNews(): List<NewsItem> = suspendCancellableCoroutine { cont ->
-        newsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        database.getReference(newsLangPath()).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 try {
                     val items = mutableListOf<NewsItem>()
@@ -32,7 +44,8 @@ object FirebaseNewsRepository {
                             category = child.child("category").getValue(String::class.java) ?: "NEWS",
                             publishedAt = child.child("publishedAt").getValue(Long::class.java) ?: System.currentTimeMillis(),
                             priority = child.child("priority").getValue(Int::class.java) ?: 0,
-                            language = child.child("language").getValue(String::class.java) ?: "ru"
+                            language = child.child("language").getValue(String::class.java) ?: "ru",
+                            scope = child.child("scope").getValue(String::class.java) ?: "world"
                         )
                         if (item.title.isNotEmpty()) items.add(item)
                     }
