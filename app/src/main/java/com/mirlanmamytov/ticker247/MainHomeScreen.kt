@@ -1533,9 +1533,10 @@ fun NewsTileGrid(
     }
 
     // Для вкладки ALL — показываем две секции: Местные и Мировые
+    // YouTube/VIRAL без scope идут в local (вирусы региональные по природе)
     if (category == "ALL") {
-        val localItems = sorted.filter { it.scope == "local" }
-        val worldItems = sorted.filter { it.scope != "local" }
+        val localItems = sorted.filter { it.scope == "local" || (it.scope == "world" && it.isVideo) }
+        val worldItems = sorted.filter { it.scope == "world" && !it.isVideo }
         Column(Modifier.fillMaxWidth()) {
             if (localItems.isNotEmpty()) {
                 ScopeSectionHeader(emoji = "📍", title = "Местные")

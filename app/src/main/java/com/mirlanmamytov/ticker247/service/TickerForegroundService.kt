@@ -426,23 +426,23 @@ class TickerForegroundService : Service() {
                         // Срочная новость старше 3 часов — пропускаем
                         if (isUrgent && urgentItem == null) return@run
 
-                        // Всегда обновляем постоянное уведомление (1001) — ротация новостей + крипта
-                        val foregroundChannelId = if (isUrgent || isImportant) "ticker_important" else "ticker_info"
+                        val now2 = System.currentTimeMillis()
+                        val canAlert = isUrgent && shouldVibrate && now2 - lastAlertTime >= 2 * 60_000L
+
+                        // Срочная первый раз → используем канал ticker_urgent (heads-up + вибрация)
+                        // Остальные → ticker_important или ticker_info
+                        // Всегда только одно уведомление (1001) — нет дублей в шторке
+                        val channelId = when {
+                            canAlert -> "ticker_urgent"
+                            isUrgent || isImportant -> "ticker_important"
+                            else -> "ticker_info"
+                        }
+                        if (canAlert) lastAlertTime = now2
+
                         val foregroundNotif = buildNotificationWithUrl(
-                            line, foregroundChannelId, iconRes, urgentItem?.url ?: ""
+                            line, channelId, iconRes, urgentItem?.url ?: ""
                         )
                         getSystemService(NotificationManager::class.java)?.notify(1001, foregroundNotif)
-
-                        // Первый раз срочная — всплывающий алерт, не чаще 1 раза в 2 минуты
-                        val now2 = System.currentTimeMillis()
-                        if (isUrgent && shouldVibrate && now2 - lastAlertTime >= 2 * 60_000L) {
-                            lastAlertTime = now2
-                            val alertNotif = buildNotificationWithUrl(
-                                line, "ticker_urgent", iconRes, urgentItem?.url ?: ""
-                            )
-                            val alertId = 2000 + (urgentItem?.url ?: line).hashCode().and(0x7FFF)
-                            getSystemService(NotificationManager::class.java)?.notify(alertId, alertNotif)
-                        }
                     } // конец run
                 } catch (e: Exception) {
                     Log.e("Ticker247", "Rotation error: ${e.message}", e)
