@@ -46,6 +46,8 @@ class TickerForegroundService : Service() {
     private val dismissedIds = mutableSetOf<String>()
     // При первой загрузке все срочные новости уже "старые" — вибрировать не нужно
     private var isInitialLoad = true
+    // Rate-limit: не более 1 всплывающего алерта за 2 минуты
+    private var lastAlertTime = 0L
 
     // BroadcastReceiver — ловит смахивание уведомления
     private val dismissReceiver = object : android.content.BroadcastReceiver() {
@@ -404,13 +406,6 @@ class TickerForegroundService : Service() {
                             delay(500L)
                         }
 
-                        // Повторный показ URGENT — без вибрации (используем info-канал)
-                        val channelId = when {
-                            isUrgent && shouldVibrate -> "ticker_urgent"   // вибрирует один раз
-                            isUrgent -> "ticker_important"                  // повтор — тихо
-                            isImportant -> "ticker_important"
-                            else -> "ticker_info"
-                        }
                         val iconRes = when {
                             isUrgent -> R.drawable.ic_lightning_urgent
                             isImportant -> R.drawable.ic_lightning_blue
@@ -418,27 +413,35 @@ class TickerForegroundService : Service() {
                         }
 
                         // Фильтр давности: срочные новости старше 3 часов не показываем
-                        // Это защита от "буфера" когда приложение было убито и перезапустилось
                         val threeHoursAgo = System.currentTimeMillis() - 3 * 60 * 60 * 1000L
                         val urgentItem = if (isUrgent || isImportant) {
                             DataBridge.newsItems.firstOrNull {
                                 (it.category == "URGENT" || it.priority >= 2) &&
                                 line.contains(it.title.take(30)) &&
-                                it.publishedAt >= threeHoursAgo   // не старше 3 часов
+                                it.publishedAt >= threeHoursAgo
                             }
                         } else null
 
-                        // Если срочная новость старше 3 часов — пропускаем, не показываем
-                        if ((isUrgent || isImportant) && urgentItem == null && isUrgent) {
-                            return@run
-                        }
+                        // Срочная новость старше 3 часов — пропускаем
+                        if (isUrgent && urgentItem == null) return@run
 
-                        val notifId = if (channelId == "ticker_info") 1001
-                                      else 2000 + (urgentItem?.url ?: line).hashCode().and(0x7FFF)
-                        val notification = buildNotificationWithUrl(
-                            line, channelId, iconRes, urgentItem?.url ?: ""
+                        // Всегда обновляем постоянное уведомление (1001) — ротация новостей + крипта
+                        val foregroundChannelId = if (isUrgent || isImportant) "ticker_important" else "ticker_info"
+                        val foregroundNotif = buildNotificationWithUrl(
+                            line, foregroundChannelId, iconRes, urgentItem?.url ?: ""
                         )
-                        getSystemService(NotificationManager::class.java)?.notify(notifId, notification)
+                        getSystemService(NotificationManager::class.java)?.notify(1001, foregroundNotif)
+
+                        // Первый раз срочная — всплывающий алерт, не чаще 1 раза в 2 минуты
+                        val now2 = System.currentTimeMillis()
+                        if (isUrgent && shouldVibrate && now2 - lastAlertTime >= 2 * 60_000L) {
+                            lastAlertTime = now2
+                            val alertNotif = buildNotificationWithUrl(
+                                line, "ticker_urgent", iconRes, urgentItem?.url ?: ""
+                            )
+                            val alertId = 2000 + (urgentItem?.url ?: line).hashCode().and(0x7FFF)
+                            getSystemService(NotificationManager::class.java)?.notify(alertId, alertNotif)
+                        }
                     } // конец run
                 } catch (e: Exception) {
                     Log.e("Ticker247", "Rotation error: ${e.message}", e)
@@ -450,7 +453,17 @@ class TickerForegroundService : Service() {
 
     private fun buildRotationLines(): List<String> {
         val lines = mutableListOf<String>()
-        val items = DataBridge.newsItems
+        val cyrillicLangs = setOf("ru", "ky", "uk", "be", "bg", "sr", "mk")
+        val userLang = com.mirlanmamytov.ticker247.data.repository.NewsBuffer.deviceLanguage
+        val items = DataBridge.newsItems.filter { item ->
+            val lang = item.language ?: ""
+            when {
+                item.category in setOf("CURRENCY", "CRYPTO") -> true
+                lang.isEmpty() || lang == "unknown" || lang == "other" -> true
+                userLang in cyrillicLangs -> lang in cyrillicLangs
+                else -> lang == userLang
+            }
+        }
 
         // ── 1. Валюта — всегда первой строкой ────────────────────────────────
         items.firstOrNull { it.category == "CURRENCY" }?.let {
@@ -479,7 +492,7 @@ class TickerForegroundService : Service() {
         }
         val cryptoSources = setOf("coingecko", "coincap", "coinmarketcap")
         items.filter { item ->
-            (item.category == "URGENT" || item.priority >= 2) &&
+            (item.category == "URGENT" || item.priority >= 1) &&
             item.cryptoSymbol == null &&
             item.category !in setOf("CURRENCY", "CRYPTO") &&
             item.source.lowercase() !in cryptoSources &&

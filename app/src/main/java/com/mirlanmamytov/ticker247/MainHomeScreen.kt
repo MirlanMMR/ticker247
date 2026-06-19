@@ -546,18 +546,20 @@ fun sortItems(items: List<NewsItem>, cat: String): List<NewsItem> {
         }
     )
 
-    // Ограничиваем видео: не более 3 в ленте, не более 1 на тему
+    // Ограничиваем видео: не более 2 в ленте, не более 1 на тему
+    // Тема определяется по пересечению значимых слов (>4 букв) — ловит "Человек-паук" во всех вариантах
     val finalList = if (cat == "ALL" || cat == "URGENT") {
-        val topicWords = mutableSetOf<String>()
+        val seenTopicWords = mutableSetOf<String>()
         var videoCount = 0
         sorted.filter { item ->
             if (!item.isVideo) return@filter true
-            if (videoCount >= 3) return@filter false
-            // Тема = первые 2 значимых слова заголовка
-            val words = item.title.lowercase().split(Regex("\\s+"))
-                .filter { it.length > 4 }.take(2).joinToString(" ")
-            if (words in topicWords) return@filter false
-            if (words.isNotEmpty()) topicWords += words
+            if (videoCount >= 2) return@filter false
+            val words = item.title.lowercase()
+                .split(Regex("[\\s\\-:,.!?\"']+"))
+                .filter { it.length > 4 }
+                .toSet()
+            if (words.any { it in seenTopicWords }) return@filter false
+            seenTopicWords += words
             videoCount++
             true
         }
