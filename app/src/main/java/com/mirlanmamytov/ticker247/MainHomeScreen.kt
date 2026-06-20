@@ -224,9 +224,13 @@ private val SPAM_PATTERNS = Regex(
     """minecraft|майнкрафт|roblox|роблокс|fortnite|форtnite|gta online|""" +
     """в игре.*ограбил|ограбление в игре|игрок.*украл|украл в minecraft|""" +
     """эпичное ограбл|жителя манкрафт|жителя minecraft|""" +
-    // Музыкальные клипы и лирик-видео — не новости
+    // Музыкальные клипы, лирик-видео, аниме/k-pop — не массовые новости
     """official music video|official video|official audio|official mv|lyric video|""" +
     """music video|official clip|премьера клипа|""" +
+    """[぀-ヿ㐀-䶿一-鿿豈-﫿ｦ-ﾟ]|""" + // японские/китайские символы
+    """[가-힯ᄀ-ᇿ]|""" + // корейские символы
+    """anime|аниме|manga|манга|k-pop|кпоп|kpop|j-pop|jpop|дорама|dorama|""" +
+    """official trailer \d|teaser pv|ティザー|тизер pv|""" +
     // Блогерский псевдоконтент
     """блогер.*заработал|блогер.*миллион|тиктокер|youtuber|ютубер.*скандал|""" +
     """стример.*задонатил|донат на стриме|""" +
@@ -1980,6 +1984,11 @@ fun ContextualAdSlot() {
 @OptIn(androidx.compose.animation.ExperimentalAnimationApi::class)
 @Composable
 fun PromoSlot() {
+    // Реклама/сотрудничество — только для RU/KY/СНГ аудитории
+    val lang = java.util.Locale.getDefault().language
+    val cyrillicLangs = setOf("ru", "ky", "uk", "be", "bg", "sr", "mk")
+    if (lang !in cyrillicLangs) return
+
     val context = LocalContext.current
     var slideIdx by remember { mutableStateOf(0) }
 
