@@ -967,6 +967,17 @@ fun CurrencyTile() {
     val currency = remember(allItems) { allItems.firstOrNull { it.category == "CURRENCY" } }
     if (currency == null) return
 
+    val lang = java.util.Locale.getDefault().language
+    val cyrillicLangs = setOf("ru", "ky", "uk", "be", "bg", "sr", "mk")
+
+    // Базовая валюта и подпись зависят от языка пула
+    val (baseCurrency, rateLabel) = when {
+        lang in cyrillicLangs -> Pair("KGS", "сом")
+        lang == "es"          -> Pair("USD", "USD")
+        lang == "pt"          -> Pair("BRL", "BRL")
+        else                  -> Pair("USD", "USD")
+    }
+
     val rates = remember(currency) {
         currency.title.split("|").map { it.trim() }.filter { it.isNotEmpty() }
     }
@@ -1017,7 +1028,7 @@ fun CurrencyTile() {
                     Spacer(Modifier.height(6.dp))
                     Text(code, fontSize = 20.sp, color = Color(0xFF00401A),
                         fontWeight = FontWeight.ExtraBold)
-                    Text("${value} сом", fontSize = 22.sp, color = Color.White,
+                    Text("$value $rateLabel", fontSize = 22.sp, color = Color.White,
                         fontWeight = FontWeight.Black)
                 }
             }
@@ -1049,7 +1060,14 @@ fun CurrencyDetailSheet(currency: NewsItem) {
     val rates = currency.title.split("|").map { it.trim() }.filter { it.isNotEmpty() }
 
     Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 40.dp)) {
-        Text("💱 Курсы валют к сому", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold,
+        val sheetLang = java.util.Locale.getDefault().language
+        val sheetBase = when {
+            sheetLang in setOf("ru","ky","uk","be","bg","sr","mk") -> "сому"
+            sheetLang == "es" -> "USD"
+            sheetLang == "pt" -> "BRL"
+            else -> "USD"
+        }
+        Text("💱 Exchange rates · $sheetBase", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold,
             color = textColor, modifier = Modifier.padding(bottom = 4.dp))
         Text(timeAgo(currency.publishedAt), fontSize = 12.sp, color = subColor,
             modifier = Modifier.padding(bottom = 16.dp))
@@ -1072,7 +1090,7 @@ fun CurrencyDetailSheet(currency: NewsItem) {
                     }
                     Text(code, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = textColor)
                 }
-                Text("$value сом", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                Text("$value $sheetBase", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
             }
             Box(Modifier.fillMaxWidth().height(0.5.dp).background(Color(0xFFE5E7EB)))
         }
