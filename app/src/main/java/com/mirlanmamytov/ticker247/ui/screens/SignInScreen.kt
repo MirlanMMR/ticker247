@@ -242,6 +242,19 @@ fun SignInScreen(
                         )
                     }
                 }
+
+                if (!signingIn) {
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        "Продолжить без входа",
+                        fontSize = 13.sp,
+                        color = Color.White.copy(alpha = 0.4f),
+                        modifier = Modifier
+                            .alpha(btnAlpha.value)
+                            .clickable { onSignedIn() }
+                            .padding(8.dp)
+                    )
+                }
             }
         }
 
