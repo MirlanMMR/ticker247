@@ -22,7 +22,6 @@ object FirebaseNewsRepository {
             lang in cyrillicLangs -> "news/ru"
             lang == "es" -> "news/es"
             lang == "pt" -> "news/pt"
-            lang == "ar" -> "news/ar"
             lang == "en" -> "news/en"
             else -> "news/en"  // fallback — English
         }
