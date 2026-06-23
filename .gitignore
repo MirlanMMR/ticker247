@@ -17,3 +17,7 @@ local.properties
 # Локальные бэкапы
 _backup_*/
 .backup_*/
+
+# Секретные файлы — не публиковать
+app/google-services.json
+app/build/
