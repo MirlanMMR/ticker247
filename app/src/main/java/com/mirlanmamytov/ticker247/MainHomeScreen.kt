@@ -230,6 +230,7 @@ private val SPAM_PATTERNS = Regex(
     """[぀-ヿ㐀-䶿一-鿿豈-﫿ｦ-ﾟ]|""" + // японские/китайские символы
     """[가-힯ᄀ-ᇿ]|""" + // корейские символы
     """anime|аниме|manga|манга|k-pop|кпоп|kpop|j-pop|jpop|дорама|dorama|""" +
+    """bts|blackpink|twice|stray kids|aespa|newjeans|\bive\b|nmixx|vtuber|hololive|""" +
     """official trailer \d|teaser pv|ティザー|тизер pv|""" +
     // Блогерский псевдоконтент
     """блогер.*заработал|блогер.*миллион|тиктокер|youtuber|ютубер.*скандал|""" +

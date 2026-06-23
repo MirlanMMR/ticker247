@@ -312,9 +312,15 @@ class TickerForegroundService : Service() {
                     try {
                         val firebaseItems = FirebaseNewsRepository.fetchNews()
                         allItems.addAll(firebaseItems)
-                        firebaseItems.filter { it.priority >= 2 }.take(3)
+                        // URGENT — всегда первым в тикере
+                        val urgentItem = firebaseItems.firstOrNull { it.category == "URGENT" }
+                        if (urgentItem != null) {
+                            tickerItems.add(0, "🚨 " + urgentItem.title.trimStart('🚨', '⚡', ' '))
+                        }
+                        // Остальные важные (priority >= 2, не URGENT) — после urgent
+                        firebaseItems.filter { it.priority >= 2 && it.category != "URGENT" }.take(3)
                             .forEach { tickerItems.add("⚡ " + it.title.trimStart('⚡', ' ')) }
-                        Log.d("Ticker247", "Firebase: ${firebaseItems.size} items")
+                        Log.d("Ticker247", "Firebase: ${firebaseItems.size} items, urgent=${urgentItem != null}")
                     } catch (e: Exception) { Log.e("Ticker247", "Firebase: ${e.message}") }
 
                     // 5. @t247feed — редакторский канал, только он из Telegram
