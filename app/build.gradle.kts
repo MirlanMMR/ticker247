@@ -9,14 +9,14 @@ plugins {
 
 android {
     namespace = "com.mirlanmamytov.ticker247"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.mirlanmamytov.ticker247"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 35
+        versionCode = 4
+        versionName = "1.0.0"
 
         // Gemini API key — добавь GEMINI_API_KEY=your_key в local.properties
         val geminiKey = rootProject.file("local.properties")
