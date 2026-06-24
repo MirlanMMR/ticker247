@@ -31,6 +31,62 @@ import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
 
+private object SplashStrings {
+    data class Strings(
+        val slogan: String,
+        val firstLaunch: String,
+        val loading: String,
+        val canClose: String,
+        val signInGoogle: String,
+        val continueGuest: String,
+        val errorSignIn: String,
+        val errorConnection: String
+    )
+
+    fun get(lang: String): Strings = when (lang) {
+        "es" -> Strings(
+            slogan = "En silencio, lo importante",
+            firstLaunch = "¡Primera vez en este dispositivo!",
+            loading = "Cargando lo más importante del mundo...",
+            canClose = "Puedes cerrar la app —\nno te perderás nada.\nTe avisaremos.",
+            signInGoogle = "Iniciar sesión con Google",
+            continueGuest = "Continuar sin iniciar sesión",
+            errorSignIn = "No se pudo iniciar sesión. Inténtalo de nuevo.",
+            errorConnection = "Error de conexión. Verifica tu internet."
+        )
+        "pt" -> Strings(
+            slogan = "Em silêncio, o que importa",
+            firstLaunch = "Primeira vez neste dispositivo!",
+            loading = "Carregando o mais importante do mundo...",
+            canClose = "Pode fechar o app —\nvocê não vai perder nada.\nVamos te avisar.",
+            signInGoogle = "Entrar com Google",
+            continueGuest = "Continuar sem entrar",
+            errorSignIn = "Não foi possível entrar. Tente novamente.",
+            errorConnection = "Erro de conexão. Verifique sua internet."
+        )
+        "en" -> Strings(
+            slogan = "Quietly about what matters",
+            firstLaunch = "First launch on this device!",
+            loading = "Loading what matters most...",
+            canClose = "You can close the app —\nyou won't miss a thing.\nWe'll notify you.",
+            signInGoogle = "Sign in with Google",
+            continueGuest = "Continue without signing in",
+            errorSignIn = "Couldn't sign in. Please try again.",
+            errorConnection = "Connection error. Check your internet."
+        )
+        else -> Strings(
+            slogan = "Тихо о важном",
+            firstLaunch = "Первый запуск на этом устройстве!",
+            loading = "Загружаем самое важное со всего мира...",
+            canClose = "Можете закрыть приложение —\nвы ничего не пропустите.\nМы вас оповестим.",
+            signInGoogle = "Войти через Google",
+            continueGuest = "Продолжить без входа",
+            errorSignIn = "Не удалось войти. Попробуй ещё раз.",
+            errorConnection = "Ошибка входа. Проверь соединение."
+        )
+    }
+}
+
 @Composable
 fun SignInScreen(
     isFirstLaunch: Boolean = true,
@@ -38,6 +94,8 @@ fun SignInScreen(
 ) {
     val context = LocalContext.current
     val auth = remember { FirebaseAuth.getInstance() }
+    val lang = remember { java.util.Locale.getDefault().language }
+    val str = remember { SplashStrings.get(lang) }
 
     // Уже вошёл — просто показываем сплэш и идём дальше
     val alreadySignedIn = remember { auth.currentUser != null }
@@ -78,7 +136,7 @@ fun SignInScreen(
                 errorMsg = null
             } catch (e: ApiException) {
                 signingIn = false
-                errorMsg = "Не удалось войти. Попробуй ещё раз."
+                errorMsg = str.errorSignIn
             }
         } else {
             signingIn = false
@@ -95,7 +153,7 @@ fun SignInScreen(
             onSignedIn()
         } catch (e: Exception) {
             signingIn = false
-            errorMsg = "Ошибка входа. Проверь соединение."
+            errorMsg = str.errorConnection
         }
     }
 
@@ -150,7 +208,7 @@ fun SignInScreen(
             )
             Spacer(Modifier.height(12.dp))
             Text(
-                "Тихо о важном",
+                str.slogan,
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color(0xFF00D4FF),
@@ -163,7 +221,7 @@ fun SignInScreen(
             if (isFirstLaunch) {
                 Spacer(Modifier.height(40.dp))
                 Text(
-                    "Первый запуск на этом устройстве!",
+                    str.firstLaunch,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(0xFF00D4FF),
@@ -175,7 +233,7 @@ fun SignInScreen(
                 )
                 Spacer(Modifier.height(10.dp))
                 Text(
-                    "Загружаем самое важное со всего мира...",
+                    str.loading,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
                     color = Color.White.copy(alpha = 0.7f),
@@ -186,7 +244,7 @@ fun SignInScreen(
                 )
                 Spacer(Modifier.height(16.dp))
                 Text(
-                    "Можете закрыть приложение —\nвы ничего не пропустите.\nМы вас оповестим.",
+                    str.canClose,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.White.copy(alpha = 0.9f),
@@ -223,7 +281,7 @@ fun SignInScreen(
                             Text("G", fontSize = 18.sp, fontWeight = FontWeight.Bold,
                                 color = Color(0xFF4285F4))
                             Text(
-                                "Войти через Google",
+                                str.signInGoogle,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.White
@@ -246,7 +304,7 @@ fun SignInScreen(
                 if (!signingIn) {
                     Spacer(Modifier.height(16.dp))
                     Text(
-                        "Продолжить без входа",
+                        str.continueGuest,
                         fontSize = 13.sp,
                         color = Color.White.copy(alpha = 0.4f),
                         modifier = Modifier
