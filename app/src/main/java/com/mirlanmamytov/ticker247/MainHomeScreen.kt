@@ -215,8 +215,31 @@ fun buildTileGroups(items: List<NewsItem>): List<TileGroup> {
     return groups
 }
 
-// Спам-паттерны: крипто-реклама, рекламные посты
-private val SPAM_PATTERNS = Regex(
+// Динамические спам-паттерны из Firebase (обновляются при старте)
+object RemoteConfig {
+    private val defaultPatterns = listOf(
+        "kpop", "k-pop", "bts", "blackpink", "twice", "stray kids", "aespa", "newjeans", "nmixx",
+        "vtuber", "hololive", "anime", "аниме", "manga", "манга", "j-pop", "jpop", "дорама", "dorama",
+        "official music video", "official video", "official audio", "official mv",
+        "lyric video", "music video", "official clip", "премьера клипа",
+        "minecraft", "майнкрафт", "roblox", "роблокс", "fortnite",
+        "airdrop", "mint now", "buy now", "presale", "whitelist", "nft drop",
+        "подпишись и получи", "переходи по ссылке", "реферальн", "промокод"
+    )
+    @Volatile private var _remotePatterns: List<String> = emptyList()
+
+    fun updateSpamPatterns(patterns: List<String>) {
+        _remotePatterns = patterns
+    }
+
+    fun buildSpamRegex(): Regex {
+        val patterns = if (_remotePatterns.isNotEmpty()) _remotePatterns else defaultPatterns
+        return Regex(patterns.joinToString("|") { Regex.escape(it) }, RegexOption.IGNORE_CASE)
+    }
+}
+
+// Спам-паттерны: крипто-реклама, рекламные посты (статический fallback)
+private val SPAM_PATTERNS_STATIC = Regex(
     // Крипто-спам
     """\$(BTC|ETH|SOL|DOGE|BOMBIE|PEPE|SHIB|FLOKI|BONK|WIF)\b|""" +
     """airdrop|mint now|buy now|presale|whitelist|nft drop|how much.*earn|""" +
@@ -470,17 +493,17 @@ fun sortItems(items: List<NewsItem>, cat: String): List<NewsItem> {
         "ALL" -> items
             .filter { it.category !in excludedFromFeed }
             .filter { now - it.publishedAt < maxAge }
-            .filter { !SPAM_PATTERNS.containsMatchIn(it.title) }
+            .filter { !SPAM_PATTERNS_STATIC.containsMatchIn(it.title) && !RemoteConfig.buildSpamRegex().containsMatchIn(it.title) }
             .filter { it.title.length > 15 }
             .map { enrichCategory(it) }
         "URGENT" -> items
             .filter { it.category == "URGENT" || it.priority >= 3 }
             .filter { now - it.publishedAt < maxAge }
-            .filter { !SPAM_PATTERNS.containsMatchIn(it.title) }
+            .filter { !SPAM_PATTERNS_STATIC.containsMatchIn(it.title) && !RemoteConfig.buildSpamRegex().containsMatchIn(it.title) }
         else -> items
             .filter { it.category == cat }
             .filter { now - it.publishedAt < maxAge }
-            .filter { !SPAM_PATTERNS.containsMatchIn(it.title) }
+            .filter { !SPAM_PATTERNS_STATIC.containsMatchIn(it.title) && !RemoteConfig.buildSpamRegex().containsMatchIn(it.title) }
     }
 
     // ── Кросс-источниковый рейтинг ────────────────────────────────────────────
@@ -1257,7 +1280,7 @@ fun HeroCarousel(onOpenTikTok: (List<NewsItem>, Int) -> Unit) {
     // Отбираем: приоритет 2+ или есть фото — только новости, без крипты/валюты/спама
     val heroItems = remember(allItems) {
         val isNews = { it: NewsItem -> it.category !in setOf("CURRENCY", "CRYPTO") && it.cryptoSymbol == null }
-        val notSpam = { it: NewsItem -> !SPAM_PATTERNS.containsMatchIn(it.title) }
+        val notSpam = { it: NewsItem -> !SPAM_PATTERNS_STATIC.containsMatchIn(it.title) && !RemoteConfig.buildSpamRegex().containsMatchIn(it.title) }
         val candidates = (allItems.filter { isNews(it) && notSpam(it) && (it.priority >= 2 || it.category == "URGENT") } +
          allItems.filter { isNews(it) && notSpam(it) && it.imageUrl != null && !it.isVideo })
             .distinctBy { it.url.ifEmpty { it.title } }

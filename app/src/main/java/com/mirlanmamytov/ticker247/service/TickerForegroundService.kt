@@ -177,6 +177,17 @@ class TickerForegroundService : Service() {
         isFetchLoopRunning = true
 
         serviceScope.launch(Dispatchers.IO) {
+            // Загружаем spam patterns из Firebase один раз при старте
+            try {
+                val patterns = FirebaseNewsRepository.fetchSpamPatterns()
+                if (patterns.isNotEmpty()) {
+                    com.mirlanmamytov.ticker247.RemoteConfig.updateSpamPatterns(patterns)
+                    Log.d("Ticker247", "RemoteConfig: ${patterns.size} spam patterns loaded")
+                }
+            } catch (e: Exception) {
+                Log.w("Ticker247", "RemoteConfig load failed, using defaults: ${e.message}")
+            }
+
             while (isActive) {
                 try {
                     val allItems = mutableListOf<NewsItem>()

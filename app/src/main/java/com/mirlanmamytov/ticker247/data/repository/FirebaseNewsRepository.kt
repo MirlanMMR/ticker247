@@ -123,6 +123,20 @@ object FirebaseNewsRepository {
         })
     }
 
+    suspend fun fetchSpamPatterns(): List<String> = suspendCancellableCoroutine { cont ->
+        database.getReference("config/spam_patterns").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val patterns = snapshot.children.mapNotNull { it.getValue(String::class.java) }
+                Log.d("Firebase", "Spam patterns loaded: ${patterns.size}")
+                cont.resume(patterns)
+            }
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("Firebase", "Spam patterns failed, using defaults")
+                cont.resume(emptyList())
+            }
+        })
+    }
+
     fun updateDataBridge(items: List<NewsItem>) {
         val tickerItems = items
             .filter { it.category in setOf("CURRENCY", "CRYPTO", "URGENT", "TRENDS") }
