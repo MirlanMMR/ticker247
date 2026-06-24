@@ -860,6 +860,8 @@ class TickerForegroundService : Service() {
     private fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val manager = getSystemService(NotificationManager::class.java)
+            // Пересоздаём urgent канал чтобы применить новые настройки звука/вибрации
+            manager.deleteNotificationChannel("ticker_urgent")
             NotificationChannel("ticker_info", "Информация", NotificationManager.IMPORTANCE_LOW).apply {
                 setSound(null, null); enableVibration(false)
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
@@ -870,8 +872,16 @@ class TickerForegroundService : Service() {
                 lightColor = android.graphics.Color.BLUE; enableLights(true)
             }.also { manager.createNotificationChannel(it) }
             NotificationChannel("ticker_urgent", "Срочно", NotificationManager.IMPORTANCE_HIGH).apply {
-                setSound(null, null); enableVibration(true)
-                vibrationPattern = longArrayOf(0, 50)
+                val urgentSound = android.media.RingtoneManager.getDefaultUri(
+                    android.media.RingtoneManager.TYPE_NOTIFICATION
+                )
+                val audioAttr = android.media.AudioAttributes.Builder()
+                    .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION)
+                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+                setSound(urgentSound, audioAttr)
+                enableVibration(true)
+                vibrationPattern = longArrayOf(0, 200, 100, 200)
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 lightColor = android.graphics.Color.RED; enableLights(true)
             }.also { manager.createNotificationChannel(it) }
