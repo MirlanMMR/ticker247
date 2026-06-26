@@ -173,15 +173,14 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
     ) {
         // ── Фото отдельным блоком сверху ────────────────────────────────────
         Box(
-            Modifier.fillMaxWidth().height(240.dp)
+            Modifier.fillMaxWidth().wrapContentHeight()
         ) {
             if (resolvedImage != null) {
                 AsyncImage(
                     model = resolvedImage,
                     contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    alignment = Alignment.TopCenter,
-                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier.fillMaxWidth(),
                     onError = { _ -> resolvedImage = null }
                 )
             } else {
