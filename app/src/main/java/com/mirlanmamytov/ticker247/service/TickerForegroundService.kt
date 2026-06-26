@@ -459,7 +459,9 @@ class TickerForegroundService : Service() {
                         val foregroundNotif = buildNotificationWithUrl(
                             line, channelId, iconRes, urgentItem?.url ?: ""
                         )
-                        getSystemService(NotificationManager::class.java)?.notify(1001, foregroundNotif)
+                        if (!com.mirlanmamytov.ticker247.DataBridge.isAppVisible) {
+                            getSystemService(NotificationManager::class.java)?.notify(1001, foregroundNotif)
+                        }
                     } // конец run
                 } catch (e: Exception) {
                     Log.e("Ticker247", "Rotation error: ${e.message}", e)

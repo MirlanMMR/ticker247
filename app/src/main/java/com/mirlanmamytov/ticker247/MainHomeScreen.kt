@@ -607,7 +607,7 @@ private fun interleave(items: List<NewsItem>): List<NewsItem> {
         hasMore = false
         for (group in byCategory) {
             if (group.isNotEmpty()) {
-                result.add(group.removeFirst())
+                result.add(group.removeAt(0))
                 hasMore = true
             }
         }
@@ -783,19 +783,55 @@ fun HomeContent(
     val context = LocalContext.current
     var isRefreshing by remember { mutableStateOf(false) }
     val refreshScope = rememberCoroutineScope()
+    var showAbout by remember { mutableStateOf(false) }
+
+    if (showAbout) {
+        AlertDialog(
+            onDismissRequest = { showAbout = false },
+            title = { Text("Ticker 24/7") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Агрегатор новостей от MMR Lab®")
+                    Text("Версия 1.0.0")
+                    HorizontalDivider()
+                    Text("Контакты:", fontWeight = FontWeight.SemiBold)
+                    Text(
+                        "tarylgan@gmail.com",
+                        color = Color(0xFF1D4ED8),
+                        modifier = Modifier.clickable {
+                            val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:tarylgan@gmail.com"))
+                            context.startActivity(intent)
+                        }
+                    )
+                    HorizontalDivider()
+                    Text(
+                        "Политика конфиденциальности",
+                        color = Color(0xFF1D4ED8),
+                        modifier = Modifier.clickable {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://mirlanmmr.github.io/ticker247/privacy-policy.html"))
+                            context.startActivity(intent)
+                        }
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showAbout = false }) { Text("Закрыть") }
+            }
+        )
+    }
 
     Scaffold(
         containerColor = bgColor,
         bottomBar = {
             Box(
-                Modifier.fillMaxWidth().background(bgColor).padding(vertical = 5.dp),
+                Modifier.fillMaxWidth().background(bgColor).padding(vertical = 5.dp).clickable { showAbout = true },
                 contentAlignment = Alignment.Center
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Box(Modifier.size(4.dp).clip(RoundedCornerShape(50)).background(Color(0xFF1D4ED8).copy(0.4f)))
-                    Text("MMR® Lab", fontSize = 10.sp, color = subColor.copy(0.5f),
+                    Text("О приложении", fontSize = 10.sp, color = subColor.copy(0.5f),
                         fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
                     Box(Modifier.size(4.dp).clip(RoundedCornerShape(50)).background(Color(0xFF1D4ED8).copy(0.4f)))
                 }

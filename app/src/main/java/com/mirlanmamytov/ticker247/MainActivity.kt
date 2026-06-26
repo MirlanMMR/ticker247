@@ -39,6 +39,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        DataBridge.isAppVisible = true
+    }
+
+    override fun onPause() {
+        super.onPause()
+        DataBridge.isAppVisible = false
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
