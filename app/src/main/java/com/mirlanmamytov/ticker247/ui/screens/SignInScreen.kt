@@ -106,6 +106,7 @@ fun SignInScreen(
 
     var signingIn  by remember { mutableStateOf(false) }
     var errorMsg   by remember { mutableStateOf<String?>(null) }
+    var pendingIdToken by remember { mutableStateOf<String?>(null) }
 
     val pulseAlpha by rememberInfiniteTransition(label = "pulse").animateFloat(
         initialValue = 0.3f, targetValue = 1f,
@@ -132,6 +133,7 @@ fun SignInScreen(
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
                 val account = task.getResult(ApiException::class.java)
+                pendingIdToken = account.idToken
                 signingIn = true
                 errorMsg = null
             } catch (e: ApiException) {
@@ -147,8 +149,12 @@ fun SignInScreen(
     LaunchedEffect(signingIn) {
         if (!signingIn) return@LaunchedEffect
         try {
-            val account = GoogleSignIn.getLastSignedInAccount(context) ?: return@LaunchedEffect
-            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+            val idToken = pendingIdToken ?: run {
+                signingIn = false
+                errorMsg = str.errorSignIn
+                return@LaunchedEffect
+            }
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
             auth.signInWithCredential(credential).await()
             onSignedIn()
         } catch (e: Exception) {
