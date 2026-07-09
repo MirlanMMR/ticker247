@@ -143,6 +143,28 @@ object ArticleExtractor {
             ?: runCatching { java.net.URL(url).host.removePrefix("www.") }.getOrNull()
     }
 
+    // Служебные фразы источников (копирайты, дисклеймеры) — вырезаются из текста статьи
+    private val boilerplatePhrases = listOf(
+        "Автором материала является K-News. Любое копирование или частичное использование возможно по разрешению редакции K-News.",
+        "Любое копирование или частичное использование возможно по разрешению редакции",
+        "Использование материалов разрешено только при наличии гиперссылки",
+        "При использовании материалов ссылка на источник обязательна",
+        "Все права защищены",
+        "© Все права защищены",
+        "Читайте нас в Telegram",
+        "Подписывайтесь на наш Telegram",
+        "Фото иллюстративное",
+        "Фото из архива"
+    )
+
+    private fun stripBoilerplate(text: String): String {
+        var result = text
+        for (phrase in boilerplatePhrases) {
+            result = result.replace(phrase, "")
+        }
+        return result.trim(' ', '.', ',', '—', '-')
+    }
+
     private fun extractBody(doc: Document): Pair<String, String> {
         // Убираем мусор
         doc.select("script, style, nav, header, footer, aside, .ads, .ad, .advertisement, .social, .comments, .sidebar").remove()
@@ -162,21 +184,21 @@ object ArticleExtractor {
             "поделиться", "добавить комментарий", "оставить комментарий"
         )
         val paragraphs = contentEl.select("p, h2, h3, h4, blockquote, li")
-            .filter { el ->
-                val t = el.text().trim()
+            .map { el -> el to stripBoilerplate(el.text().trim()) }
+            .filter { (_, t) ->
                 t.length > 20 && spamPhrases.none { t.lowercase().contains(it) }
             }
 
-        val bodyHtml = paragraphs.joinToString("\n") { el ->
+        val bodyHtml = paragraphs.joinToString("\n") { (el, t) ->
             when (el.tagName()) {
-                "h2" -> "<h2>${el.text()}</h2>"
-                "h3", "h4" -> "<h3>${el.text()}</h3>"
-                "blockquote" -> "<blockquote>${el.text()}</blockquote>"
-                "li" -> "<li>${el.text()}</li>"
-                else -> "<p>${el.text()}</p>"
+                "h2" -> "<h2>$t</h2>"
+                "h3", "h4" -> "<h3>$t</h3>"
+                "blockquote" -> "<blockquote>$t</blockquote>"
+                "li" -> "<li>$t</li>"
+                else -> "<p>$t</p>"
             }
         }
-        val plainText = paragraphs.joinToString("\n\n") { it.text() }
+        val plainText = paragraphs.joinToString("\n\n") { (_, t) -> t }
 
         return plainText to bodyHtml
     }

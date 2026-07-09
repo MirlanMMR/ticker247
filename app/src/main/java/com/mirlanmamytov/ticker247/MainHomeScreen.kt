@@ -1308,32 +1308,36 @@ fun CryptoDetailSheet(cryptos: List<NewsItem>) {
 
 // ─── Hero-карусель: HorizontalPager на всю ширину + точки ────────────────────
 
+// Отбор новостей для hero-карусели — единая функция, чтобы сетка плиток могла
+// исключить эти же новости и не показывать их второй раз
+fun selectHeroItems(allItems: List<NewsItem>): List<NewsItem> {
+    val isNews = { it: NewsItem -> it.category !in setOf("CURRENCY", "CRYPTO") && it.cryptoSymbol == null }
+    val notSpam = { it: NewsItem -> !SPAM_PATTERNS_STATIC.containsMatchIn(it.title) && !RemoteConfig.buildSpamRegex().containsMatchIn(it.title) }
+    val candidates = (allItems.filter { isNews(it) && notSpam(it) && (it.priority >= 2 || it.category == "URGENT") } +
+     allItems.filter { isNews(it) && notSpam(it) && it.imageUrl != null && !it.isVideo })
+        .distinctBy { it.url.ifEmpty { it.title } }
+    // Не более 1 видео в карусели, тема-дедуп
+    val seenWords = mutableSetOf<String>()
+    var videoCount = 0
+    return candidates.filter { item ->
+        val words = item.title.lowercase().split(Regex("[\\s\\-:,.!?\"']+")).filter { it.length > 4 }.toSet()
+        if (item.isVideo) {
+            if (videoCount >= 1) return@filter false
+            if (words.any { it in seenWords }) return@filter false
+            videoCount++
+        }
+        seenWords += words
+        true
+    }.take(10)
+}
+
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun HeroCarousel(onOpenTikTok: (List<NewsItem>, Int) -> Unit) {
     val allItems by DataBridge.newsItemsFlow.collectAsState()
 
     // Отбираем: приоритет 2+ или есть фото — только новости, без крипты/валюты/спама
-    val heroItems = remember(allItems) {
-        val isNews = { it: NewsItem -> it.category !in setOf("CURRENCY", "CRYPTO") && it.cryptoSymbol == null }
-        val notSpam = { it: NewsItem -> !SPAM_PATTERNS_STATIC.containsMatchIn(it.title) && !RemoteConfig.buildSpamRegex().containsMatchIn(it.title) }
-        val candidates = (allItems.filter { isNews(it) && notSpam(it) && (it.priority >= 2 || it.category == "URGENT") } +
-         allItems.filter { isNews(it) && notSpam(it) && it.imageUrl != null && !it.isVideo })
-            .distinctBy { it.url.ifEmpty { it.title } }
-        // Не более 1 видео в карусели, тема-дедуп
-        val seenWords = mutableSetOf<String>()
-        var videoCount = 0
-        candidates.filter { item ->
-            val words = item.title.lowercase().split(Regex("[\\s\\-:,.!?\"']+")).filter { it.length > 4 }.toSet()
-            if (item.isVideo) {
-                if (videoCount >= 1) return@filter false
-                if (words.any { it in seenWords }) return@filter false
-                videoCount++
-            }
-            seenWords += words
-            true
-        }.take(10)
-    }
+    val heroItems = remember(allItems) { selectHeroItems(allItems) }
 
     if (heroItems.isEmpty()) return
 
@@ -1602,7 +1606,13 @@ fun NewsTileGrid(
     onOpenTikTok: (List<NewsItem>, Int) -> Unit
 ) {
     val allItems by DataBridge.newsItemsFlow.collectAsState()
-    val sorted = remember(allItems, category) { sortItems(allItems, category) }
+    val sorted = remember(allItems, category) {
+        // Исключаем новости, уже показанные в hero-карусели (только для главной)
+        val heroUrls = if (category == "ALL")
+            selectHeroItems(allItems).map { it.url.ifEmpty { it.title } }.toSet()
+        else emptySet()
+        sortItems(allItems, category).filter { (it.url.ifEmpty { it.title }) !in heroUrls }
+    }
 
     if (allItems.isEmpty()) return  // HomeContent уже показал SplashLoadingScreen
 
