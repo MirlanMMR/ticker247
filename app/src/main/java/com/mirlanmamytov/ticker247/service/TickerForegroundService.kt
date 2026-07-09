@@ -328,9 +328,9 @@ class TickerForegroundService : Service() {
                                 parser.fetchChannel(editorialSource)
                             }
                             allItems.addAll(editorialItems)
-                            editorialItems.filter { it.priority >= 3 }.take(1)
-                                .forEach { tickerItems.add(0, "🏆 ${it.title.substringBefore('\n').trim()}") }
-                            editorialItems.filter { it.priority == 2 }.take(2)
+                            // Редакторский канал: в тикер идут САМЫЕ СВЕЖИЕ посты
+                            // (список из парсера отсортирован от старых к новым)
+                            editorialItems.sortedByDescending { it.publishedAt }.take(2)
                                 .forEach { tickerItems.add(0, "⚡ ${it.title.substringBefore('\n').trim()}") }
                             Log.d("Ticker247", "@t247feed: ${editorialItems.size} items")
                         }
