@@ -334,9 +334,10 @@ class TickerForegroundService : Service() {
                                 parser.fetchChannel(editorialSource)
                             }
                             allItems.addAll(editorialItems)
-                            // Редакторский канал: в тикер идут САМЫЕ СВЕЖИЕ посты
-                            // (список из парсера отсортирован от старых к новым)
-                            editorialItems.sortedByDescending { it.publishedAt }.take(2)
+                            // Все посты идут в ленту, а в тикер — только помеченные редактором:
+                            // СРОЧНО / BREAKING / ⚡ / #важно / #urgent в тексте поста
+                            editorialItems.filter { it.category == "URGENT" }
+                                .sortedByDescending { it.publishedAt }.take(2)
                                 .forEach { tickerItems.add(0, "⚡ ${it.title.substringBefore('\n').trim()}") }
                             Log.d("Ticker247", "@t247feed: ${editorialItems.size} items")
                         }
