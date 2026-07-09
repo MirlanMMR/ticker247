@@ -737,7 +737,7 @@ fun SplashLoadingScreen() {
             Spacer(Modifier.height(16.dp))
             Text("Ticker 24/7", fontSize = 36.sp, fontWeight = FontWeight.Black, color = Color.White, letterSpacing = (-0.5).sp)
             Spacer(Modifier.height(12.dp))
-            Text("Тихо о важном", fontSize = 17.sp, fontWeight = FontWeight.Medium, color = Color(0xFF00D4FF), letterSpacing = 1.5.sp)
+            Text("Коротко о важном", fontSize = 17.sp, fontWeight = FontWeight.Medium, color = Color(0xFF00D4FF), letterSpacing = 1.5.sp)
             Spacer(Modifier.height(48.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 repeat(3) { i ->

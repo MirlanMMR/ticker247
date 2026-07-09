@@ -45,7 +45,7 @@ private object SplashStrings {
 
     fun get(lang: String): Strings = when (lang) {
         "es" -> Strings(
-            slogan = "En silencio, lo importante",
+            slogan = "Lo importante, en breve",
             firstLaunch = "¡Primera vez en este dispositivo!",
             loading = "Cargando lo más importante del mundo...",
             canClose = "Puedes cerrar la app —\nno te perderás nada.\nTe avisaremos.",
@@ -55,7 +55,7 @@ private object SplashStrings {
             errorConnection = "Error de conexión. Verifica tu internet."
         )
         "pt" -> Strings(
-            slogan = "Em silêncio, o que importa",
+            slogan = "O que importa, em resumo",
             firstLaunch = "Primeira vez neste dispositivo!",
             loading = "Carregando o mais importante do mundo...",
             canClose = "Pode fechar o app —\nvocê não vai perder nada.\nVamos te avisar.",
@@ -65,7 +65,7 @@ private object SplashStrings {
             errorConnection = "Erro de conexão. Verifique sua internet."
         )
         "en" -> Strings(
-            slogan = "Quietly about what matters",
+            slogan = "What matters, in brief",
             firstLaunch = "First launch on this device!",
             loading = "Loading what matters most...",
             canClose = "You can close the app —\nyou won't miss a thing.\nWe'll notify you.",
@@ -75,7 +75,7 @@ private object SplashStrings {
             errorConnection = "Connection error. Check your internet."
         )
         else -> Strings(
-            slogan = "Тихо о важном",
+            slogan = "Коротко о важном",
             firstLaunch = "Первый запуск на этом устройстве!",
             loading = "Загружаем самое важное со всего мира...",
             canClose = "Можете закрыть приложение —\nвы ничего не пропустите.\nМы вас оповестим.",
