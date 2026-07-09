@@ -7,8 +7,8 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Цены на топливо в Кыргызстане.
- * Источник: mototopline.kg (агрегатор цен по АЗС)
- * Fallback: hardcoded средние цены — меняются редко (раз в неделю-две)
+ * Источник: ежедневная сводка Kaktus.media «Сколько стоит бензин и дизтопливо»
+ * (строка Роснефть/КНП — ценовой ориентир). Динамика ▲▼ по локальной истории.
  */
 object FuelPriceFetcher {
 
@@ -80,12 +80,17 @@ object FuelPriceFetcher {
         }
 
         return try {
-            val html = fetchHtml("https://mototopline.kg") ?: return useFallback()
-            val prices = parseHtml(html)
+            // Kaktus.media ежедневно публикует сводку цен «Сколько стоит бензин...»
+            // Находим свежую статью с главной и парсим таблицу цен
+            val home = fetchHtml("https://kaktus.media") ?: return useFallback()
+            val articleUrl = Regex("href=\"(https?://kaktus\\.media/doc/\\d+_skolko_stoi[a-z]*_benzin[^\"]*)\"")
+                .find(home)?.groupValues?.get(1) ?: return useFallback()
+            val article = fetchHtml(articleUrl) ?: return useFallback()
+            val prices = parseKaktusTable(article)
             if (prices != null) {
                 cache = prices.copy(isReal = true)
-                Log.d(TAG, "Fuel prices: А-92=${prices.a92}, А-95=${prices.a95}, ДТ=${prices.diesel}")
-                prices
+                Log.d(TAG, "Fuel prices (kaktus): А-92=${prices.a92}, А-95=${prices.a95}, ДТ=${prices.diesel}")
+                cache!!
             } else {
                 useFallback()
             }
@@ -95,6 +100,22 @@ object FuelPriceFetcher {
         }
     }
 
+    /**
+     * Парсит таблицу цен из статьи Kaktus: строка «Роснефть» содержит
+     * три цены подряд — АИ-92, АИ-95, ДТ (Роснефть/КНП — ценовой ориентир рынка)
+     */
+    private fun parseKaktusTable(html: String): FuelPrices? {
+        val text = html.replace(Regex("<[^>]+>"), " ")
+        val idx = text.indexOf("Роснефть")
+        if (idx < 0) return null
+        val window = text.substring(idx, (idx + 200).coerceAtMost(text.length))
+        val nums = Regex("""\d{2,3}[.,]\d{1,2}""").findAll(window)
+            .mapNotNull { it.value.replace(',', '.').toDoubleOrNull() }
+            .filter { it in 40.0..200.0 }
+            .take(3).toList()
+        return if (nums.size >= 3) FuelPrices(a92 = nums[0], a95 = nums[1], diesel = nums[2]) else null
+    }
+
     private fun useFallback(): FuelPrices {
         return cache ?: FALLBACK
     }
@@ -102,42 +123,6 @@ object FuelPriceFetcher {
     private fun fetchHtml(url: String): String? {
         val req = Request.Builder().url(url).build()
         return client.newCall(req).execute().use { it.body?.string() }
-    }
-
-    private fun parseHtml(html: String): FuelPrices? {
-        // mototopline.kg — ищем паттерны вида "62.50" или "63" рядом с А-92/А-95/ДТ
-        val a92   = extractPrice(html, listOf("А-92", "A-92", "АИ-92", "92"))
-        val a95   = extractPrice(html, listOf("А-95", "A-95", "АИ-95", "95"))
-        val diesel = extractPrice(html, listOf("Дизель", "ДТ", "Diesel", "дизельное"))
-
-        return if (a92 != null || a95 != null || diesel != null) {
-            FuelPrices(a92 = a92, a95 = a95, diesel = diesel)
-        } else null
-    }
-
-    /**
-     * Ищет цену (число 50-120) в окрестности ключевых слов.
-     * Паттерн: ключевое_слово ... число.XX или число
-     */
-    private fun extractPrice(html: String, keywords: List<String>): Double? {
-        val pricePattern = Regex("""(\d{2,3}(?:\.\d{1,2})?)""")
-
-        for (kw in keywords) {
-            val idx = html.indexOf(kw, ignoreCase = true)
-            if (idx < 0) continue
-
-            // Смотрим 200 символов вперёд и назад от ключевого слова
-            val window = html.substring(
-                (idx - 50).coerceAtLeast(0),
-                (idx + 200).coerceAtMost(html.length)
-            )
-            val match = pricePattern.findAll(window)
-                .mapNotNull { it.value.toDoubleOrNull() }
-                .firstOrNull { it in 40.0..150.0 }  // реальный диапазон цен на топливо в KGS
-
-            if (match != null) return match
-        }
-        return null
     }
 
     /** Форматирует цены в строки для тикера — с динамикой ▲▼ если цена менялась */
