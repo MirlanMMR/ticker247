@@ -67,7 +67,12 @@ fun TikTokReader(
     Box(Modifier.fillMaxSize().background(Color.Black)) {
             VerticalPager(
                 state = pagerState,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                // Лёгкий свайп: достаточно протянуть 15% экрана чтобы перейти к следующей новости
+                flingBehavior = androidx.compose.foundation.pager.PagerDefaults.flingBehavior(
+                    state = pagerState,
+                    snapPositionalThreshold = 0.15f
+                )
             ) { page ->
                 TikTokPage(item = items[page % items.size], onBack = onBack)
             }
