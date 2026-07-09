@@ -323,14 +323,16 @@ class TickerForegroundService : Service() {
                     try {
                         val firebaseItems = FirebaseNewsRepository.fetchNews()
                         allItems.addAll(firebaseItems)
+                        // Бегущая строка — только на языке интерфейса (мировые новости в пуле на английском)
+                        val tickerCandidates = firebaseItems.filter { matchesUiLanguage(it.title) }
                         // URGENT — всегда первым в тикере
-                        val urgentItem = firebaseItems.firstOrNull { it.category == "URGENT" }
+                        val urgentItem = tickerCandidates.firstOrNull { it.category == "URGENT" }
                         if (urgentItem != null) {
-                            tickerItems.add(0, "🚨 " + urgentItem.title.trimStart('🚨', '⚡', ' '))
+                            tickerItems.add(0, "🚨 " + urgentItem.title.trimStart { it == ' ' }.removePrefix("🚨").removePrefix("⚡").trimStart())
                         }
                         // Остальные важные (priority >= 2, не URGENT) — после urgent
-                        firebaseItems.filter { it.priority >= 2 && it.category != "URGENT" }.take(3)
-                            .forEach { tickerItems.add("⚡ " + it.title.trimStart('⚡', ' ')) }
+                        tickerCandidates.filter { it.priority >= 2 && it.category != "URGENT" }.take(3)
+                            .forEach { tickerItems.add("⚡ " + it.title.trimStart { it == ' ' }.removePrefix("⚡").trimStart()) }
                         Log.d("Ticker247", "Firebase: ${firebaseItems.size} items, urgent=${urgentItem != null}")
                     } catch (e: Exception) { Log.e("Ticker247", "Firebase: ${e.message}") }
 
@@ -577,6 +579,17 @@ class TickerForegroundService : Service() {
         }
 
         return parts.joinToString("  |  ")
+    }
+
+    // Заголовок подходит для бегущей строки только если он на языке интерфейса:
+    // кириллические локали (ru/ky/kk и др.) → кириллица, остальные → латиница
+    private fun matchesUiLanguage(title: String): Boolean {
+        if (title.isBlank()) return false
+        val cyrillic = title.count { it in 'Ѐ'..'ӿ' }
+        val latin = title.count { it.lowercaseChar() in 'a'..'z' }
+        val cyrillicLocales = setOf("ru", "ky", "kk", "uz", "tg", "be", "uk")
+        return if (java.util.Locale.getDefault().language in cyrillicLocales)
+            cyrillic > latin else latin > cyrillic
     }
 
     private fun timeAgoShort(timestamp: Long): String {
