@@ -115,19 +115,26 @@ object NewsBuffer {
         // Финансовые данные всегда первыми — их нельзя вытеснить из ленты
         // Кириллические языки взаимопонятны — ru/ky/uk читают одно
         val cyrillicLangs = setOf("ru", "ky", "uk", "be", "bg", "sr", "mk")
-        val userLang = deviceLanguage
+        // Сравниваем с языком ПУЛА, а не устройства: турецкая/немецкая/любая другая
+        // локаль получает английский пул — и должна видеть его новости, а не пустую ленту
+        val poolLang = when {
+            deviceLanguage in cyrillicLangs -> "ru"
+            deviceLanguage == "es" -> "es"
+            deviceLanguage == "pt" -> "pt"
+            else -> "en"
+        }
         val finance = buffer.filter { it.category in setOf("CURRENCY", "CRYPTO") }
         val rest    = buffer.filter { item ->
             item.category !in setOf("CURRENCY", "CRYPTO") &&
             item.publishedAt >= cutoff &&
-            // Фильтруем контент не на языке пользователя
+            // Фильтруем контент не на языке пула
             // Исключение: если язык неизвестен ("unknown"/"other") — показываем
             run {
                 val itemLang = item.language
                 when {
                     itemLang == "unknown" || itemLang == "other" || itemLang.isEmpty() -> true
-                    userLang in cyrillicLangs -> itemLang in cyrillicLangs
-                    else -> itemLang == userLang
+                    poolLang == "ru" -> itemLang in cyrillicLangs
+                    else -> itemLang == poolLang
                 }
             }
         }

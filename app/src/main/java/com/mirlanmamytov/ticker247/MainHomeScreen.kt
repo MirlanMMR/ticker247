@@ -1028,13 +1028,8 @@ fun CurrencyTile() {
     val lang = java.util.Locale.getDefault().language
     val cyrillicLangs = setOf("ru", "ky", "uk", "be", "bg", "sr", "mk")
 
-    // Базовая валюта и подпись зависят от языка пула
-    val (baseCurrency, rateLabel) = when {
-        lang in cyrillicLangs -> Pair("KGS", "сом")
-        lang == "es"          -> Pair("USD", "USD")
-        lang == "pt"          -> Pair("BRL", "BRL")
-        else                  -> Pair("USD", "USD")
-    }
+    // Данные всегда в сомах (курсы НБКР) — меняется только написание подписи
+    val rateLabel = if (lang in cyrillicLangs) "сом" else "KGS"
 
     val rates = remember(currency) {
         currency.title.split("|").map { it.trim() }.filter { it.isNotEmpty() }
@@ -1119,12 +1114,8 @@ fun CurrencyDetailSheet(currency: NewsItem) {
 
     Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 40.dp)) {
         val sheetLang = java.util.Locale.getDefault().language
-        val sheetBase = when {
-            sheetLang in setOf("ru","ky","uk","be","bg","sr","mk") -> "сому"
-            sheetLang == "es" -> "USD"
-            sheetLang == "pt" -> "BRL"
-            else -> "USD"
-        }
+        // Данные всегда в сомах (курсы НБКР) — меняется только написание
+        val sheetBase = if (sheetLang in setOf("ru","ky","uk","be","bg","sr","mk")) "сому" else "KGS"
         Text("💱 Exchange rates · $sheetBase", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold,
             color = textColor, modifier = Modifier.padding(bottom = 4.dp))
         Text(timeAgo(currency.publishedAt), fontSize = 12.sp, color = subColor,
