@@ -1025,11 +1025,8 @@ fun CurrencyTile() {
     val currency = remember(allItems) { allItems.firstOrNull { it.category == "CURRENCY" } }
     if (currency == null) return
 
-    val lang = java.util.Locale.getDefault().language
-    val cyrillicLangs = setOf("ru", "ky", "uk", "be", "bg", "sr", "mk")
-
-    // Данные всегда в сомах (курсы НБКР) — меняется только написание подписи
-    val rateLabel = if (lang in cyrillicLangs) "сом" else "KGS"
+    // Подпись из того же профиля, по которому сервис строит данные
+    val rateLabel = remember { com.mirlanmamytov.ticker247.util.CurrencyProfile.current().label }
 
     val rates = remember(currency) {
         currency.title.split("|").map { it.trim() }.filter { it.isNotEmpty() }
@@ -1113,9 +1110,8 @@ fun CurrencyDetailSheet(currency: NewsItem) {
     val rates = currency.title.split("|").map { it.trim() }.filter { it.isNotEmpty() }
 
     Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 40.dp)) {
-        val sheetLang = java.util.Locale.getDefault().language
-        // Данные всегда в сомах (курсы НБКР) — меняется только написание
-        val sheetBase = if (sheetLang in setOf("ru","ky","uk","be","bg","sr","mk")) "сому" else "KGS"
+        // Подпись из того же профиля, по которому сервис строит данные
+        val sheetBase = remember { com.mirlanmamytov.ticker247.util.CurrencyProfile.current().label }
         Text("💱 Exchange rates · $sheetBase", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold,
             color = textColor, modifier = Modifier.padding(bottom = 4.dp))
         Text(timeAgo(currency.publishedAt), fontSize = 12.sp, color = subColor,

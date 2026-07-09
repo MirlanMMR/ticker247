@@ -85,20 +85,13 @@ class TickerForegroundService : Service() {
                     val now = System.currentTimeMillis()
                     val newItems = DataBridge.newsItems.toMutableList()
 
-                    // Обновляем валюту
+                    // Обновляем валюту — база и набор зависят от локали (CurrencyProfile)
                     try {
-                        val r = ApiClient.exchangeRate.getRates("USD")
-                        if (r.result == "success" && r.rates != null) {
-                            val kgs = r.rates["KGS"] ?: 0.0
-                            fun toSom(code: String) = r.rates[code]?.let { kgs / it }
-                            val parts = mutableListOf("USD ${"%.2f".format(kgs)}")
-                            toSom("EUR")?.let { parts.add("EUR ${"%.2f".format(it)}") }
-                            toSom("RUB")?.let { parts.add("RUB ${"%.4f".format(it)}") }
-                            toSom("KZT")?.let { parts.add("KZT ${"%.4f".format(it)}") }
-                            toSom("UZS")?.let { parts.add("UZS ${"%.6f".format(it)}") }
-                            toSom("TRY")?.let { parts.add("TRY ${"%.3f".format(it)}") }
-                            toSom("AED")?.let { parts.add("AED ${"%.2f".format(it)}") }
-                            val ratesText = parts.joinToString(" | ")
+                        val profile = com.mirlanmamytov.ticker247.util.CurrencyProfile.current()
+                        val r = ApiClient.exchangeRate.getRates(profile.base)
+                        val ratesText = if (r.result == "success" && r.rates != null)
+                            com.mirlanmamytov.ticker247.util.CurrencyProfile.buildRatesText(r.rates) else null
+                        if (ratesText != null) {
                             newItems.removeAll { it.category == "CURRENCY" }
                             newItems.add(0, NewsItem(
                                 url = "", title = ratesText, summary = ratesText,
@@ -142,9 +135,10 @@ class TickerForegroundService : Service() {
                         val tickerFuel     = mutableListOf<String>()
                         val tickerCrypto   = mutableListOf<String>()
                         newItems.firstOrNull { it.category == "CURRENCY" }?.let { cur ->
+                            val label = com.mirlanmamytov.ticker247.util.CurrencyProfile.current().label
                             val parts = cur.title.split(" | ")
-                            parts.firstOrNull { it.startsWith("USD") }?.let { tickerItems.add("💵 $it сом") }
-                            parts.firstOrNull { it.startsWith("EUR") }?.let { tickerItems.add("💶 $it сом") }
+                            parts.firstOrNull { it.startsWith("USD") }?.let { tickerItems.add("💵 $it $label") }
+                            parts.firstOrNull { it.startsWith("EUR") }?.let { tickerItems.add("💶 $it $label") }
                         }
                         newItems.filter { it.category == "CRYPTO" }.take(5).forEach { coin ->
                             val price  = coin.cryptoPrice ?: 0.0
@@ -199,33 +193,21 @@ class TickerForegroundService : Service() {
                     val now = System.currentTimeMillis()
 
                     // 1. Валюта — ExchangeRate → fallback: кэш из буфера
+                    // База и набор валют зависят от локали (CurrencyProfile)
                     try {
-                        val r = ApiClient.exchangeRate.getRates("USD")
-                        if (r.result == "success" && r.rates != null) {
-                            val kgs = r.rates["KGS"] ?: 0.0
-                            fun toSom(code: String) = r.rates[code]?.let { kgs / it }
-                            val parts = mutableListOf("USD ${"%.2f".format(kgs)}")
-                            toSom("EUR")?.let { parts.add("EUR ${"%.2f".format(it)}") }
-                            toSom("RUB")?.let { parts.add("RUB ${"%.4f".format(it)}") }
-                            toSom("KZT")?.let { parts.add("KZT ${"%.4f".format(it)}") }
-                            toSom("UZS")?.let { parts.add("UZS ${"%.6f".format(it)}") }
-                            toSom("TRY")?.let { parts.add("TRY ${"%.3f".format(it)}") }
-                            toSom("AED")?.let { parts.add("AED ${"%.2f".format(it)}") }
-                            val ratesText = parts.joinToString(" | ")
-                            // Все валюты в тикер
-                            tickerCurrency.add("💵 USD ${"%.2f".format(kgs)} сом")
-                            toSom("EUR")?.let { tickerCurrency.add("💶 EUR ${"%.2f".format(it)} сом") }
-                            toSom("RUB")?.let { tickerCurrency.add("🇷🇺 RUB ${"%.2f".format(it)} сом") }
-                            toSom("KZT")?.let { tickerCurrency.add("🇰🇿 KZT ${"%.2f".format(it)} сом") }
-                            toSom("UZS")?.let { tickerCurrency.add("🇺🇿 UZS ${"%.4f".format(it)} сом") }
-                            toSom("AED")?.let { tickerCurrency.add("🇦🇪 AED ${"%.2f".format(it)} сом") }
-                            toSom("GEL")?.let { tickerCurrency.add("🇬🇪 GEL ${"%.2f".format(it)} сом") }
+                        val profile = com.mirlanmamytov.ticker247.util.CurrencyProfile.current()
+                        val r = ApiClient.exchangeRate.getRates(profile.base)
+                        val ratesText = if (r.result == "success" && r.rates != null)
+                            com.mirlanmamytov.ticker247.util.CurrencyProfile.buildRatesText(r.rates) else null
+                        if (ratesText != null) {
+                            com.mirlanmamytov.ticker247.util.CurrencyProfile.buildTickerEntries(r.rates!!)
+                                .forEach { tickerCurrency.add(it) }
                             allItems.add(NewsItem(
                                 url = "", title = ratesText, summary = ratesText,
                                 imageUrl = null, source = "ExchangeRate",
                                 category = "CURRENCY", publishedAt = now, priority = 0
                             ))
-                            Log.d("Ticker247", "Currency: OK")
+                            Log.d("Ticker247", "Currency: OK (base=${profile.base})")
                         }
                     } catch (e: Exception) {
                         Log.w("Ticker247", "Currency ExchangeRate failed: ${e.message}, using cache")
@@ -611,28 +593,14 @@ class TickerForegroundService : Service() {
             catch (e: Exception) { Log.w("Ticker247", "TrendingFetcher: ${e.message}") }
         }
 
-        // Параллельно: валюта
+        // Параллельно: валюта — база и набор зависят от локали (CurrencyProfile)
         val currencyDeferred = async(Dispatchers.IO) {
             try {
-                val r = ApiClient.exchangeRate.getRates("USD")
-                if (r.result == "success" && r.rates != null) {
-                    val kgs = r.rates["KGS"] ?: return@async null
-                    fun toSom(code: String): Double? = r.rates[code]?.let { kgs / it }
-
-                    val parts = mutableListOf<String>()
-                    parts.add("USD ${"%.2f".format(kgs)}")
-                    toSom("EUR")?.let { parts.add("EUR ${"%.2f".format(it)}") }
-                    toSom("RUB")?.let { parts.add("RUB ${"%.4f".format(it)}") }
-                    toSom("KZT")?.let { parts.add("KZT ${"%.4f".format(it)}") }
-                    toSom("UZS")?.let { parts.add("UZS ${"%.6f".format(it)}") }
-                    toSom("CNY")?.let { parts.add("CNY ${"%.2f".format(it)}") }
-                    toSom("TRY")?.let { parts.add("TRY ${"%.3f".format(it)}") }
-                    toSom("AED")?.let { parts.add("AED ${"%.2f".format(it)}") }
-                    toSom("SAR")?.let { parts.add("SAR ${"%.2f".format(it)}") }
-                    toSom("JPY")?.let { parts.add("JPY ${"%.4f".format(it)}") }
-                    toSom("KRW")?.let { parts.add("KRW ${"%.5f".format(it)}") }
-                    parts.joinToString(" | ")
-                } else null
+                val profile = com.mirlanmamytov.ticker247.util.CurrencyProfile.current()
+                val r = ApiClient.exchangeRate.getRates(profile.base)
+                if (r.result == "success" && r.rates != null)
+                    com.mirlanmamytov.ticker247.util.CurrencyProfile.buildRatesText(r.rates)
+                else null
             } catch (e: Exception) { Log.e("Ticker247", "Currency: ${e.message}"); null }
         }
 
