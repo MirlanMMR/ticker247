@@ -25,6 +25,39 @@ object FuelPriceFetcher {
 
     private var cache: FuelPrices? = null
 
+    // История цен: храним последнюю цену в SharedPreferences,
+    // при изменении запоминаем предыдущую — для динамики ▲▼ в тикере
+    private var prefs: android.content.SharedPreferences? = null
+
+    fun init(context: android.content.Context) {
+        prefs = context.getSharedPreferences("fuel_prices", android.content.Context.MODE_PRIVATE)
+    }
+
+    /** Обновляет историю и возвращает изменение цены (текущая - предыдущая) */
+    private fun trackDelta(key: String, current: Double?): Double? {
+        val p = prefs ?: return null
+        if (current == null) return null
+        val last = p.getFloat("last_$key", 0f).toDouble()
+        if (last == 0.0) {
+            p.edit().putFloat("last_$key", current.toFloat()).apply()
+            return null
+        }
+        if (kotlin.math.abs(last - current) >= 0.5) {
+            // Цена изменилась — запоминаем прошлую и новую
+            p.edit()
+                .putFloat("prev_$key", last.toFloat())
+                .putFloat("last_$key", current.toFloat())
+                .putLong("changed_$key", System.currentTimeMillis())
+                .apply()
+            return current - last
+        }
+        // Цена не менялась — показываем последнее изменение если оно свежее 7 дней
+        val prev = p.getFloat("prev_$key", 0f).toDouble()
+        val changedAt = p.getLong("changed_$key", 0L)
+        val weekAgo = System.currentTimeMillis() - 7 * 24 * 3_600_000L
+        return if (prev > 0 && changedAt > weekAgo) current - prev else null
+    }
+
     // Реальные цены Бишкек (обновлять вручную при изменении)
     private val FALLBACK = FuelPrices(a92 = null, a95 = null, diesel = null, isReal = false)
 
@@ -107,12 +140,22 @@ object FuelPriceFetcher {
         return null
     }
 
-    /** Форматирует цены в строки для тикера */
+    /** Форматирует цены в строки для тикера — с динамикой ▲▼ если цена менялась */
     fun toTickerItems(prices: FuelPrices): List<String> {
-        val items = mutableListOf<String>()
-        prices.a92?.let    { items.add("⛽ А-92: ${"%.0f".format(it)} сом") }
-        prices.a95?.let    { items.add("⛽ А-95: ${"%.0f".format(it)} сом") }
-        prices.diesel?.let { items.add("⛽ ДТ: ${"%.0f".format(it)} сом") }
-        return items
+        fun fmt(label: String, key: String, price: Double?): String? {
+            if (price == null) return null
+            val delta = trackDelta(key, price)
+            val arrow = when {
+                delta == null || kotlin.math.abs(delta) < 0.5 -> ""
+                delta > 0 -> " ▲+${"%.0f".format(delta)}"
+                else      -> " ▼${"%.0f".format(delta)}"
+            }
+            return "⛽ $label: ${"%.0f".format(price)} сом$arrow"
+        }
+        return listOfNotNull(
+            fmt("А-92", "a92", prices.a92),
+            fmt("А-95", "a95", prices.a95),
+            fmt("ДТ", "diesel", prices.diesel)
+        )
     }
 }

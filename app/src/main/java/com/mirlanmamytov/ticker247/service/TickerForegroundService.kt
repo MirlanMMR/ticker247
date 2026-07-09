@@ -68,6 +68,7 @@ class TickerForegroundService : Service() {
         }
         createNotificationChannels()
         com.mirlanmamytov.ticker247.data.repository.NewsBuffer.init(this)
+        com.mirlanmamytov.ticker247.network.FuelPriceFetcher.init(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
