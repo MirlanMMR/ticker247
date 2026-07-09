@@ -324,8 +324,8 @@ class TickerForegroundService : Service() {
                         val editorialChannel = when (java.util.Locale.getDefault().language) {
                             in setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk") -> "t247feed"
                             "es" -> "ticker247feed_es"
-                            "pt" -> "ticker247feed_pt"
-                            else -> "ticker247feed_en"
+                            "pt" -> "t247feed_pt"
+                            else -> "t247feed_en"
                         }
                         val editorialSource = com.mirlanmamytov.ticker247.network.TelegramParser
                             .TelegramSource(editorialChannel, "KG", 10)
