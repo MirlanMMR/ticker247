@@ -92,6 +92,11 @@ object TelegramParser {
                 val cleanText = stripHtml(rawHtml).trim()
                 if (cleanText.length < 20) continue
 
+                // Архивные посты бота (новости из тикера, запощенные бэкендом в канал)
+                // имеют подпись «📲 @t247feed…» — их обратно в приложение не берём.
+                // Ручные редакторские посты подписи не имеют и получают высший приоритет.
+                if (cleanText.contains("📲 @t247feed")) continue
+
                 // Ссылка на пост в Telegram
                 val telegramUrl = block.selectFirst("a.tgme_widget_message_date")
                     ?.attr("href") ?: continue
