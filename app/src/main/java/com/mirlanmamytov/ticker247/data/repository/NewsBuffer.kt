@@ -123,10 +123,12 @@ object NewsBuffer {
             deviceLanguage == "pt" -> "pt"
             else -> "en"
         }
+        val now = System.currentTimeMillis()
         val finance = buffer.filter { it.category in setOf("CURRENCY", "CRYPTO") }
         val rest    = buffer.filter { item ->
             item.category !in setOf("CURRENCY", "CRYPTO") &&
-            item.publishedAt >= cutoff &&
+            // Обычные новости живут 24ч; посты с таймером (#3д/#12ч) — до истечения
+            (if (item.expiresAt != null) item.expiresAt > now else item.publishedAt >= cutoff) &&
             // Фильтруем контент не на языке пула
             // Исключение: если язык неизвестен ("unknown"/"other") — показываем
             run {

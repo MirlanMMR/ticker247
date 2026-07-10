@@ -1300,7 +1300,8 @@ fun CryptoDetailSheet(cryptos: List<NewsItem>) {
 fun selectHeroItems(allItems: List<NewsItem>): List<NewsItem> {
     val isNews = { it: NewsItem -> it.category !in setOf("CURRENCY", "CRYPTO") && it.cryptoSymbol == null }
     val notSpam = { it: NewsItem -> !SPAM_PATTERNS_STATIC.containsMatchIn(it.title) && !RemoteConfig.buildSpamRegex().containsMatchIn(it.title) }
-    val candidates = (allItems.filter { isNews(it) && notSpam(it) && (it.priority >= 2 || it.category == "URGENT") } +
+    val candidates = (allItems.filter { isNews(it) && notSpam(it) && it.isEditorCarousel } +
+     allItems.filter { isNews(it) && notSpam(it) && (it.priority >= 2 || it.category == "URGENT") } +
      allItems.filter { isNews(it) && notSpam(it) && it.imageUrl != null && !it.isVideo })
         .distinctBy { it.url.ifEmpty { it.title } }
     // Не более 1 видео в карусели, тема-дедуп

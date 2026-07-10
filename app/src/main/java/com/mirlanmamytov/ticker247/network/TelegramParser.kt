@@ -82,7 +82,8 @@ object TelegramParser {
         val doc = org.jsoup.Jsoup.parse(html)
         val postBlocks = doc.select("div.tgme_widget_message_wrap")
 
-        for (block in postBlocks.takeLast(10)) {
+        // 30 постов: длинные посты (#7д) не должны вытесняться свежими из окна
+        for (block in postBlocks.takeLast(30)) {
             try {
                 // Текст поста
                 val textEl = block.selectFirst("div.tgme_widget_message_text") ?: continue
@@ -117,7 +118,7 @@ object TelegramParser {
 
                 // Чистим текст — убираем URL, хэштеги, призывы к подписке, лишние эмодзи в начале
                 val urlRegex = Regex("https?://\\S+")
-                val hashtagRegex = Regex("#\\w+")
+                val hashtagRegex = Regex("#[\\wа-яё]+", RegexOption.IGNORE_CASE)
                 val selfPromo = Regex(
                     "(подпис|поделис|подпишись|читайте|читать далее|следите|наш канал|наш telegram|@\\w+\\s*$|>>>|<<<)",
                     RegexOption.IGNORE_CASE
@@ -161,12 +162,25 @@ object TelegramParser {
                     if (externalUrl == null) continue
                 }
 
-                // Срочность — только если в тексте есть ключевые слова (независимо от канала)
+                // ── Редакторские маркеры-хэштеги ─────────────────────────────
+                // #срочно → уведомление + тикер первым; #важно → тикер ⚡;
+                // #карусель → hero-карусель; #3д/#12ч → время жизни поста
+                val tagUrgent    = Regex("#срочно|#urgent", RegexOption.IGNORE_CASE).containsMatchIn(cleanText)
+                val tagImportant = Regex("#важно|#important", RegexOption.IGNORE_CASE).containsMatchIn(cleanText)
+                val tagCarousel  = Regex("#карусель|#carousel", RegexOption.IGNORE_CASE).containsMatchIn(cleanText)
+                val lifetimeMs = Regex("#(\\d{1,2})\\s?(д|d|ч|h)\\b", RegexOption.IGNORE_CASE)
+                    .find(cleanText)?.let { m ->
+                        val n = m.groupValues[1].toLongOrNull() ?: return@let null
+                        val unit = if (m.groupValues[2].lowercase() in setOf("д", "d")) 24 * 3_600_000L else 3_600_000L
+                        n * unit
+                    }
+
+                // Срочность — маркер редактора или ключевые слова (для всех каналов)
                 val urgentKeywords = Regex(
-                    "СРОЧНО|BREAKING|ЭКСТРЕННО|⚡|#важно|#urgent|убит|убита|убили|взрыв|теракт|катастроф|крушение|землетрясение|захват|эвакуац",
+                    "СРОЧНО|BREAKING|ЭКСТРЕННО|⚡|убит|убита|убили|взрыв|теракт|катастроф|крушение|землетрясение|захват|эвакуац",
                     RegexOption.IGNORE_CASE
                 )
-                val isUrgent = cleanText.contains(urgentKeywords)
+                val isUrgent = tagUrgent || cleanText.contains(urgentKeywords)
 
                 // 🏆 KG спорт → URGENT: наши атлеты победили — первыми в ленте везде в мире
                 // Ищем сочетание "кыргыз*" + победа ИЛИ победа + "кыргыз*" в радиусе 80 символов
@@ -222,7 +236,10 @@ object TelegramParser {
                     publishedAt = publishedAt,
                     priority = finalPriority,
                     telegramViews = telegramViews,
-                    isTrending = trending
+                    isTrending = trending,
+                    isEditorImportant = tagImportant,
+                    isEditorCarousel = tagCarousel,
+                    expiresAt = lifetimeMs?.let { publishedAt + it }
                 ))
             } catch (e: Exception) { /* skip bad post */ }
         }

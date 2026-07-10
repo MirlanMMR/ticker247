@@ -30,5 +30,11 @@ data class NewsItem(
     // Язык контента — для фильтрации по языку устройства
     val language: String = "ru",
     // Масштаб: "local" — локальные/региональные, "world" — мировые
-    val scope: String = "world"
+    val scope: String = "world",
+    // ── Редакторские маркеры (хэштеги в постах TG-канала) ────────────────
+    // #срочно → category=URGENT; #важно → тикер ⚡; #карусель → hero-карусель
+    val isEditorImportant: Boolean = false,
+    val isEditorCarousel: Boolean = false,
+    // Время жизни поста (#3д / #12ч): null = стандартные 24 часа
+    val expiresAt: Long? = null
 )

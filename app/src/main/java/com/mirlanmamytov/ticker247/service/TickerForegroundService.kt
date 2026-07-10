@@ -335,11 +335,14 @@ class TickerForegroundService : Service() {
                                 parser.fetchChannel(editorialSource)
                             }
                             allItems.addAll(editorialItems)
-                            // Все посты идут в ленту, а в тикер — только помеченные редактором:
-                            // СРОЧНО / BREAKING / ⚡ / #важно / #urgent в тексте поста
-                            editorialItems.filter { it.category == "URGENT" }
+                            // Все посты идут в ленту, а в тикер — только помеченные:
+                            // #важно → ⚡, #срочно → 🚨 первым (+ уведомление)
+                            editorialItems.filter { it.isEditorImportant && it.category != "URGENT" }
                                 .sortedByDescending { it.publishedAt }.take(2)
                                 .forEach { tickerItems.add(0, "⚡ ${it.title.substringBefore('\n').trim()}") }
+                            editorialItems.filter { it.category == "URGENT" }
+                                .sortedByDescending { it.publishedAt }.take(2)
+                                .forEach { tickerItems.add(0, "🚨 ${it.title.substringBefore('\n').trim()}") }
                             Log.d("Ticker247", "@t247feed: ${editorialItems.size} items")
                         }
                     } catch (e: Exception) { Log.e("Ticker247", "@t247feed: ${e.message}") }
