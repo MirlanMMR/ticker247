@@ -137,6 +137,48 @@ object FirebaseNewsRepository {
         })
     }
 
+    // ── Редакторские Telegram-каналы ─────────────────────────────────────────
+    // Имена читаются из /config/editorial_channels (бэкенд публикует при каждом
+    // запуске). Фолбэк — зашитые имена, если Firebase недоступен.
+
+    private val EDITORIAL_FALLBACK = mapOf(
+        "ru" to "t247feed",
+        "en" to "t247feed_en",
+        "es" to "t247feed_es",
+        "pt" to "t247feed_pt"
+    )
+
+    @Volatile private var editorialCache: Map<String, String>? = null
+
+    suspend fun fetchEditorialChannel(): String {
+        val channels = try {
+            suspendCancellableCoroutine<Map<String, String>> { cont ->
+                database.getReference("config/editorial_channels")
+                    .addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            val map = snapshot.children.mapNotNull { child ->
+                                val v = child.getValue(String::class.java)
+                                if (child.key != null && !v.isNullOrBlank()) child.key!! to v else null
+                            }.toMap()
+                            cont.resume(map)
+                        }
+                        override fun onCancelled(error: DatabaseError) { cont.resume(emptyMap()) }
+                    })
+            }.also { if (it.isNotEmpty()) editorialCache = it }
+        } catch (e: Exception) { emptyMap() }
+
+        val effective = channels.ifEmpty { editorialCache ?: EDITORIAL_FALLBACK }
+        val lang = java.util.Locale.getDefault().language
+        val cyrillicLangs = setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk")
+        val key = when {
+            lang in cyrillicLangs -> "ru"
+            lang == "es" -> "es"
+            lang == "pt" -> "pt"
+            else -> "en"
+        }
+        return effective[key] ?: EDITORIAL_FALLBACK.getValue(key)
+    }
+
     fun updateDataBridge(items: List<NewsItem>) {
         val tickerItems = items
             .filter { it.category in setOf("CURRENCY", "CRYPTO", "URGENT", "TRENDS") }

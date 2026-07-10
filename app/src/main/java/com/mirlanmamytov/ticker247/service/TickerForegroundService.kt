@@ -319,15 +319,11 @@ class TickerForegroundService : Service() {
                         Log.d("Ticker247", "Firebase: ${firebaseItems.size} items, urgent=${urgentItem != null}")
                     } catch (e: Exception) { Log.e("Ticker247", "Firebase: ${e.message}") }
 
-                    // 5. Редакторский Telegram-канал — у каждого языкового пула свой
+                    // 5. Редакторский Telegram-канал — у каждого языкового пула свой,
+                    // имя приходит из Firebase /config/editorial_channels (фолбэк зашит)
                     try {
                         val parser = com.mirlanmamytov.ticker247.network.TelegramParser
-                        val editorialChannel = when (java.util.Locale.getDefault().language) {
-                            in setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk") -> "t247feed"
-                            "es" -> "t247feed_es"
-                            "pt" -> "t247feed_pt"
-                            else -> "t247feed_en"
-                        }
+                        val editorialChannel = FirebaseNewsRepository.fetchEditorialChannel()
                         val editorialSource = com.mirlanmamytov.ticker247.network.TelegramParser
                             .TelegramSource(editorialChannel, "KG", 10)
                         run {
