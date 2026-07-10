@@ -225,57 +225,63 @@ object SourceSelector {
 
     // ── Главная функция — собрать полный список источников ───────────────────
 
+    // Группа из Firebase (/config/app_sources) или зашитый фолбэк.
+    // FirebaseSourceConfig.refresh() вызывается сервисом перед каждым fetch-циклом.
+    private fun grp(name: String, fallback: List<ChannelSource>): List<ChannelSource> =
+        FirebaseSourceConfig.groups[name]?.takeIf { it.isNotEmpty() } ?: fallback
+
     fun getSources(ctx: UserLocale.UserContext): List<ChannelSource> {
         val sources = mutableListOf<ChannelSource>()
 
         // 1. KG-источники — всегда
-        sources.addAll(KG_ALWAYS)
-        sources.addAll(KG_SPORT)
-        sources.addAll(KG_YOUTUBE)
+        sources.addAll(grp("kg_always", KG_ALWAYS))
+        sources.addAll(grp("kg_sport", KG_SPORT))
+        sources.addAll(grp("kg_youtube", KG_YOUTUBE))
 
         // 2. Мировые — нейтральная база
-        sources.addAll(WORLD_NEUTRAL)
+        val worldNeutral = grp("world_neutral", WORLD_NEUTRAL)
+        sources.addAll(worldNeutral)
 
         // 3. Дополнительные мировые по региону
         when (ctx.region) {
             Region.KYRGYZSTAN,
             Region.CIS,
-            Region.CENTRAL_ASIA -> sources.addAll(WORLD_CIS_EXTRA)
-            Region.EUROPE        -> sources.addAll(WORLD_EUROPE_EXTRA)
-            Region.MIDDLE_EAST   -> sources.addAll(WORLD_MIDDLE_EAST_EXTRA)
-            else                 -> sources.addAll(WORLD_NEUTRAL) // нейтральные повторно = больший вес
+            Region.CENTRAL_ASIA -> sources.addAll(grp("world_cis_extra", WORLD_CIS_EXTRA))
+            Region.EUROPE        -> sources.addAll(grp("world_europe_extra", WORLD_EUROPE_EXTRA))
+            Region.MIDDLE_EAST   -> sources.addAll(grp("world_middle_east_extra", WORLD_MIDDLE_EAST_EXTRA))
+            else                 -> sources.addAll(worldNeutral) // нейтральные повторно = больший вес
         }
 
         // 4. Технологии и гаджеты — всегда
-        sources.addAll(TECH_ALWAYS)
+        sources.addAll(grp("tech_always", TECH_ALWAYS))
 
         // 5. Нишевые
-        sources.addAll(NICHE_ALWAYS)
+        sources.addAll(grp("niche_always", NICHE_ALWAYS))
 
         // 6. YouTube мировые новости
-        sources.addAll(YOUTUBE_WORLD_NEWS)
+        sources.addAll(grp("youtube_world_news", YOUTUBE_WORLD_NEWS))
 
         // 7. YouTube боевые виды спорта — MMA, бокс, борьба
-        sources.addAll(COMBAT_SPORTS_YOUTUBE)
+        sources.addAll(grp("combat_sports_youtube", COMBAT_SPORTS_YOUTUBE))
 
         // 8. Туризм КГ — иностранцы о нашей природе, Telegram + YouTube
-        sources.addAll(TOURS_KG)
-        sources.addAll(TOURS_YOUTUBE)
+        sources.addAll(grp("tours_kg", TOURS_KG))
+        sources.addAll(grp("tours_youtube", TOURS_YOUTUBE))
 
         // 9. Хорошие новости — позитивный контент, баланс негатива
-        sources.addAll(GOOD_NEWS)
+        sources.addAll(grp("good_news", GOOD_NEWS))
 
         // 10. Звёзды, шоубиз, знаменитости — развлекательный контент
-        sources.addAll(STARS_ALWAYS)
+        sources.addAll(grp("stars_always", STARS_ALWAYS))
 
         // 11. Здоровье — медицина, питание, психология
-        sources.addAll(HEALTH_ALWAYS)
+        sources.addAll(grp("health_always", HEALTH_ALWAYS))
 
         // 12. Деньги — личные финансы, курсы, советы
-        sources.addAll(MONEY_ALWAYS)
+        sources.addAll(grp("money_always", MONEY_ALWAYS))
 
         // 13. Лайфхаки — советы, рецепты, дом, семья
-        sources.addAll(LIFE_ALWAYS)
+        sources.addAll(grp("life_always", LIFE_ALWAYS))
 
         return sources.distinctBy { it.handle }
     }

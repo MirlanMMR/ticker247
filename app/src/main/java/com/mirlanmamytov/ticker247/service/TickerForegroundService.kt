@@ -185,6 +185,10 @@ class TickerForegroundService : Service() {
 
             while (isActive) {
                 try {
+                    // Источники из Firebase — правки на бэкенде подхватываются без релиза
+                    try { com.mirlanmamytov.ticker247.network.FirebaseSourceConfig.refresh() }
+                    catch (e: Exception) { Log.w("Ticker247", "SourceConfig: ${e.message}") }
+
                     val allItems = mutableListOf<NewsItem>()
                     val tickerItems    = mutableListOf<String>()
                     val tickerCurrency = mutableListOf<String>()
