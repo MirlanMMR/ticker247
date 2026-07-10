@@ -498,8 +498,9 @@ class TickerForegroundService : Service() {
         if (cryptoLine.isNotEmpty()) lines.add("₿ $cryptoLine")
 
         // ── 3. Срочные новости — по мере появления, поверх валюты ────────────
+        // Только на языке интерфейса — непереведённые из пула не показываем
         fun titleOnly(s: String) = s.substringBefore('\n').trim().take(160)
-        items.filter { it.priority >= 3 }.take(2).forEach {
+        items.filter { it.priority >= 3 && matchesUiLanguage(it.title) }.take(2).forEach {
             lines.add(0, "🏆 ${titleOnly(it.title)}")
         }
         val cryptoSources = setOf("coingecko", "coincap", "coinmarketcap")
@@ -508,7 +509,8 @@ class TickerForegroundService : Service() {
             item.cryptoSymbol == null &&
             item.category !in setOf("CURRENCY", "CRYPTO") &&
             item.source.lowercase() !in cryptoSources &&
-            item.summary.length > 20
+            item.summary.length > 20 &&
+            matchesUiLanguage(item.title)
         }
             .distinctBy { it.url }
             .take(5)
@@ -563,8 +565,8 @@ class TickerForegroundService : Service() {
             parts.add("$sym $price $chg".trim())
         }
 
-        // Срочная новость если есть
-        items.firstOrNull { it.category == "URGENT" }?.let {
+        // Срочная новость если есть — только на языке интерфейса
+        items.firstOrNull { it.category == "URGENT" && matchesUiLanguage(it.title) }?.let {
             parts.add("⚡ ${it.title}")
         }
 
