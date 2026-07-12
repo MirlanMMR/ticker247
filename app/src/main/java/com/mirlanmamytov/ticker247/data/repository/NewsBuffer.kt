@@ -99,6 +99,8 @@ object NewsBuffer {
         fun qualityScore(item: NewsItem): Int {
             var score = 0
             score += item.priority * 5
+            // Редакторская повестка (#тема: в TG-канале) — совпавшие новости наверх
+            score += com.mirlanmamytov.ticker247.util.EditorialTopics.boostFor(item.title, item.summary)
             if (item.summary.length > 80) score += 3
             if (item.imageUrl != null)    score += 2
             val ageH = (System.currentTimeMillis() - item.publishedAt) / 3_600_000

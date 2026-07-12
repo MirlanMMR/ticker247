@@ -77,6 +77,8 @@ object TelegramParser {
 
     private fun parseHtml(html: String, source: TelegramSource): List<NewsItem> {
         val items = mutableListOf<NewsItem>()
+        // Директивы «#тема: ...» — собираем и регистрируем в конце разбора
+        val foundTopics = mutableListOf<Pair<String, Long>>()
 
         // Парсим каждый пост как изолированный блок через Jsoup
         val doc = org.jsoup.Jsoup.parse(html)
@@ -96,6 +98,28 @@ object TelegramParser {
                 // имеют подпись «📲 @t247feed…» — их обратно в приложение не берём.
                 // Ручные редакторские посты подписи не имеют и получают высший приоритет.
                 if (cleanText.contains("📲 @t247feed")) continue
+
+                // ── Директива «#тема: ...» — редакторская повестка ──────────
+                // Пост-директива НЕ новость: темы регистрируются, пост в ленту не идёт.
+                // Время жизни темы: #Nд/#Nч в том же посте, по умолчанию 3 дня.
+                val topicMatches = Regex("#тема:\\s*([^#\\n]+)|#topic:\\s*([^#\\n]+)", RegexOption.IGNORE_CASE)
+                    .findAll(cleanText).toList()
+                if (topicMatches.isNotEmpty()) {
+                    val postDate = block.selectFirst("time[datetime]")?.attr("datetime")
+                        ?.let { runCatching { java.time.OffsetDateTime.parse(it).toInstant().toEpochMilli() }.getOrNull() }
+                        ?: System.currentTimeMillis()
+                    val life = Regex("#(\\d{1,2})\\s?(д|d|ч|h)\\b", RegexOption.IGNORE_CASE)
+                        .find(cleanText)?.let { m ->
+                            val n = m.groupValues[1].toLongOrNull() ?: return@let null
+                            val unit = if (m.groupValues[2].lowercase() in setOf("д", "d")) 24 * 3_600_000L else 3_600_000L
+                            n * unit
+                        } ?: (3 * 24 * 3_600_000L)
+                    topicMatches.forEach { m ->
+                        val topic = (m.groupValues[1].ifEmpty { m.groupValues[2] }).trim(' ', ',', '.', '-')
+                        if (topic.length >= 3) foundTopics.add(topic to (postDate + life))
+                    }
+                    continue  // директива — не новость
+                }
 
                 // Ссылка на пост в Telegram
                 val telegramUrl = block.selectFirst("a.tgme_widget_message_date")
@@ -247,6 +271,11 @@ object TelegramParser {
                     expiresAt = lifetimeMs?.let { publishedAt + it }
                 ))
             } catch (e: Exception) { /* skip bad post */ }
+        }
+
+        // Регистрируем найденные темы (пустой список очищает устаревшие)
+        if (source.priority >= 10) {  // только редакторский канал задаёт повестку
+            com.mirlanmamytov.ticker247.util.EditorialTopics.update(foundTopics)
         }
 
         return items
