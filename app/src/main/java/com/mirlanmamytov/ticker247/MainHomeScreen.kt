@@ -1438,11 +1438,12 @@ fun HeroCard(item: NewsItem, onClick: () -> Unit) {
         }
         // Текст внизу
         Column(Modifier.align(Alignment.BottomStart).padding(14.dp)) {
-            // Бейдж категории — только СРОЧНО (остальные скрыты: ошибки категоризации не видны)
-            if (item.category == "URGENT") {
+            // Бейдж: СРОЧНО или редакторская метка (#метка:) — остальные скрыты
+            val badgeText = item.editorLabel ?: style.label.takeIf { item.category == "URGENT" }
+            if (badgeText != null) {
                 Box(Modifier.clip(RoundedCornerShape(6.dp)).background(style.accent.copy(0.25f))
                     .padding(horizontal = 8.dp, vertical = 3.dp)
-                ) { Text(style.label, fontSize = 10.sp, color = style.accent, fontWeight = FontWeight.Bold) }
+                ) { Text(badgeText, fontSize = 10.sp, color = style.accent, fontWeight = FontWeight.Bold) }
                 Spacer(Modifier.height(6.dp))
             }
             Text(item.title, fontSize = 16.sp, fontWeight = FontWeight.Bold,
@@ -1535,15 +1536,16 @@ fun CarouselCard(item: NewsItem, onClick: () -> Unit) {
         Box(Modifier.fillMaxSize().background(
             Brush.verticalGradient(0f to Color.Transparent, 1f to Color.Black.copy(0.8f))
         ))
-        // Бейдж — только СРОЧНО
-        if (item.category == "URGENT") {
+        // Бейдж: СРОЧНО или редакторская метка
+        val miniBadge = item.editorLabel ?: style.label.takeIf { item.category == "URGENT" }
+        if (miniBadge != null) {
             Box(
                 Modifier.align(Alignment.TopStart).padding(8.dp)
                     .clip(RoundedCornerShape(6.dp))
                     .background(style.accent.copy(0.2f))
                     .padding(horizontal = 6.dp, vertical = 2.dp)
             ) {
-                Text(style.label, fontSize = 9.sp, color = style.accent, fontWeight = FontWeight.Bold)
+                Text(miniBadge, fontSize = 9.sp, color = style.accent, fontWeight = FontWeight.Bold)
             }
         }
         // Заголовок
@@ -1940,13 +1942,14 @@ fun LiveTile(
                             .padding(end = if (size == TileSize.SMALL) 7.dp else 10.dp)
                             .padding(bottom = if (size == TileSize.SMALL) 7.dp else 8.dp)
                     ) {
-                        // Бейдж категории — только СРОЧНО
-                        if (item.category == "URGENT") {
+                        // Бейдж: СРОЧНО или редакторская метка
+                        val tileBadge = item.editorLabel ?: style.label.takeIf { item.category == "URGENT" }
+                        if (tileBadge != null) {
                             Box(Modifier.clip(RoundedCornerShape(50))
                                 .background(style.accent.copy(0.12f))
                                 .padding(horizontal = 7.dp, vertical = 2.dp)
                             ) {
-                                Text(style.label,
+                                Text(tileBadge,
                                     fontSize = if (size == TileSize.SMALL) 8.sp else 9.sp,
                                     color = style.accent, fontWeight = FontWeight.ExtraBold,
                                     letterSpacing = 0.3.sp)

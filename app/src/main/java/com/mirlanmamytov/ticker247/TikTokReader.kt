@@ -247,15 +247,16 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                     )
                 )
             )
-            // Бейдж категории — только СРОЧНО (остальные скрыты)
-            if (item.category == "URGENT") {
+            // Бейдж: СРОЧНО или редакторская метка (#метка:)
+            val readerBadge = item.editorLabel ?: style.label.takeIf { item.category == "URGENT" }
+            if (readerBadge != null) {
                 Box(
                     Modifier.align(Alignment.BottomStart).padding(14.dp)
                         .clip(RoundedCornerShape(50))
                         .background(accentCol.copy(0.9f))
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
-                    Text(style.label, fontSize = 11.sp, color = Color.White, fontWeight = FontWeight.ExtraBold)
+                    Text(readerBadge, fontSize = 11.sp, color = Color.White, fontWeight = FontWeight.ExtraBold)
                 }
             }
         }

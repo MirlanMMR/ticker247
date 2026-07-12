@@ -35,6 +35,8 @@ data class NewsItem(
     // #срочно → category=URGENT; #важно → тикер ⚡; #карусель → hero-карусель
     val isEditorImportant: Boolean = false,
     val isEditorCarousel: Boolean = false,
+    // #метка: <текст> — произвольный бейдж на карточке («ВИДЕО ДНЯ», «ИСТОРИЯ»...)
+    val editorLabel: String? = null,
     // Время жизни поста (#3д / #12ч): null = стандартные 24 часа
     val expiresAt: Long? = null
 )

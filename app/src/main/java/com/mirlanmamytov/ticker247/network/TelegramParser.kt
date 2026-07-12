@@ -161,6 +161,8 @@ object TelegramParser {
                 )
                 val textWithoutUrls = cleanText
                     .replace(urlRegex, "")
+                    // Директивы с текстом («#метка: видео дня») убираем целиком, до хэштегов
+                    .replace(Regex("#(метка|label|тема|topic):\\s*[^#\\n]+", RegexOption.IGNORE_CASE), "")
                     .replace(hashtagRegex, "")
                     .split("\n")
                     .filterNot { line -> selfPromo.containsMatchIn(line) }
@@ -204,6 +206,13 @@ object TelegramParser {
                 val tagUrgent    = Regex("#срочно|#urgent", RegexOption.IGNORE_CASE).containsMatchIn(cleanText)
                 val tagImportant = Regex("#важно|#important", RegexOption.IGNORE_CASE).containsMatchIn(cleanText)
                 val tagCarousel  = Regex("#карусель|#carousel", RegexOption.IGNORE_CASE).containsMatchIn(cleanText)
+                // #метка: <текст> — произвольный бейдж редактора на карточке
+                val editorLabel = Regex("#метка:\\s*([^#\\n]+)|#label:\\s*([^#\\n]+)", RegexOption.IGNORE_CASE)
+                    .find(cleanText)?.let { m ->
+                        (m.groupValues[1].ifEmpty { m.groupValues[2] })
+                            .trim(' ', ',', '.', '-').take(24).uppercase()
+                            .ifEmpty { null }
+                    }
                 val lifetimeMs = Regex("#(\\d{1,2})\\s?(д|d|ч|h)\\b", RegexOption.IGNORE_CASE)
                     .find(cleanText)?.let { m ->
                         val n = m.groupValues[1].toLongOrNull() ?: return@let null
@@ -276,6 +285,7 @@ object TelegramParser {
                     isVideo = isVideoLink,
                     isEditorImportant = tagImportant,
                     isEditorCarousel = tagCarousel,
+                    editorLabel = editorLabel,
                     expiresAt = lifetimeMs?.let { publishedAt + it }
                 ))
             } catch (e: Exception) { /* skip bad post */ }
