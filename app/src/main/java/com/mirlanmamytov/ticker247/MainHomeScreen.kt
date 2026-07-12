@@ -1425,10 +1425,16 @@ fun HeroCard(item: NewsItem, onClick: () -> Unit) {
         ))
         // Видео-бейдж
         if (item.isVideo) {
+            val platform = when {
+                item.url.contains("tiktok.com") -> "▶ TikTok"
+                item.url.contains("instagram.com") -> "▶ Instagram"
+                item.url.contains("vk.com") -> "▶ VK Видео"
+                else -> "▶ YouTube"
+            }
             Box(Modifier.align(Alignment.TopEnd).padding(12.dp)
                 .clip(RoundedCornerShape(6.dp)).background(Color.Red.copy(0.9f))
                 .padding(horizontal = 8.dp, vertical = 3.dp)
-            ) { Text("▶ YouTube", fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.Bold) }
+            ) { Text(platform, fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.Bold) }
         }
         // Текст внизу
         Column(Modifier.align(Alignment.BottomStart).padding(14.dp)) {
