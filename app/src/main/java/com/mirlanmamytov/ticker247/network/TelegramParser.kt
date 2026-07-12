@@ -292,8 +292,8 @@ object TelegramParser {
         }
 
         // Регистрируем найденные темы (пустой список очищает устаревшие)
-        if (source.priority >= 10) {  // только редакторский канал задаёт повестку
-            com.mirlanmamytov.ticker247.util.EditorialTopics.update(foundTopics)
+        if (source.priority >= 10) {  // только редакторские каналы задают повестку
+            com.mirlanmamytov.ticker247.util.EditorialTopics.update(source.channel, foundTopics)
         }
 
         return items

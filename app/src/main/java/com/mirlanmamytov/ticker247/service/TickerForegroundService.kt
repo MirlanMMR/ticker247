@@ -331,8 +331,13 @@ class TickerForegroundService : Service() {
                         val editorialSource = com.mirlanmamytov.ticker247.network.TelegramParser
                             .TelegramSource(editorialChannel, "KG", 10)
                         run {
+                            // Локальный редакторский канал + глобальный @t247_gl (для всех регионов).
+                            // language="unknown" — редакторские посты проходят фильтры любого пула
+                            val globalSource = com.mirlanmamytov.ticker247.network.TelegramParser
+                                .TelegramSource(FirebaseNewsRepository.globalEditorialChannel(), "KG", 10)
                             val editorialItems = withContext(Dispatchers.IO) {
-                                parser.fetchChannel(editorialSource)
+                                (parser.fetchChannel(editorialSource) + parser.fetchChannel(globalSource))
+                                    .map { it.copy(language = "unknown") }
                             }
                             allItems.addAll(editorialItems)
                             // Все посты идут в ленту, а в тикер — только помеченные:
@@ -343,9 +348,9 @@ class TickerForegroundService : Service() {
                             editorialItems.filter { it.category == "URGENT" }
                                 .sortedByDescending { it.publishedAt }.take(2)
                                 .forEach { tickerItems.add(0, "🚨 ${it.title.substringBefore('\n').trim()}") }
-                            Log.d("Ticker247", "@t247feed: ${editorialItems.size} items")
+                            Log.d("Ticker247", "editorial: ${editorialItems.size} items")
                         }
-                    } catch (e: Exception) { Log.e("Ticker247", "@t247feed: ${e.message}") }
+                    } catch (e: Exception) { Log.e("Ticker247", "editorial: ${e.message}") }
 
                     // 6. Редакторские темы (#тема:) — ищем свежие статьи в Google News,
                     // чтобы лента наполнялась по повестке даже если источники молчат

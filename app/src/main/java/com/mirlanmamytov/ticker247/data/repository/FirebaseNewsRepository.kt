@@ -145,8 +145,13 @@ object FirebaseNewsRepository {
         "ru" to "t247feed",
         "en" to "t247feed_en",
         "es" to "t247feed_es",
-        "pt" to "t247feed_pt"
+        "pt" to "t247feed_pt",
+        "gl" to "t247_gl"   // глобальный — посты для всех регионов
     )
+
+    /** Глобальный редакторский канал (кэш обновляется в fetchEditorialChannel) */
+    fun globalEditorialChannel(): String =
+        (editorialCache ?: EDITORIAL_FALLBACK)["gl"] ?: EDITORIAL_FALLBACK.getValue("gl")
 
     @Volatile private var editorialCache: Map<String, String>? = null
 

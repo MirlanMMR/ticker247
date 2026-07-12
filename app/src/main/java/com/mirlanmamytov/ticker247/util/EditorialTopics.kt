@@ -13,8 +13,11 @@ object EditorialTopics {
 
     data class Topic(val raw: String, val words: List<String>, val expiresAt: Long)
 
-    @Volatile
-    private var topics: List<Topic> = emptyList()
+    // Темы по каналам (локальный + глобальный задают повестку независимо)
+    private val byChannel = java.util.concurrent.ConcurrentHashMap<String, List<Topic>>()
+
+    private val topics: List<Topic>
+        get() = byChannel.values.flatten()
 
     private val stopWords = setOf(
         "в", "на", "и", "с", "по", "из", "за", "от", "к", "о", "об", "не",
@@ -27,16 +30,17 @@ object EditorialTopics {
         .filter { it.length >= 3 && it !in stopWords }
         .map { it.take(6) }
 
-    /** Регистрирует темы, найденные в постах канала (вызывается парсером каждый цикл) */
-    fun update(found: List<Pair<String, Long>>) {
+    /** Регистрирует темы канала (вызывается парсером каждый цикл, по каналу) */
+    fun update(channel: String, found: List<Pair<String, Long>>) {
         val now = System.currentTimeMillis()
-        topics = found.mapNotNull { (raw, expiresAt) ->
+        byChannel[channel] = found.mapNotNull { (raw, expiresAt) ->
             val words = topicWords(raw)
             if (words.isEmpty() || expiresAt <= now) null
             else Topic(raw, words, expiresAt)
         }
-        if (topics.isNotEmpty()) {
-            android.util.Log.d("EditorialTopics", "Активные темы: ${topics.map { it.raw }}")
+        val all = topics
+        if (all.isNotEmpty()) {
+            android.util.Log.d("EditorialTopics", "Активные темы: ${all.map { it.raw }}")
         }
     }
 
