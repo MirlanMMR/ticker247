@@ -48,6 +48,23 @@ private fun buildShareUrl(item: NewsItem): String {
     return "$WEB_BASE/?s=$enc&t=$title"
 }
 
+/**
+ * Сокращает ссылку через TinyURL (бесплатно, без ключа — тот же сервис,
+ * что использует бэкенд для TG-постов). При ошибке возвращает исходную.
+ */
+private suspend fun shortenUrl(longUrl: String): String = withContext(Dispatchers.IO) {
+    try {
+        val apiUrl = "https://tinyurl.com/api-create.php?url=${Uri.encode(longUrl)}"
+        val conn = java.net.URL(apiUrl).openConnection() as java.net.HttpURLConnection
+        conn.connectTimeout = 3000
+        conn.readTimeout = 3000
+        val short = conn.inputStream.bufferedReader().readText().trim()
+        if (short.startsWith("https://tinyurl.com/")) short else longUrl
+    } catch (_: Exception) {
+        longUrl
+    }
+}
+
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun TikTokReader(
@@ -323,22 +340,25 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 IconButton(onClick = {
-                    val shareUrl  = buildShareUrl(item)
-                    val shareText = buildString {
-                        append("⚡ ${item.title}\n\n")
-                        if (item.summary.isNotEmpty()) append("${item.summary.take(300)}\n\n")
-                        append("🔗 $shareUrl\n")
-                        append("📱 Ticker 24/7 — новости в реальном времени")
-                    }
-                    context.startActivity(
-                        Intent.createChooser(
-                            Intent(Intent.ACTION_SEND).apply {
-                                type = "text/plain"
-                                putExtra(Intent.EXTRA_TEXT, shareText)
-                                putExtra(Intent.EXTRA_SUBJECT, item.title)
-                            }, "Поделиться новостью"
+                    scope.launch {
+                        // Сокращаем ссылку (TinyURL, до 3 сек) — при ошибке шарим длинную
+                        val shareUrl = shortenUrl(buildShareUrl(item))
+                        val shareText = buildString {
+                            append("⚡ ${item.title}\n\n")
+                            if (item.summary.isNotEmpty()) append("${item.summary.take(300)}\n\n")
+                            append("🔗 $shareUrl\n")
+                            append("📱 Ticker 24/7 — новости в реальном времени")
+                        }
+                        context.startActivity(
+                            Intent.createChooser(
+                                Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_TEXT, shareText)
+                                    putExtra(Intent.EXTRA_SUBJECT, item.title)
+                                }, "Поделиться новостью"
+                            )
                         )
-                    )
+                    }
                 }) {
                     Icon(Icons.Default.Share, null, tint = Color.White.copy(0.7f))
                 }
