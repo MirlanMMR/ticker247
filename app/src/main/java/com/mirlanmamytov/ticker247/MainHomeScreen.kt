@@ -1425,10 +1425,13 @@ fun HeroCard(item: NewsItem, onClick: () -> Unit) {
         }
         // Текст внизу
         Column(Modifier.align(Alignment.BottomStart).padding(14.dp)) {
-            Box(Modifier.clip(RoundedCornerShape(6.dp)).background(style.accent.copy(0.25f))
-                .padding(horizontal = 8.dp, vertical = 3.dp)
-            ) { Text(style.label, fontSize = 10.sp, color = style.accent, fontWeight = FontWeight.Bold) }
-            Spacer(Modifier.height(6.dp))
+            // Бейдж категории — только СРОЧНО (остальные скрыты: ошибки категоризации не видны)
+            if (item.category == "URGENT") {
+                Box(Modifier.clip(RoundedCornerShape(6.dp)).background(style.accent.copy(0.25f))
+                    .padding(horizontal = 8.dp, vertical = 3.dp)
+                ) { Text(style.label, fontSize = 10.sp, color = style.accent, fontWeight = FontWeight.Bold) }
+                Spacer(Modifier.height(6.dp))
+            }
             Text(item.title, fontSize = 16.sp, fontWeight = FontWeight.Bold,
                 color = Color.White, lineHeight = 22.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
             Spacer(Modifier.height(4.dp))
@@ -1519,14 +1522,16 @@ fun CarouselCard(item: NewsItem, onClick: () -> Unit) {
         Box(Modifier.fillMaxSize().background(
             Brush.verticalGradient(0f to Color.Transparent, 1f to Color.Black.copy(0.8f))
         ))
-        // Бейдж
-        Box(
-            Modifier.align(Alignment.TopStart).padding(8.dp)
-                .clip(RoundedCornerShape(6.dp))
-                .background(style.accent.copy(0.2f))
-                .padding(horizontal = 6.dp, vertical = 2.dp)
-        ) {
-            Text(style.label, fontSize = 9.sp, color = style.accent, fontWeight = FontWeight.Bold)
+        // Бейдж — только СРОЧНО
+        if (item.category == "URGENT") {
+            Box(
+                Modifier.align(Alignment.TopStart).padding(8.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(style.accent.copy(0.2f))
+                    .padding(horizontal = 6.dp, vertical = 2.dp)
+            ) {
+                Text(style.label, fontSize = 9.sp, color = style.accent, fontWeight = FontWeight.Bold)
+            }
         }
         // Заголовок
         Text(
@@ -1922,16 +1927,19 @@ fun LiveTile(
                             .padding(end = if (size == TileSize.SMALL) 7.dp else 10.dp)
                             .padding(bottom = if (size == TileSize.SMALL) 7.dp else 8.dp)
                     ) {
-                        Box(Modifier.clip(RoundedCornerShape(50))
-                            .background(style.accent.copy(0.12f))
-                            .padding(horizontal = 7.dp, vertical = 2.dp)
-                        ) {
-                            Text(style.label,
-                                fontSize = if (size == TileSize.SMALL) 8.sp else 9.sp,
-                                color = style.accent, fontWeight = FontWeight.ExtraBold,
-                                letterSpacing = 0.3.sp)
+                        // Бейдж категории — только СРОЧНО
+                        if (item.category == "URGENT") {
+                            Box(Modifier.clip(RoundedCornerShape(50))
+                                .background(style.accent.copy(0.12f))
+                                .padding(horizontal = 7.dp, vertical = 2.dp)
+                            ) {
+                                Text(style.label,
+                                    fontSize = if (size == TileSize.SMALL) 8.sp else 9.sp,
+                                    color = style.accent, fontWeight = FontWeight.ExtraBold,
+                                    letterSpacing = 0.3.sp)
+                            }
+                            Spacer(Modifier.height(5.dp))
                         }
-                        Spacer(Modifier.height(5.dp))
                         Text(
                             item.title,
                             fontSize = when (size) { TileSize.LARGE -> 14.sp; TileSize.MEDIUM -> 12.sp; TileSize.SMALL -> 11.sp },
