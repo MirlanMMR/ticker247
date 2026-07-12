@@ -34,8 +34,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// Веб-версия приложения (Firebase Hosting) — открывается если нет приложения
-private const val WEB_BASE = "https://ticker247.web.app"
+// Веб-страница шаринга (GitHub Pages) — открывается если нет приложения
+private const val WEB_BASE = "https://mirlanmmr.github.io/ticker247/share"
 
 /**
  * Формирует ссылку для шаринга.
