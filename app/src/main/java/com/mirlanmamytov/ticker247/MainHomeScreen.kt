@@ -696,9 +696,16 @@ fun MainHomeScreen() {
             // Отмечаем как прочитанное — уйдёт вниз ленты при следующем рендере
             if (item != null) DataBridge.markSeen(item.url)
             when {
-                // Видео → YouTube плеер внутри приложения
-                item != null && item.isVideo && item.url.isNotEmpty() ->
+                // YouTube-видео → встроенный плеер
+                item != null && item.isVideo && item.url.isNotEmpty() &&
+                (item.url.contains("youtube.com") || item.url.contains("youtu.be")) ->
                     youTubeUrl = item.url
+                // Видео других платформ (TikTok/Instagram/VK) → родное приложение
+                item != null && item.isVideo && item.url.isNotEmpty() -> {
+                    try {
+                        context.startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse(item.url)))
+                    } catch (_: Exception) {}
+                }
                 // Пустая новость (нет текста и нет фото) → открыть в браузере
                 item != null && item.summary.isBlank() && item.imageUrl == null && item.url.isNotEmpty() -> {
                     try {

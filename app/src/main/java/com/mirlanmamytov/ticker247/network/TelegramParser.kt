@@ -131,6 +131,13 @@ object TelegramParser {
 
                 val url = externalUrl ?: telegramUrl
 
+                // Ссылка на видео (YouTube/TikTok/Instagram/VK) — редактор делится
+                // интересным видео: YouTube откроется во встроенном плеере,
+                // остальные — в родном приложении платформы
+                val videoHosts = listOf("youtube.com/watch", "youtu.be/", "youtube.com/shorts",
+                    "tiktok.com/", "instagram.com/reel", "instagram.com/p/", "vk.com/video")
+                val isVideoLink = externalUrl != null && videoHosts.any { externalUrl.contains(it) }
+
                 // Дата
                 val dateStr = block.selectFirst("time[datetime]")
                     ?.attr("datetime") ?: continue
@@ -266,6 +273,7 @@ object TelegramParser {
                     priority = finalPriority,
                     telegramViews = telegramViews,
                     isTrending = trending,
+                    isVideo = isVideoLink,
                     isEditorImportant = tagImportant,
                     isEditorCarousel = tagCarousel,
                     expiresAt = lifetimeMs?.let { publishedAt + it }
