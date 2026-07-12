@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Ticker 24/7 — Новости</title>
+  <meta property="og:type" content="article">
+  <meta name="theme-color" content="#0A0A0F">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0A0A0F;
+      color: #EAEAEA;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      background: #13131A;
+      border-bottom: 1px solid rgba(0,212,255,0.15);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .logo {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #00D4FF, #7B2FBE);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .brand { font-size: 18px; font-weight: 700; color: #00D4FF; }
+    .brand span { color: #EAEAEA; font-weight: 400; }
+
+    /* Article */
+    .article {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 0 120px;
+    }
+
+    .cover {
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+      display: block;
+    }
+    .cover-placeholder {
+      width: 100%;
+      height: 200px;
+      background: radial-gradient(circle at 30% 50%, rgba(0,212,255,0.12), #0A0A0F);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+    }
+
+    .content {
+      padding: 24px 20px 20px;
+    }
+
+    .category-chip {
+      display: inline-block;
+      background: rgba(0,212,255,0.12);
+      color: #00D4FF;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.4;
+      color: #EAEAEA;
+      margin-bottom: 14px;
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #6B7280;
+      margin-bottom: 20px;
+    }
+    .source { color: #00D4FF; font-weight: 600; }
+
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.07);
+      margin: 20px 0;
+    }
+
+    .body {
+      font-size: 16px;
+      line-height: 1.75;
+      color: rgba(234,234,234,0.88);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .source-link {
+      margin-top: 24px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #6B7280;
+      font-size: 13px;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 8px 14px;
+      border-radius: 10px;
+    }
+    .source-link:hover { border-color: rgba(0,212,255,0.3); color: #00D4FF; }
+
+    /* Bottom CTA */
+    .cta-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(to top, #0A0A0F 70%, transparent);
+      padding: 20px 20px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cta-text {
+      font-size: 13px;
+      color: #6B7280;
+      text-align: center;
+    }
+    .cta-text strong { color: #EAEAEA; }
+
+    .gplay-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #00D4FF;
+      color: #0A0A0F;
+      font-weight: 700;
+      font-size: 15px;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 360px;
+      justify-content: center;
+      box-shadow: 0 4px 24px rgba(0,212,255,0.35);
+      transition: opacity 0.15s;
+    }
+    .gplay-btn:active { opacity: 0.85; }
+    .gplay-btn svg { flex-shrink: 0; }
+
+    .no-article {
+      padding: 60px 20px;
+      text-align: center;
+      color: #6B7280;
+    }
+    .no-article .icon { font-size: 48px; margin-bottom: 16px; }
+    .no-article h2 { color: #EAEAEA; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">⚡</div>
+  <div>
+    <div class="brand">Ticker <span>24/7</span></div>
+  </div>
+</div>
+
+<div class="article" id="article">
+  <div class="cover-placeholder" id="coverPlaceholder">📰</div>
+  <img id="coverImg" class="cover" style="display:none" alt="cover">
+
+  <div class="content">
+    <div class="category-chip" id="category">НОВОСТИ</div>
+    <h1 class="title" id="title">Загружаем статью...</h1>
+    <div class="meta">
+      <span class="source" id="source"></span>
+      <span id="metaDot" style="display:none">·</span>
+      <span id="date"></span>
+    </div>
+    <div class="divider"></div>
+    <div class="body" id="body"></div>
+    <a href="#" id="srcLink" class="source-link" style="display:none" target="_blank">
+      🔗 Открыть оригинал
+    </a>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-bar">
+  <div class="cta-text"><strong>Ticker 24/7</strong> — все новости в одном месте</div>
+  <a class="gplay-btn"
+     id="playBtn"
+     href="https://play.google.com/store/apps/details?id=com.mirlanmamytov.ticker247"
+     target="_blank">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M3 20.5v-17c0-.83 1-.83 1.5-.5l16 8.5-16 8.5C3.5 21.33 3 21.33 3 20.5z"/>
+    </svg>
+    Скачать в Google Play
+  </a>
+</div>
+
+<script>
+  const p = new URLSearchParams(location.search);
+  const title    = p.get('title')  || '';
+  const body     = p.get('body')   || '';
+  const source   = p.get('source') || '';
+  const url      = p.get('url')    || '';
+  const image    = p.get('img')    || '';
+  const category = p.get('cat')    || 'НОВОСТИ';
+
+  if (title) {
+    document.title = title + ' — Ticker 24/7';
+
+    // OG meta (best-effort)
+    setMeta('og:title',       title);
+    setMeta('og:description', body.substring(0, 200));
+    setMeta('og:image',       image || '');
+
+    document.getElementById('title').textContent    = title;
+    document.getElementById('body').textContent     = body;
+    document.getElementById('category').textContent = category;
+
+    if (source) {
+      document.getElementById('source').textContent = source;
+      document.getElementById('metaDot').style.display = '';
+    }
+
+    if (image) {
+      const img = document.getElementById('coverImg');
+      img.src = image;
+      img.style.display = 'block';
+      document.getElementById('coverPlaceholder').style.display = 'none';
+      img.onerror = () => { img.style.display='none'; document.getElementById('coverPlaceholder').style.display='flex'; };
+    }
+
+    if (url && !url.includes('t.me/')) {
+      const a = document.getElementById('srcLink');
+      a.href = url;
+      a.style.display = 'inline-flex';
+    }
+  } else {
+    // Нет параметров — показываем общую страницу
+    document.getElementById('article').innerHTML = `
+      <div class="no-article">
+        <div class="icon">⚡</div>
+        <h2>Ticker 24/7</h2>
+        <p>Живые новости, курсы валют и крипта в одном месте. Скачай приложение и читай первым.</p>
+      </div>`;
+  }
+
+  function setMeta(prop, content) {
+    if (!content) return;
+    let el = document.querySelector('meta[property="'+prop+'"]');
+    if (!el) { el = document.createElement('meta'); el.setAttribute('property', prop); document.head.appendChild(el); }
+    el.setAttribute('content', content);
+  }
+</script>
+</body>
+</html>
