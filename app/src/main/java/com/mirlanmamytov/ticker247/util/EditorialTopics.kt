@@ -40,6 +40,12 @@ object EditorialTopics {
         }
     }
 
+    /** Активные темы (для поиска новостей в Google News) */
+    fun active(): List<String> {
+        val now = System.currentTimeMillis()
+        return topics.filter { it.expiresAt > now }.map { it.raw }
+    }
+
     /**
      * Бонус к рейтингу новости, если она совпадает с активной темой.
      * Совпадение: минимум половина слов темы встречается в заголовке+тексте.

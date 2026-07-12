@@ -347,6 +347,18 @@ class TickerForegroundService : Service() {
                         }
                     } catch (e: Exception) { Log.e("Ticker247", "@t247feed: ${e.message}") }
 
+                    // 6. Редакторские темы (#тема:) — ищем свежие статьи в Google News,
+                    // чтобы лента наполнялась по повестке даже если источники молчат
+                    try {
+                        val topics = com.mirlanmamytov.ticker247.util.EditorialTopics.active().take(5)
+                        topics.forEach { topic ->
+                            val found = withContext(Dispatchers.IO) {
+                                com.mirlanmamytov.ticker247.network.TopicNewsFetcher.fetch(topic)
+                            }
+                            allItems.addAll(found)
+                            if (found.isNotEmpty()) Log.d("Ticker247", "Тема «$topic»: ${found.size} статей")
+                        }
+                    } catch (e: Exception) { Log.e("Ticker247", "TopicNews: ${e.message}") }
 
                     // Fuzzy-дедуп: убираем дубли между Telegram и Google News
                     val dedupedItems = com.mirlanmamytov.ticker247.util.FuzzyDedup.deduplicate(allItems)
