@@ -102,7 +102,7 @@ object TelegramParser {
                 // ── Директива «#тема: ...» — редакторская повестка ──────────
                 // Пост-директива НЕ новость: темы регистрируются, пост в ленту не идёт.
                 // Время жизни темы: #Nд/#Nч в том же посте, по умолчанию 3 дня.
-                val topicMatches = Regex("#тема:\\s*([^#\\n]+)|#topic:\\s*([^#\\n]+)", RegexOption.IGNORE_CASE)
+                val topicMatches = Regex("#тема\\s*:\\s*([^#\\n]+)|#topic\\s*:\\s*([^#\\n]+)", RegexOption.IGNORE_CASE)
                     .findAll(cleanText).toList()
                 if (topicMatches.isNotEmpty()) {
                     val postDate = block.selectFirst("time[datetime]")?.attr("datetime")
@@ -125,9 +125,13 @@ object TelegramParser {
                 val telegramUrl = block.selectFirst("a.tgme_widget_message_date")
                     ?.attr("href") ?: continue
 
-                // Внешняя ссылка — только из link_preview карточки
+                // Внешняя ссылка — из link_preview карточки, а если Telegram
+                // не создал превью — прямо из текста поста
                 val externalUrl = block.selectFirst("a.tgme_widget_message_link_preview")
                     ?.attr("href")?.takeIf { it.startsWith("http") && !it.contains("t.me") }
+                    ?: Regex("https?://\\S+").findAll(cleanText)
+                        .map { it.value.trimEnd(')', ']', '.', ',') }
+                        .firstOrNull { !it.contains("t.me") }
 
                 val url = externalUrl ?: telegramUrl
 
@@ -161,14 +165,15 @@ object TelegramParser {
                 )
                 val textWithoutUrls = cleanText
                     .replace(urlRegex, "")
-                    // Директивы с текстом («#метка: видео дня») убираем целиком, до хэштегов
-                    .replace(Regex("#(метка|label|тема|topic):\\s*[^#\\n]+", RegexOption.IGNORE_CASE), "")
+                    // Директивы с текстом («#метка: видео дня», пробел у двоеточия допустим)
+                    .replace(Regex("#(метка|label|тема|topic)\\s*:\\s*[^#\\n]+", RegexOption.IGNORE_CASE), "")
                     .replace(hashtagRegex, "")
                     .split("\n")
                     .filterNot { line -> selfPromo.containsMatchIn(line) }
                     .joinToString("\n")
                     .trim()
-                if (textWithoutUrls.length < 20) continue
+                // Видео-пост может быть совсем без описания — одни хэштеги и ссылка
+                if (textWithoutUrls.length < 20 && !isVideoLink) continue
 
                 val publishedAt = parseDate(dateStr)
 
@@ -181,6 +186,8 @@ object TelegramParser {
                     .trim()
                     .take(150)
                     .ifEmpty { rawTitle.take(150) }
+                    .ifEmpty { if (isVideoLink) "🎬 Видео" else "" }
+                if (title.isEmpty()) continue
                 // Тело = всё начиная со второго предложения
                 val body = if (sentences.size > 1)
                     sentences.drop(1).joinToString(" ").trim()
@@ -206,8 +213,8 @@ object TelegramParser {
                 val tagUrgent    = Regex("#срочно|#urgent", RegexOption.IGNORE_CASE).containsMatchIn(cleanText)
                 val tagImportant = Regex("#важно|#important", RegexOption.IGNORE_CASE).containsMatchIn(cleanText)
                 val tagCarousel  = Regex("#карусель|#carousel", RegexOption.IGNORE_CASE).containsMatchIn(cleanText)
-                // #метка: <текст> — произвольный бейдж редактора на карточке
-                val editorLabel = Regex("#метка:\\s*([^#\\n]+)|#label:\\s*([^#\\n]+)", RegexOption.IGNORE_CASE)
+                // #метка: <текст> — произвольный бейдж редактора (пробел у двоеточия допустим)
+                val editorLabel = Regex("#метка\\s*:\\s*([^#\\n]+)|#label\\s*:\\s*([^#\\n]+)", RegexOption.IGNORE_CASE)
                     .find(cleanText)?.let { m ->
                         (m.groupValues[1].ifEmpty { m.groupValues[2] })
                             .trim(' ', ',', '.', '-').take(24).uppercase()
