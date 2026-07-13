@@ -97,7 +97,12 @@ object ArticleExtractor {
     private fun extractTelegram(url: String): ArticleContent {
         val html = fetchHtml(url.replace("t.me/", "t.me/s/").also { Log.d("ArticleExtractor", "TG url: $it") })
         val doc = Jsoup.parse(html, url)
-        val postText = doc.select(".tgme_widget_message_text").firstOrNull()?.wholeText() ?: ""
+        // Ссылки и хэштеги-директивы из текста поста не показываем читателю
+        val postText = (doc.select(".tgme_widget_message_text").firstOrNull()?.wholeText() ?: "")
+            .replace(Regex("https?://\\S+"), "")
+            .replace(Regex("#(метка|label|тема|topic)\\s*:\\s*[^#\\n]+", RegexOption.IGNORE_CASE), "")
+            .replace(Regex("#[\\wа-яё]+", RegexOption.IGNORE_CASE), "")
+            .trim()
         val img = doc.select(".tgme_widget_message_photo_wrap").firstOrNull()
             ?.attr("style")?.let { Regex("url\\('([^']+)'\\)").find(it)?.groupValues?.get(1) }
         val date = doc.select("time").firstOrNull()?.attr("datetime") ?: ""
