@@ -135,6 +135,14 @@ class TickerForegroundService : Service() {
                         Log.d("Ticker247", "CoinCap: ${coins.size} coins loaded")
                     } catch (e: Exception) { Log.e("Ticker247", "Refresh crypto: ${e.message}") }
 
+                    // Свежие новости из Firebase — потягивание обновляет и контент,
+                    // а не только финансы (буфер отсеет дубли уже показанного)
+                    try {
+                        val freshNews = FirebaseNewsRepository.fetchNews()
+                        if (freshNews.isNotEmpty()) newItems.addAll(freshNews)
+                        Log.d("Ticker247", "Refresh news: ${freshNews.size} items")
+                    } catch (e: Exception) { Log.e("Ticker247", "Refresh news: ${e.message}") }
+
                     withContext(Dispatchers.Main) {
                         // Обновляем финансовые карточки в NewsBuffer, не трогая новости
                         com.mirlanmamytov.ticker247.data.repository.NewsBuffer.addItems(newItems)
