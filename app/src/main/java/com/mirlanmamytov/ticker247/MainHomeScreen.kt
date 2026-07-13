@@ -799,7 +799,7 @@ fun HomeContent(
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Агрегатор новостей от MMR Lab®")
-                    Text("Версия 1.0.0")
+                    Text("Версия ${com.mirlanmamytov.ticker247.BuildConfig.VERSION_NAME}")
                     HorizontalDivider()
                     Text("Контакты:", fontWeight = FontWeight.SemiBold)
                     Text(
@@ -1119,7 +1119,9 @@ fun CurrencyDetailSheet(currency: NewsItem) {
     Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 40.dp)) {
         // Подпись из того же профиля, по которому сервис строит данные
         val sheetBase = remember { com.mirlanmamytov.ticker247.util.CurrencyProfile.current().label }
-        Text("💱 Exchange rates · $sheetBase", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold,
+        val sheetTitle = if (java.util.Locale.getDefault().language in setOf("ru","ky","kk","uz","tg","be","uk","bg","sr","mk"))
+            "Курсы валют" else "Exchange rates"
+        Text("💱 $sheetTitle · $sheetBase", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold,
             color = textColor, modifier = Modifier.padding(bottom = 4.dp))
         Text(timeAgo(currency.publishedAt), fontSize = 12.sp, color = subColor,
             modifier = Modifier.padding(bottom = 16.dp))
