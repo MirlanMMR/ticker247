@@ -19,18 +19,18 @@ class BootReceiver : BroadcastReceiver() {
     lateinit var appSettings: AppSettings
 
     override fun onReceive(context: Context, intent: Intent) {
-        val pendingResult = goAsync()
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val wasRunning = appSettings.onboardingDoneFlow.first()
-                if (wasRunning) {
-                    TickerForegroundService.startService(context)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                pendingResult.finish()
-            }
+        // Android 15+ запрещает запуск dataSync-сервиса из BOOT_COMPLETED —
+        // не пытаемся, сервис поднимется при первом открытии приложения
+        if (android.os.Build.VERSION.SDK_INT >= 35) return
+
+        // Запускаем СРАЗУ, синхронно: окно разрешения после загрузки короткое,
+        // асинхронное чтение настроек его упускало (ForegroundServiceStartNotAllowed).
+        // Быстрая проверка первого запуска — по SharedPreferences (синхронно)
+        val firstLaunchDone = context
+            .getSharedPreferences("ticker247_prefs", Context.MODE_PRIVATE)
+            .getBoolean("first_launch_done", false)
+        if (firstLaunchDone) {
+            TickerForegroundService.startService(context)
         }
     }
 }

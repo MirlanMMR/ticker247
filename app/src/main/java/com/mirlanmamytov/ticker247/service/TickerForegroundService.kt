@@ -69,6 +69,17 @@ class TickerForegroundService : Service() {
         createNotificationChannels()
         com.mirlanmamytov.ticker247.data.repository.NewsBuffer.init(this)
         com.mirlanmamytov.ticker247.network.FuelPriceFetcher.init(this)
+        // startForeground сразу в onCreate — гарантия уложиться в 5-секундный
+        // лимит системы (ForegroundServiceDidNotStartInTimeException)
+        try {
+            ServiceCompat.startForeground(
+                this, 1001,
+                buildNotification("Загрузка новостей…", "ticker_info", R.drawable.ic_lightning_white),
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC else 0
+            )
+        } catch (e: Exception) {
+            Log.w("Ticker247", "startForeground in onCreate: ${e.message}")
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -913,16 +924,27 @@ class TickerForegroundService : Service() {
         const val ACTION_DISMISSED  = "com.mirlanmamytov.ticker247.NOTIFICATION_DISMISSED"
 
         fun startService(context: Context) {
-            val intent = Intent(context, TickerForegroundService::class.java)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(intent)
-            else context.startService(intent)
+            // Android 12+ запрещает запуск foreground-сервиса из фона
+            // (в т.ч. dataSync после загрузки на Android 15) — не роняем приложение,
+            // сервис поднимется при следующем открытии
+            try {
+                val intent = Intent(context, TickerForegroundService::class.java)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(intent)
+                else context.startService(intent)
+            } catch (e: Exception) {
+                Log.w("Ticker247", "startService rejected: ${e.message}")
+            }
         }
 
         fun refresh(context: Context) {
-            val intent = Intent(context, TickerForegroundService::class.java)
-            intent.action = ACTION_REFRESH
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(intent)
-            else context.startService(intent)
+            try {
+                val intent = Intent(context, TickerForegroundService::class.java)
+                intent.action = ACTION_REFRESH
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(intent)
+                else context.startService(intent)
+            } catch (e: Exception) {
+                Log.w("Ticker247", "refresh rejected: ${e.message}")
+            }
         }
     }
 }
