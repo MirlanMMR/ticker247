@@ -34,35 +34,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// Веб-страница шаринга (GitHub Pages) — открывается если нет приложения
-private const val WEB_BASE = "https://mirlanmmr.github.io/ticker247/share"
-
 /**
- * Формирует ссылку для шаринга.
- * Получатель без приложения → веб-страница с превью + кнопка «Скачать»
- * Получатель с приложением → (будущий deep link) откроет статью напрямую
+ * Ссылка для шаринга — TG-канал Ticker 24/7 на языке пользователя:
+ * получатель видит живой канал с новостями и ссылкой на приложение.
  */
-private fun buildShareUrl(item: NewsItem): String {
-    val enc = Uri.encode(item.url.take(400))
-    val title = Uri.encode(item.title.take(120))
-    return "$WEB_BASE/?s=$enc&t=$title"
-}
-
-/**
- * Сокращает ссылку через TinyURL (бесплатно, без ключа — тот же сервис,
- * что использует бэкенд для TG-постов). При ошибке возвращает исходную.
- */
-private suspend fun shortenUrl(longUrl: String): String = withContext(Dispatchers.IO) {
-    try {
-        val apiUrl = "https://tinyurl.com/api-create.php?url=${Uri.encode(longUrl)}"
-        val conn = java.net.URL(apiUrl).openConnection() as java.net.HttpURLConnection
-        conn.connectTimeout = 3000
-        conn.readTimeout = 3000
-        val short = conn.inputStream.bufferedReader().readText().trim()
-        if (short.startsWith("https://tinyurl.com/")) short else longUrl
-    } catch (_: Exception) {
-        longUrl
+private fun buildShareUrl(): String {
+    val lang = java.util.Locale.getDefault().language
+    val cyrillic = setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk")
+    val channel = when {
+        lang in cyrillic -> "t247feed"
+        lang == "es" -> "t247feed_es"
+        lang == "pt" -> "t247feed_pt"
+        else -> "t247feed_en"
     }
+    return "https://t.me/$channel"
 }
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
@@ -343,25 +328,21 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 IconButton(onClick = {
-                    scope.launch {
-                        // Сокращаем ссылку (TinyURL, до 3 сек) — при ошибке шарим длинную
-                        val shareUrl = shortenUrl(buildShareUrl(item))
-                        val shareText = buildString {
-                            append("⚡ ${item.title}\n\n")
-                            if (item.summary.isNotEmpty()) append("${item.summary.take(300)}\n\n")
-                            append("🔗 $shareUrl\n")
-                            append("📱 Ticker 24/7 — новости в реальном времени")
-                        }
-                        context.startActivity(
-                            Intent.createChooser(
-                                Intent(Intent.ACTION_SEND).apply {
-                                    type = "text/plain"
-                                    putExtra(Intent.EXTRA_TEXT, shareText)
-                                    putExtra(Intent.EXTRA_SUBJECT, item.title)
-                                }, "Поделиться новостью"
-                            )
-                        )
+                    val shareText = buildString {
+                        append("⚡ ${item.title}\n\n")
+                        if (item.summary.isNotEmpty()) append("${item.summary.take(300)}\n\n")
+                        append("📲 Ticker 24/7 — новости в реальном времени\n")
+                        append(buildShareUrl())
                     }
+                    context.startActivity(
+                        Intent.createChooser(
+                            Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, shareText)
+                                putExtra(Intent.EXTRA_SUBJECT, item.title)
+                            }, "Поделиться новостью"
+                        )
+                    )
                 }) {
                     Icon(Icons.Default.Share, null, tint = Color.White.copy(0.7f))
                 }
