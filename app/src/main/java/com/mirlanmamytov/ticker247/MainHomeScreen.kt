@@ -2008,7 +2008,23 @@ private data class PromoSlide(
 )
 
 // Контакт для рекламы — одно место, легко менять
-private const val ADS_CONTACT = "https://t.me/tarylgan"  // замени на @mmrlab_ads после создания
+private const val ADS_CONTACT_USER = "r_rauf_83"  // TG для рекламы и сотрудничества
+
+/**
+ * Открывает Telegram-профиль: сначала приложение (tg:// работает даже когда
+ * оператор блокирует домен t.me), при отсутствии Telegram — браузер.
+ */
+private fun openTelegramContact(context: android.content.Context) {
+    try {
+        context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW,
+            android.net.Uri.parse("tg://resolve?domain=$ADS_CONTACT_USER")))
+    } catch (_: Exception) {
+        try {
+            context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW,
+                android.net.Uri.parse("https://t.me/$ADS_CONTACT_USER")))
+        } catch (_: Exception) {}
+    }
+}
 
 // Слайды для "Реклама · Сотрудничество" — только про партнёрство
 private val PROMO_SLIDES = listOf(
@@ -2016,7 +2032,7 @@ private val PROMO_SLIDES = listOf(
         emoji = "📲",
         title = "Реклама · Сотрудничество",
         subtitle = "Напишите нам — ответим в течение дня",
-        contact = ADS_CONTACT,
+        contact = "tg://resolve?domain=$ADS_CONTACT_USER",
         accentColor = Color(0xFF10B981),
         bgColors = listOf(Color(0xFFEFFDF5), Color(0xFFD1FAE5))
     ),
@@ -2024,7 +2040,7 @@ private val PROMO_SLIDES = listOf(
         emoji = "✍️",
         title = "Есть интересная публикация?",
         subtitle = "Разместим ваш материал в ленте — статья, анонс, интервью",
-        contact = ADS_CONTACT,
+        contact = "tg://resolve?domain=$ADS_CONTACT_USER",
         accentColor = Color(0xFF0EA5E9),
         bgColors = listOf(Color(0xFFEFF9FF), Color(0xFFE0F2FE))
     ),
@@ -2045,11 +2061,7 @@ fun ContextualAdSlot() {
             .height(90.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(Color(0xFFF8F4FF))
-            .clickable {
-                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW,
-                    android.net.Uri.parse(ADS_CONTACT))
-                context.startActivity(intent)
-            }
+            .clickable { openTelegramContact(context) }
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -2134,16 +2146,7 @@ fun PromoSlot() {
                     .fillMaxSize()
                     .background(Brush.linearGradient(slide.bgColors))
                     .border(1.5.dp, slide.accentColor.copy(borderAlpha), RoundedCornerShape(12.dp))
-                    .clickable {
-                        try {
-                            context.startActivity(
-                                android.content.Intent(
-                                    android.content.Intent.ACTION_VIEW,
-                                    android.net.Uri.parse(slide.contact)
-                                )
-                            )
-                        } catch (e: Exception) { /* ignore */ }
-                    }
+                    .clickable { openTelegramContact(context) }
                     .padding(horizontal = 14.dp, vertical = 10.dp)
             ) {
                 // Левая цветная черта — как у новостных плиток
