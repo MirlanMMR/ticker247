@@ -1119,8 +1119,13 @@ fun CurrencyDetailSheet(currency: NewsItem) {
     Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 40.dp)) {
         // Подпись из того же профиля, по которому сервис строит данные
         val sheetBase = remember { com.mirlanmamytov.ticker247.util.CurrencyProfile.current().label }
-        val sheetTitle = if (java.util.Locale.getDefault().language in setOf("ru","ky","kk","uz","tg","be","uk","bg","sr","mk"))
-            "Курсы валют" else "Exchange rates"
+        val sheetLang2 = java.util.Locale.getDefault().language
+        val sheetTitle = when {
+            sheetLang2 in setOf("ru","ky","kk","uz","tg","be","uk","bg","sr","mk") -> "Курсы валют"
+            sheetLang2 == "es" -> "Tipos de cambio"
+            sheetLang2 == "pt" -> "Taxas de câmbio"
+            else -> "Exchange rates"
+        }
         Text("💱 $sheetTitle · $sheetBase", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold,
             color = textColor, modifier = Modifier.padding(bottom = 4.dp))
         Text(timeAgo(currency.publishedAt), fontSize = 12.sp, color = subColor,
