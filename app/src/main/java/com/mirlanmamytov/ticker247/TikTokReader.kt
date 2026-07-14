@@ -47,7 +47,9 @@ private fun buildShareUrl(): String {
         lang == "pt" -> "t247feed_pt"
         else -> "t247feed_en"
     }
-    return "https://t.me/$channel"
+    // telegram.me вместо t.me: операторы ряда стран блокируют t.me,
+    // а telegram.me открывается и браузером, и приложением Telegram
+    return "https://telegram.me/$channel"
 }
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)

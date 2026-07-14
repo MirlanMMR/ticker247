@@ -95,7 +95,13 @@ object ArticleExtractor {
     }
 
     private fun extractTelegram(url: String): ArticleContent {
-        val html = fetchHtml(url.replace("t.me/", "t.me/s/").also { Log.d("ArticleExtractor", "TG url: $it") })
+        // t.me блокируют операторы — пробуем зеркала
+        val html = listOf("t.me", "telegram.me", "telegram.dog").firstNotNullOfOrNull { domain ->
+            runCatching {
+                fetchHtml(url.replace("t.me/", "$domain/s/").replace("$domain/s/s/", "$domain/s/"))
+                    .takeIf { it.contains("tgme_widget_message") }
+            }.getOrNull()
+        } ?: fetchHtml(url.replace("t.me/", "t.me/s/"))
         val doc = Jsoup.parse(html, url)
         // Ссылки и хэштеги-директивы из текста поста не показываем читателю
         val postText = (doc.select(".tgme_widget_message_text").firstOrNull()?.wholeText() ?: "")

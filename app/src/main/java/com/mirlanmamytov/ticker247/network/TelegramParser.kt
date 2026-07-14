@@ -62,17 +62,27 @@ object TelegramParser {
         TelegramSource("travel_kg",     "TOURS",   0),
     )
 
-    /** Парсит публичный канал t.me/s/channel → список NewsItem */
+    // t.me блокируют операторы в ряде стран (КГ в т.ч.) — пробуем зеркала
+    private val TG_DOMAINS = listOf("t.me", "telegram.me", "telegram.dog")
+
+    /** Парсит публичный канал через t.me или зеркала → список NewsItem */
     fun fetchChannel(source: TelegramSource): List<NewsItem> {
-        return try {
-            val url = "https://t.me/s/${source.channel}"
-            val req = Request.Builder().url(url).build()
-            val body = client.newCall(req).execute().use { it.body?.string() ?: return emptyList() }
-            parseHtml(body, source)
-        } catch (e: Exception) {
-            Log.w("TelegramParser", "${source.channel}: ${e.message}")
-            emptyList()
+        for (domain in TG_DOMAINS) {
+            try {
+                val url = "https://$domain/s/${source.channel}"
+                val req = Request.Builder().url(url).build()
+                val body = client.newCall(req).execute().use { it.body?.string() ?: continue }
+                val items = parseHtml(body, source)
+                // Пустой список при живом домене = в канале нет постов; но если
+                // страница без разметки постов (блок/редирект) — пробуем зеркало
+                if (body.contains("tgme_widget_message_wrap") || domain == TG_DOMAINS.last()) {
+                    return items
+                }
+            } catch (e: Exception) {
+                Log.w("TelegramParser", "${source.channel} via $domain: ${e.message}")
+            }
         }
+        return emptyList()
     }
 
     private fun parseHtml(html: String, source: TelegramSource): List<NewsItem> {
@@ -139,7 +149,7 @@ object TelegramParser {
                 // интересным видео: YouTube откроется во встроенном плеере,
                 // остальные — в родном приложении платформы
                 val videoHosts = listOf("youtube.com/watch", "youtu.be/", "youtube.com/shorts",
-                    "tiktok.com/", "instagram.com/reel", "instagram.com/p/", "vk.com/video")
+                    "youtube.com/live", "tiktok.com/", "instagram.com/reel", "instagram.com/p/", "vk.com/video")
                 val isVideoLink = externalUrl != null && videoHosts.any { externalUrl.contains(it) }
 
                 // Дата
