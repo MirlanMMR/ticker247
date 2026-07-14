@@ -2031,25 +2031,58 @@ private fun openTelegramContact(context: android.content.Context) {
     }
 }
 
-// Слайды для "Реклама · Сотрудничество" — только про партнёрство
-private val PROMO_SLIDES = listOf(
-    PromoSlide(
-        emoji = "📲",
-        title = "Реклама · Сотрудничество",
-        subtitle = "Напишите нам — ответим в течение дня",
-        contact = "tg://resolve?domain=$ADS_CONTACT_USER",
-        accentColor = Color(0xFF10B981),
-        bgColors = listOf(Color(0xFFEFFDF5), Color(0xFFD1FAE5))
-    ),
-    PromoSlide(
-        emoji = "✍️",
-        title = "Есть интересная публикация?",
-        subtitle = "Разместим ваш материал в ленте — статья, анонс, интервью",
-        contact = "tg://resolve?domain=$ADS_CONTACT_USER",
-        accentColor = Color(0xFF0EA5E9),
-        bgColors = listOf(Color(0xFFEFF9FF), Color(0xFFE0F2FE))
-    ),
+// Тексты промо-блоков по языку пула
+private data class PromoStrings(
+    val adsTitle: String, val adsSubtitle: String,
+    val pubTitle: String, val pubSubtitle: String,
+    val slotTitle: String, val slotSubtitle: String
 )
+
+private fun promoStrings(): PromoStrings {
+    val lang = java.util.Locale.getDefault().language
+    val cyrillic = setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk")
+    return when {
+        lang in cyrillic -> PromoStrings(
+            "Реклама · Сотрудничество", "Напишите нам — ответим в течение дня",
+            "Есть интересная публикация?", "Разместим ваш материал в ленте — статья, анонс, интервью",
+            "Здесь может быть ваша реклама", "Продвигайте бизнес среди читателей Ticker 24/7")
+        lang == "es" -> PromoStrings(
+            "Publicidad · Colaboración", "Escríbenos — respondemos en un día",
+            "¿Tienes una publicación interesante?", "Publicamos tu material en el feed: artículo, anuncio, entrevista",
+            "Tu anuncio podría estar aquí", "Promociona tu negocio entre los lectores de Ticker 24/7")
+        lang == "pt" -> PromoStrings(
+            "Publicidade · Parceria", "Escreva para nós — respondemos em um dia",
+            "Tem uma publicação interessante?", "Publicamos seu material no feed: artigo, anúncio, entrevista",
+            "Seu anúncio poderia estar aqui", "Promova seu negócio entre os leitores do Ticker 24/7")
+        else -> PromoStrings(
+            "Advertising · Partnership", "Message us — we reply within a day",
+            "Got an interesting story?", "We'll feature your content: article, announcement, interview",
+            "Your ad could be here", "Promote your business to Ticker 24/7 readers")
+    }
+}
+
+// Слайды для "Реклама · Сотрудничество" — только про партнёрство
+private val PROMO_SLIDES: List<PromoSlide> by lazy {
+    val s = promoStrings()
+    listOf(
+        PromoSlide(
+            emoji = "📲",
+            title = s.adsTitle,
+            subtitle = s.adsSubtitle,
+            contact = "tg://resolve?domain=$ADS_CONTACT_USER",
+            accentColor = Color(0xFF10B981),
+            bgColors = listOf(Color(0xFFEFFDF5), Color(0xFFD1FAE5))
+        ),
+        PromoSlide(
+            emoji = "✍️",
+            title = s.pubTitle,
+            subtitle = s.pubSubtitle,
+            contact = "tg://resolve?domain=$ADS_CONTACT_USER",
+            accentColor = Color(0xFF0EA5E9),
+            bgColors = listOf(Color(0xFFEFF9FF), Color(0xFFE0F2FE))
+        ),
+    )
+}
 
 /**
  * Нативная рекламная плитка с flip-анимацией — как новостные плитки.
@@ -2075,15 +2108,16 @@ fun ContextualAdSlot() {
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text("📢", fontSize = 28.sp)
+            val promo = remember { promoStrings() }
             Column {
                 Text(
-                    "Здесь может быть ваша реклама",
+                    promo.slotTitle,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(0xFF6366F1)
                 )
                 Text(
-                    "Продвигайте бизнес среди читателей Ticker 24/7",
+                    promo.slotSubtitle,
                     fontSize = 11.sp,
                     color = Color(0xFF6B7280)
                 )
