@@ -15,8 +15,8 @@ android {
         applicationId = "com.mirlanmamytov.ticker247"
         minSdk = 24
         targetSdk = 35
-        versionCode = 11
-        versionName = "1.3.1"
+        versionCode = 12
+        versionName = "1.3.2"
 
         // Gemini API key — добавь GEMINI_API_KEY=your_key в local.properties
         val geminiKey = rootProject.file("local.properties")
