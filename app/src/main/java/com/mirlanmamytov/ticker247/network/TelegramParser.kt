@@ -71,7 +71,7 @@ object TelegramParser {
             try {
                 val url = "https://$domain/s/${source.channel}"
                 val req = Request.Builder().url(url).build()
-                val body = client.newCall(req).execute().use { it.body?.string() ?: continue }
+                val body = client.newCall(req).execute().use { it.body?.string() } ?: continue
                 val items = parseHtml(body, source)
                 // Пустой список при живом домене = в канале нет постов; но если
                 // страница без разметки постов (блок/редирект) — пробуем зеркало
