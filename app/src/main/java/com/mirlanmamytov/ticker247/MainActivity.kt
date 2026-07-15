@@ -22,12 +22,49 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var prefs: SharedPreferences
 
+    // In-App Updates: приложение само предлагает обновление из Play —
+    // пользователям не нужно искать ссылку на стор
+    private val appUpdateManager by lazy {
+        com.google.android.play.core.appupdate.AppUpdateManagerFactory.create(this)
+    }
+    private val updateLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.StartIntentSenderForResult()
+    ) { /* принял или отклонил — не настаиваем */ }
+
+    private fun checkForUpdate() {
+        try {
+            val updateType = com.google.android.play.core.install.model.AppUpdateType.FLEXIBLE
+            appUpdateManager.registerListener { state ->
+                if (state.installStatus() ==
+                    com.google.android.play.core.install.model.InstallStatus.DOWNLOADED
+                ) {
+                    // Обновление скачано в фоне — применяем при следующем уходе в фон
+                    appUpdateManager.completeUpdate()
+                }
+            }
+            appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
+                if (info.updateAvailability() ==
+                    com.google.android.play.core.install.model.UpdateAvailability.UPDATE_AVAILABLE &&
+                    info.isUpdateTypeAllowed(updateType)
+                ) {
+                    appUpdateManager.startUpdateFlowForResult(
+                        info, updateLauncher,
+                        com.google.android.play.core.appupdate.AppUpdateOptions.newBuilder(updateType).build()
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.w("Ticker247", "In-app update: ${e.message}")
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Переключаемся на основную тему сразу — сплэш-фон держится до первого кадра Compose
         setTheme(R.style.Theme_Ticker247)
         super.onCreate(savedInstanceState)
         prefs = getSharedPreferences("ticker247_prefs", MODE_PRIVATE)
         handleDeepLink(intent)
+        checkForUpdate()
 
         setContent {
             AppRoot(

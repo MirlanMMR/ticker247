@@ -99,6 +99,9 @@ dependencies {
     // Chrome Custom Tabs
     implementation("androidx.browser:browser:1.8.0")
 
+    // In-App Updates — приложение само предлагает обновиться из Play
+    implementation("com.google.android.play:app-update-ktx:2.1.0")
+
     // Article parser
     implementation("org.jsoup:jsoup:1.17.2")
 

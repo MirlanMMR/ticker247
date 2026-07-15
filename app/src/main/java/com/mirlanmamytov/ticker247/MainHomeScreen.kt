@@ -800,6 +800,21 @@ fun HomeContent(
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Агрегатор новостей от MMR Lab®")
                     Text("Версия ${com.mirlanmamytov.ticker247.BuildConfig.VERSION_NAME}")
+                    Text(
+                        "Обновить в Google Play",
+                        color = Color(0xFF1D4ED8),
+                        modifier = Modifier.clickable {
+                            try {
+                                context.startActivity(Intent(Intent.ACTION_VIEW,
+                                    Uri.parse("market://details?id=com.mirlanmamytov.ticker247")))
+                            } catch (_: Exception) {
+                                try {
+                                    context.startActivity(Intent(Intent.ACTION_VIEW,
+                                        Uri.parse("https://play.google.com/store/apps/details?id=com.mirlanmamytov.ticker247")))
+                                } catch (_: Exception) {}
+                            }
+                        }
+                    )
                     HorizontalDivider()
                     Text("Контакты:", fontWeight = FontWeight.SemiBold)
                     Text(
