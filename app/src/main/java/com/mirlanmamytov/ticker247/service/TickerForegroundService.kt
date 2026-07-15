@@ -83,11 +83,20 @@ class TickerForegroundService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        ServiceCompat.startForeground(
-            this, 1001,
-            buildNotification("Загрузка новостей…", "ticker_info", R.drawable.ic_lightning_white),
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC else 0
-        )
+        // Android 12+ может перезапустить START_STICKY-сервис в фоне, где
+        // startForeground запрещён — не падаем, а тихо останавливаемся:
+        // сервис поднимется при следующем открытии приложения
+        try {
+            ServiceCompat.startForeground(
+                this, 1001,
+                buildNotification("Загрузка новостей…", "ticker_info", R.drawable.ic_lightning_white),
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC else 0
+            )
+        } catch (e: Exception) {
+            Log.w("Ticker247", "startForeground denied: ${e.message}")
+            stopSelf()
+            return START_NOT_STICKY
+        }
 
         // Pull-to-refresh — обновляем валюту и крипту напрямую из API (всегда актуально)
         if (intent?.action == ACTION_REFRESH) {
