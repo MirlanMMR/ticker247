@@ -132,6 +132,17 @@ object CountryNewsFetcher {
         }
     }
 
+    // Срочность: отключения, аварии, ЧС, спортивные победы — в СРОЧНО/ВАЖНО
+    // (русский + английский + испанский/португальский базовые)
+    private val urgentRegex = Regex(
+        "отключ|авари|землетряс|наводнен|паводк|пожар|взрыв|теракт|стрельб|погиб|жертв|" +
+        "эвакуац|чрезвычайн|крушени|обрушени|эпидеми|перекрыт|" +
+        "earthquake|flood|wildfire|explosion|terror|shooting|killed|evacuat|emergency|crash|outbreak|" +
+        "terremoto|inundaci|incendio|explosi|tiroteo|muert|evacuaci|emergencia|" +
+        "чемпион|финал|золото|медаль|champion|final|gold medal|campeón|campeão",
+        RegexOption.IGNORE_CASE
+    )
+
     private fun parseItems(xml: String, limit: Int): List<NewsItem> {
         val doc = Jsoup.parse(xml, "", Parser.xmlParser())
         val cutoff = System.currentTimeMillis() - 24 * 3_600_000L
@@ -149,15 +160,16 @@ object CountryNewsFetcher {
             val title = rawTitle.substringBeforeLast(" - ").trim()
             if (title.length < 15) return@mapNotNull null
 
+            val isUrgent = urgentRegex.containsMatchIn(title)
             NewsItem(
                 url = link,
                 title = title,
                 summary = "",
                 imageUrl = null,
                 source = sourceName,
-                category = "NEWS",
+                category = if (isUrgent) "URGENT" else "NEWS",
                 publishedAt = pubMillis,
-                priority = 1,
+                priority = if (isUrgent) 2 else 1,
                 // "unknown" — проходит языковые фильтры любого пула
                 // (госязык страны намеренно показывается вместе с языком пула)
                 language = "unknown",

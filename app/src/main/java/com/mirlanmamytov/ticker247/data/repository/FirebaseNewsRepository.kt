@@ -69,22 +69,30 @@ object FirebaseNewsRepository {
                 try {
                     val items = mutableListOf<NewsItem>()
                     // Определяем регионы по системному языку
+                    // Видео — строго на языке пула: кириллическим локалям СНГ-регионы,
+                    // испанцам Мексика, португальцам Бразилия, остальным Британия+мир
                     val sysLang = java.util.Locale.getDefault().language
                     val sysCountry = java.util.Locale.getDefault().country
+                    val cyrillicLangs = setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk")
                     val regions = when {
                         sysLang == "ky" -> listOf("kg", "ru")
                         sysCountry == "KG" -> listOf("kg", "ru", "world")
                         sysCountry == "KZ" -> listOf("kz", "kg", "ru")
                         sysCountry == "RU" -> listOf("ru", "kg", "world")
-                        sysLang == "ru"  -> listOf("ru", "kg", "world")
-                        else -> listOf("world", "kg", "ru")
+                        sysLang in cyrillicLangs -> listOf("ru", "kg", "world")
+                        sysLang == "es" -> listOf("mx", "world")
+                        sysLang == "pt" -> listOf("br", "world")
+                        else -> listOf("gb", "world")
                     }
                     regions.forEach { region ->
                         val label = when(region) {
                             "kg" -> "🔥 ВИРАЛЬНО В КГ"
                             "ru" -> "🔥 ВИРАЛЬНО В РФ"
                             "kz" -> "🔥 ВИРАЛЬНО В КЗ"
-                            else -> "🌍 ВИРАЛЬНО В МИРЕ"
+                            "mx" -> "🔥 VIRAL"
+                            "br" -> "🔥 VIRAL"
+                            "gb" -> "🔥 VIRAL"
+                            else -> if (sysLang in cyrillicLangs) "🌍 ВИРАЛЬНО В МИРЕ" else "🌍 VIRAL"
                         }
                         for (child in snapshot.child(region).children) {
                             val url = child.child("url").getValue(String::class.java) ?: ""
