@@ -18,8 +18,8 @@ object CurrencyProfile {
         // КГ (или кириллическая локаль без страны) — домашний профиль
         if (country == "KG" || (country.isEmpty() && lang in cyrillic)) {
             return Profile("KGS", "сом", listOf(
-                Quote("USD", "💵"), Quote("EUR", "💶"), Quote("RUB", "🇷🇺"), Quote("KZT", "🇰🇿"),
-                Quote("UZS", "🇺🇿"), Quote("TRY", "🇹🇷"), Quote("AED", "🇦🇪")))
+                Quote("USD", "💵"), Quote("EUR", "💶"), Quote("RUB", "🇷🇺"), Quote("CNY", "🇨🇳"),
+                Quote("KZT", "🇰🇿"), Quote("UZS", "🇺🇿"), Quote("TRY", "🇹🇷"), Quote("AED", "🇦🇪")))
         }
 
         // Любая страна мира: национальная валюта из системного справочника
