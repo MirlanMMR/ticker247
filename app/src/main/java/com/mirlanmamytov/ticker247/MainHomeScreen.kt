@@ -2028,7 +2028,7 @@ private data class PromoSlide(
 )
 
 // Контакт для рекламы — одно место, легко менять
-private const val ADS_CONTACT_USER = "ticker247ads"  // TG для рекламы и сотрудничества
+private const val ADS_CONTACT_USER = "ticker247ads_bot"  // TG для рекламы и сотрудничества
 
 /**
  * Открывает Telegram-профиль: сначала приложение (tg:// работает даже когда
