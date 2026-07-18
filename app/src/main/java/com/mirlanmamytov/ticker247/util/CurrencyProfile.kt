@@ -10,10 +10,25 @@ object CurrencyProfile {
     data class Quote(val code: String, val emoji: String)
     data class Profile(val base: String, val label: String, val quotes: List<Quote>)
 
+    // База по СТРАНЕ для СНГ: каждый видит курсы в своей валюте
+    private val CIS_BASE = mapOf(
+        "KZ" to "KZT", "UZ" to "UZS", "BY" to "BYN", "RU" to "RUB", "TJ" to "TJS",
+        "AZ" to "AZN", "AM" to "AMD", "GE" to "GEL", "UA" to "UAH", "MD" to "MDL"
+    )
+
     fun current(): Profile {
         val lang = java.util.Locale.getDefault().language
+        val country = java.util.Locale.getDefault().country.uppercase()
         val cyrillic = setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk")
         return when {
+            // СНГ вне КГ: базовая валюта своей страны
+            lang in cyrillic && CIS_BASE.containsKey(country) -> {
+                val base = CIS_BASE.getValue(country)
+                Profile(base, base, listOf(
+                    Quote("USD", "💵"), Quote("EUR", "💶"), Quote("RUB", "🇷🇺"),
+                    Quote("CNY", "🇨🇳"), Quote("TRY", "🇹🇷")
+                ).filter { it.code != base })
+            }
             lang in cyrillic -> Profile("KGS", "сом", listOf(
                 Quote("USD", "💵"), Quote("EUR", "💶"), Quote("RUB", "🇷🇺"), Quote("KZT", "🇰🇿"),
                 Quote("UZS", "🇺🇿"), Quote("TRY", "🇹🇷"), Quote("AED", "🇦🇪")))

@@ -252,9 +252,13 @@ class TickerForegroundService : Service() {
                             ?.let { allItems.add(it.copy(source = "ExchangeRate (кэш)")) }
                     }
 
-                    // 2. Цены на топливо — только реальные данные, не fallback
+                    // 2. Цены на топливо — данные Кыргызстана (Kaktus), показываем
+                    // только пользователям в КГ. Нет данных по стране = нет ГСМ в строке
                     try {
-                        val fuel = com.mirlanmamytov.ticker247.network.FuelPriceFetcher.fetch()
+                        val fuel = if (com.mirlanmamytov.ticker247.network.CountryNewsFetcher.deviceCountry() == "KG")
+                            com.mirlanmamytov.ticker247.network.FuelPriceFetcher.fetch()
+                        else
+                            com.mirlanmamytov.ticker247.network.FuelPriceFetcher.FuelPrices(null, null, null)
                         if (fuel.isReal) {
                             com.mirlanmamytov.ticker247.network.FuelPriceFetcher.toTickerItems(fuel)
                                 .forEach { tickerFuel.add(it) }
