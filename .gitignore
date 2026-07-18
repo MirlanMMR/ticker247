@@ -21,3 +21,6 @@ _backup_*/
 # Секретные файлы — не публиковать
 app/google-services.json
 app/build/
+
+# Собранные релизы
+app/release/
