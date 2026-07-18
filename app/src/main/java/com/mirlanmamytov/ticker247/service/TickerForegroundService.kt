@@ -216,6 +216,8 @@ class TickerForegroundService : Service() {
                     // Источники из Firebase — правки на бэкенде подхватываются без релиза
                     try { com.mirlanmamytov.ticker247.network.FirebaseSourceConfig.refresh() }
                     catch (e: Exception) { Log.w("Ticker247", "SourceConfig: ${e.message}") }
+                    try { FirebaseNewsRepository.refreshCountryLocalsFlag() }
+                    catch (e: Exception) { Log.w("Ticker247", "CountryFlag: ${e.message}") }
 
                     val allItems = mutableListOf<NewsItem>()
                     val tickerItems    = mutableListOf<String>()
@@ -336,7 +338,24 @@ class TickerForegroundService : Service() {
 
                     // 5. Новости — из Firebase
                     try {
-                        val firebaseItems = FirebaseNewsRepository.fetchNews()
+                        var firebaseItems = FirebaseNewsRepository.fetchNews()
+                        // Местные — строго по стране устройства: пользователи вне КГ
+                        // получают вместо КГ-местных новости СВОЕЙ страны (50/50
+                        // госязык + язык пула из Google News). Выключатель:
+                        // /config/country_locals = false отключает удалённо
+                        try {
+                            if (com.mirlanmamytov.ticker247.network.CountryNewsFetcher.shouldReplaceLocals() &&
+                                FirebaseNewsRepository.countryLocalsEnabled()
+                            ) {
+                                val countryLocals = withContext(Dispatchers.IO) {
+                                    com.mirlanmamytov.ticker247.network.CountryNewsFetcher.fetchCountryLocals()
+                                }
+                                if (countryLocals.isNotEmpty()) {
+                                    firebaseItems = firebaseItems.filter { it.scope != "local" } + countryLocals
+                                    Log.d("Ticker247", "Country locals: ${countryLocals.size} для ${com.mirlanmamytov.ticker247.network.CountryNewsFetcher.deviceCountry()}")
+                                }
+                            }
+                        } catch (e: Exception) { Log.w("Ticker247", "CountryLocals: ${e.message}") }
                         allItems.addAll(firebaseItems)
                         // Бегущая строка — только на языке интерфейса (мировые новости в пуле на английском)
                         val tickerCandidates = firebaseItems.filter { matchesUiLanguage(it.title) }

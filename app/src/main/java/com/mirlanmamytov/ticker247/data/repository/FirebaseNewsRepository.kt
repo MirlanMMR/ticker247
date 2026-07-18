@@ -184,6 +184,28 @@ object FirebaseNewsRepository {
         return effective[key] ?: EDITORIAL_FALLBACK.getValue(key)
     }
 
+    // ── Выключатель «местные по стране» ──────────────────────────────────────
+    // /config/country_locals: false отключает подмену местных удалённо.
+    // Отсутствие узла = включено (фича активна по умолчанию).
+    @Volatile private var countryLocalsFlag: Boolean = true
+
+    fun countryLocalsEnabled(): Boolean = countryLocalsFlag
+
+    suspend fun refreshCountryLocalsFlag() {
+        try {
+            suspendCancellableCoroutine<Unit> { cont ->
+                database.getReference("config/country_locals")
+                    .addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            countryLocalsFlag = snapshot.getValue(Boolean::class.java) ?: true
+                            cont.resume(Unit)
+                        }
+                        override fun onCancelled(error: DatabaseError) { cont.resume(Unit) }
+                    })
+            }
+        } catch (_: Exception) {}
+    }
+
     fun updateDataBridge(items: List<NewsItem>) {
         val tickerItems = items
             .filter { it.category in setOf("CURRENCY", "CRYPTO", "URGENT", "TRENDS") }
