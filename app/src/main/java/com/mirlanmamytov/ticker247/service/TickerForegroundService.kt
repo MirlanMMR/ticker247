@@ -60,17 +60,9 @@ class TickerForegroundService : Service() {
     @android.annotation.SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate() {
         super.onCreate()
-        val filter = android.content.IntentFilter(ACTION_DISMISSED)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(dismissReceiver, filter, android.content.Context.RECEIVER_NOT_EXPORTED)
-        } else {
-            registerReceiver(dismissReceiver, filter)
-        }
+        // startForeground — ПЕРВЫМ делом, до любых инициализаций: система даёт
+        // ~5 секунд, на загруженных устройствах опоздание = DidNotStartInTime-краш
         createNotificationChannels()
-        com.mirlanmamytov.ticker247.data.repository.NewsBuffer.init(this)
-        com.mirlanmamytov.ticker247.network.FuelPriceFetcher.init(this)
-        // startForeground сразу в onCreate — гарантия уложиться в 5-секундный
-        // лимит системы (ForegroundServiceDidNotStartInTimeException)
         try {
             ServiceCompat.startForeground(
                 this, 1001,
@@ -80,6 +72,14 @@ class TickerForegroundService : Service() {
         } catch (e: Exception) {
             Log.w("Ticker247", "startForeground in onCreate: ${e.message}")
         }
+        val filter = android.content.IntentFilter(ACTION_DISMISSED)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(dismissReceiver, filter, android.content.Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(dismissReceiver, filter)
+        }
+        com.mirlanmamytov.ticker247.data.repository.NewsBuffer.init(this)
+        com.mirlanmamytov.ticker247.network.FuelPriceFetcher.init(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
