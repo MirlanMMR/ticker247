@@ -10,40 +10,37 @@ object CurrencyProfile {
     data class Quote(val code: String, val emoji: String)
     data class Profile(val base: String, val label: String, val quotes: List<Quote>)
 
-    // База по СТРАНЕ для СНГ: каждый видит курсы в своей валюте
-    private val CIS_BASE = mapOf(
-        "KZ" to "KZT", "UZ" to "UZS", "BY" to "BYN", "RU" to "RUB", "TJ" to "TJS",
-        "AZ" to "AZN", "AM" to "AMD", "GE" to "GEL", "UA" to "UAH", "MD" to "MDL"
-    )
-
     fun current(): Profile {
         val lang = java.util.Locale.getDefault().language
         val country = java.util.Locale.getDefault().country.uppercase()
         val cyrillic = setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk")
-        return when {
-            // СНГ вне КГ: базовая валюта своей страны
-            lang in cyrillic && CIS_BASE.containsKey(country) -> {
-                val base = CIS_BASE.getValue(country)
-                Profile(base, base, listOf(
-                    Quote("USD", "💵"), Quote("EUR", "💶"), Quote("RUB", "🇷🇺"),
-                    Quote("CNY", "🇨🇳"), Quote("TRY", "🇹🇷")
-                ).filter { it.code != base })
-            }
-            lang in cyrillic -> Profile("KGS", "сом", listOf(
+
+        // КГ (или кириллическая локаль без страны) — домашний профиль
+        if (country == "KG" || (country.isEmpty() && lang in cyrillic)) {
+            return Profile("KGS", "сом", listOf(
                 Quote("USD", "💵"), Quote("EUR", "💶"), Quote("RUB", "🇷🇺"), Quote("KZT", "🇰🇿"),
                 Quote("UZS", "🇺🇿"), Quote("TRY", "🇹🇷"), Quote("AED", "🇦🇪")))
-            lang == "tr" -> Profile("TRY", "TRY", listOf(
-                Quote("USD", "💵"), Quote("EUR", "💶"), Quote("GBP", "🇬🇧"), Quote("RUB", "🇷🇺"), Quote("SAR", "🇸🇦")))
-            lang == "es" -> Profile("USD", "USD", listOf(
-                Quote("EUR", "💶"), Quote("MXN", "🇲🇽"), Quote("ARS", "🇦🇷"), Quote("COP", "🇨🇴"), Quote("CLP", "🇨🇱")))
-            lang == "pt" -> Profile("BRL", "BRL", listOf(
-                Quote("USD", "💵"), Quote("EUR", "💶"), Quote("GBP", "🇬🇧"), Quote("ARS", "🇦🇷")))
-            lang in setOf("fr", "de", "it", "nl") -> Profile("EUR", "EUR", listOf(
-                Quote("USD", "💵"), Quote("GBP", "🇬🇧"), Quote("CHF", "🇨🇭"), Quote("JPY", "🇯🇵")))
-            else -> Profile("USD", "USD", listOf(
-                Quote("EUR", "💶"), Quote("GBP", "🇬🇧"), Quote("JPY", "🇯🇵"),
-                Quote("CNY", "🇨🇳"), Quote("CAD", "🇨🇦"), Quote("AUD", "🇦🇺")))
         }
+
+        // Любая страна мира: национальная валюта из системного справочника
+        val base = runCatching {
+            java.util.Currency.getInstance(java.util.Locale("", country)).currencyCode
+        }.getOrNull() ?: when {
+            lang in cyrillic -> "RUB"
+            lang == "pt" -> "BRL"
+            else -> "USD"
+        }
+
+        // Котировки: мировые резервные + региональные, свою базу исключаем
+        val quotes = (if (lang in cyrillic)
+            listOf(Quote("USD", "💵"), Quote("EUR", "💶"), Quote("RUB", "🇷🇺"),
+                   Quote("CNY", "🇨🇳"), Quote("TRY", "🇹🇷"))
+        else
+            listOf(Quote("USD", "💵"), Quote("EUR", "💶"), Quote("GBP", "🇬🇧"),
+                   Quote("CNY", "🇨🇳"), Quote("JPY", "🇯🇵"))
+        ).filter { it.code != base }
+
+        return Profile(base, base, quotes)
     }
 
     private fun fmt(v: Double): String = when {
