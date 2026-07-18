@@ -1676,7 +1676,7 @@ fun NewsTileGrid(
         while (itemIdx < sorted.size) {
             // Ряд 4: первый слот контекстной рекламы (AdMob)
             if (rowCount == 4) {
-                ContextualAdSlot()
+                ContextualAdSlot(com.mirlanmamytov.ticker247.ads.AdsConfig.FEED_SLOT_1)
                 Spacer(Modifier.height(8.dp))
             }
             // Ряд 7: партнёрский слот "Реклама · Сотрудничество"
@@ -1686,7 +1686,7 @@ fun NewsTileGrid(
             }
             // Ряд 10: второй слот контекстной рекламы (AdMob)
             if (rowCount == 10) {
-                ContextualAdSlot()
+                ContextualAdSlot(com.mirlanmamytov.ticker247.ads.AdsConfig.FEED_SLOT_2)
                 Spacer(Modifier.height(8.dp))
             }
 
@@ -1789,9 +1789,9 @@ fun NewsTileBlock(
         var rowCount = 0
         while (itemIdx < items.size) {
             val absRow = rowCount + adOffset
-            if (absRow == 4) { ContextualAdSlot(); Spacer(Modifier.height(8.dp)) }
+            if (absRow == 4) { ContextualAdSlot(com.mirlanmamytov.ticker247.ads.AdsConfig.FEED_SLOT_1); Spacer(Modifier.height(8.dp)) }
             if (absRow == 7) { PromoSlot(); Spacer(Modifier.height(8.dp)) }
-            if (absRow == 10) { ContextualAdSlot(); Spacer(Modifier.height(8.dp)) }
+            if (absRow == 10) { ContextualAdSlot(com.mirlanmamytov.ticker247.ads.AdsConfig.FEED_SLOT_2); Spacer(Modifier.height(8.dp)) }
 
             val pattern = shuffledPatterns[rowCount % shuffledPatterns.size]
             val available = items.size - itemIdx
@@ -2104,9 +2104,20 @@ private val PROMO_SLIDES: List<PromoSlide> by lazy {
  * Переворачивается между слайдами каждые 6 секунд.
  * При тапе на любой слайд — открывает контакт.
  */
-// Заглушка под контекстную рекламу (Google AdMob — подключим после релиза)
+/**
+ * Слот контекстной рекламы: нативное объявление AdMob, при отсутствии
+ * заполнения — партнёрская визитка (реклама никогда не пустует)
+ */
 @Composable
-fun ContextualAdSlot() {
+fun ContextualAdSlot(adUnitId: String = com.mirlanmamytov.ticker247.ads.AdsConfig.FEED_SLOT_1) {
+    com.mirlanmamytov.ticker247.ads.NativeAdSlot(adUnitId = adUnitId) {
+        AdPlaceholderCard()
+    }
+}
+
+// Партнёрская визитка — фолбэк когда AdMob не дал объявление
+@Composable
+fun AdPlaceholderCard() {
     val context = LocalContext.current
     Box(
         Modifier

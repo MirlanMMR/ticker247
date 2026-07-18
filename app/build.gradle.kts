@@ -76,8 +76,10 @@ dependencies {
     // WorkManager & DataStore
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
-    // AdMob подключим перед релизом
-    // implementation("com.google.android.gms:play-services-ads:22.6.0")
+    // AdMob — контекстная реклама (нативные блоки в ленте)
+    implementation("com.google.android.gms:play-services-ads:23.2.0")
+    // Согласие на обработку данных (GDPR/UMP) — требование Google для Европы
+    implementation("com.google.android.ump:user-messaging-platform:2.2.0")
 
     // Network
     implementation("com.squareup.retrofit2:retrofit:2.11.0")

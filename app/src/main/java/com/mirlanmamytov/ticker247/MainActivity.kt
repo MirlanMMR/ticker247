@@ -58,6 +58,34 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // AdMob: согласие (GDPR/UMP для Европы) → инициализация SDK
+    @Volatile private var adsInitialized = false
+    private fun initAdsWithConsent() {
+        try {
+            val consentInfo = com.google.android.ump.UserMessagingPlatform.getConsentInformation(this)
+            val params = com.google.android.ump.ConsentRequestParameters.Builder().build()
+            consentInfo.requestConsentInfoUpdate(this, params, {
+                com.google.android.ump.UserMessagingPlatform.loadAndShowConsentFormIfRequired(this) { _ ->
+                    if (consentInfo.canRequestAds()) initAdsSdk()
+                }
+            }, {
+                // Не удалось получить статус (нет сети и т.п.) — пробуем без формы
+                initAdsSdk()
+            })
+        } catch (e: Exception) {
+            android.util.Log.w("Ticker247", "Ads consent: ${e.message}")
+        }
+    }
+
+    private fun initAdsSdk() {
+        if (adsInitialized) return
+        adsInitialized = true
+        Thread {
+            try { com.google.android.gms.ads.MobileAds.initialize(this) }
+            catch (e: Exception) { android.util.Log.w("Ticker247", "MobileAds init: ${e.message}") }
+        }.start()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Переключаемся на основную тему сразу — сплэш-фон держится до первого кадра Compose
         setTheme(R.style.Theme_Ticker247)
@@ -65,6 +93,7 @@ class MainActivity : ComponentActivity() {
         prefs = getSharedPreferences("ticker247_prefs", MODE_PRIVATE)
         handleDeepLink(intent)
         checkForUpdate()
+        initAdsWithConsent()
 
         setContent {
             AppRoot(
