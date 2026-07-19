@@ -105,6 +105,22 @@ object TelegramParser {
                 val cleanText = stripHtml(rawHtml).trim()
                 if (cleanText.length < 20) continue
 
+                // #удалить БЕЗ двоеточия, дописанный к самому посту (редактированием) —
+                // скрыть из ленты именно ЭТУ новость. Работает и на архивных постах бота
+                if (source.priority >= 10 &&
+                    Regex("#удалить\\b(?!\\s*:)|#remove\\b(?!\\s*:)", RegexOption.IGNORE_CASE).containsMatchIn(cleanText)
+                ) {
+                    // Цель блокировки — первая строка поста (заголовок), без ссылок и тегов
+                    val target = cleanText
+                        .replace(Regex("https?://\\S+"), "")
+                        .replace(Regex("#[\\wа-яё]+", RegexOption.IGNORE_CASE), "")
+                        .lines().firstOrNull { it.trim().length > 10 }?.trim()?.take(120)
+                    if (target != null) {
+                        foundRemovals.add(target to (System.currentTimeMillis() + 3 * 24 * 3_600_000L))
+                    }
+                    continue
+                }
+
                 // Архивные посты бота (новости из тикера, запощенные бэкендом в канал)
                 // имеют подпись «📲 @t247feed…» — их обратно в приложение не берём.
                 // Ручные редакторские посты подписи не имеют и получают высший приоритет.

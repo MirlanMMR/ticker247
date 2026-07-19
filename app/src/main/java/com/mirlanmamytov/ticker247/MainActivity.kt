@@ -13,9 +13,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.mirlanmamytov.ticker247.service.TickerForegroundService
 import com.mirlanmamytov.ticker247.ui.screens.SignInScreen
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -87,13 +89,19 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Переключаемся на основную тему сразу — сплэш-фон держится до первого кадра Compose
-        setTheme(R.style.Theme_Ticker247)
+        // Тему НЕ переключаем: брендовый сплэш (лого) виден до первого кадра
+        // Compose — раньше здесь был сплошной тёмный фон = «чёрный экран»
+        // на холодном старте
         super.onCreate(savedInstanceState)
         prefs = getSharedPreferences("ticker247_prefs", MODE_PRIVATE)
         handleDeepLink(intent)
-        checkForUpdate()
-        initAdsWithConsent()
+        // Тяжёлую инициализацию (обновления, реклама) откладываем — сначала
+        // рисуем интерфейс, холодный старт становится заметно быстрее
+        lifecycleScope.launch {
+            kotlinx.coroutines.delay(2000)
+            checkForUpdate()
+            initAdsWithConsent()
+        }
 
         setContent {
             AppRoot(
