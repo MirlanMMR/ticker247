@@ -124,6 +124,7 @@ class MainActivity : ComponentActivity() {
     private fun handleDeepLink(intent: Intent?) {
         intent?.getStringExtra("article_url")?.takeIf { it.isNotEmpty() }?.let {
             DataBridge.pendingArticleUrl = it
+            DataBridge.pendingArticleTitle = intent.getStringExtra("article_title") ?: ""
         }
         intent?.getStringExtra("open_tab")?.takeIf { it.isNotEmpty() }?.let {
             DataBridge.pendingTab = it

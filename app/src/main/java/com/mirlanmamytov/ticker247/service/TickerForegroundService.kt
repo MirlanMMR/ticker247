@@ -457,11 +457,16 @@ class TickerForegroundService : Service() {
         }
     }
 
+    // Новостные строки, уже показанные в шторке — не повторяем,
+    // пока не появятся новые (финансовые цифры крутятся всегда)
+    private val rotationShownNews = LinkedHashSet<String>()
+
     // Крутим уведомление каждые 8 секунд — только цифры и срочные
     private fun startRotationLoop() {
         isRotationLoopRunning = true
         serviceScope.launch {
             var index = 0
+            val newsPrefixes = setOf("⚡","💧","🔌","⛽","♨️","🚧","🚗","🌍","🌊","🔥","🌪️","🚨","🆘","🏥","📈","✈️","📵","📅","🥊","⚠️","🏆","📰")
             while (isActive) {
                 try {
                     // Смахнутые уведомления чистим раз в час (новости устаревают)
@@ -472,8 +477,20 @@ class TickerForegroundService : Service() {
                         continue
                     }
                     run {
-                        val line = lines[index % lines.size]
+                        // Новость показываем один раз; когда все показаны — в шторке
+                        // остаются только курсы/крипта до появления свежих новостей
+                        val unseen = lines.filter { l ->
+                            newsPrefixes.none { p -> l.startsWith(p) } || l.take(60) !in rotationShownNews
+                        }
+                        val pool = unseen.ifEmpty {
+                            lines.filter { l -> newsPrefixes.none { p -> l.startsWith(p) } }.ifEmpty { lines }
+                        }
+                        val line = pool[index % pool.size]
                         index++
+                        if (newsPrefixes.any { line.startsWith(it) }) {
+                            rotationShownNews.add(line.take(60))
+                            while (rotationShownNews.size > 300) rotationShownNews.remove(rotationShownNews.first())
+                        }
                         val urgentPrefixes = setOf("⚡","💧","🔌","⛽","♨️","🚧","🚗","🌍","🌊","🔥","🌪️","🚨","🆘","🏥","📈","✈️","📵","📅","🥊","⚠️")
                         val isUrgent = urgentPrefixes.any { line.startsWith(it) }
                         val isImportant = line.startsWith("🏆") || line.startsWith("📰")
@@ -831,10 +848,15 @@ class TickerForegroundService : Service() {
     private fun buildNotificationWithUrl(
         text: String, channelId: String, iconRes: Int, articleUrl: String
     ): Notification {
-        // Intent с URL статьи для открытия при тапе
+        // Intent с URL и заголовком статьи — заголовок позволяет открыть ридер
+        // мгновенно, не дожидаясь загрузки ленты (было: чёрный экран на холодном старте)
+        val titleForIntent = text.dropWhile { !it.isLetterOrDigit() }.trim()
         val tapIntent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            if (articleUrl.isNotEmpty()) putExtra("article_url", articleUrl)
+            if (articleUrl.isNotEmpty()) {
+                putExtra("article_url", articleUrl)
+                putExtra("article_title", titleForIntent)
+            }
             if (channelId == "ticker_urgent") putExtra("open_tab", "URGENT")
         }
 

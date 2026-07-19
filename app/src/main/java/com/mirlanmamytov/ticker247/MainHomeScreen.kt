@@ -639,11 +639,24 @@ fun MainHomeScreen() {
                 if (idx >= 0) {
                     tikTokItems = sorted
                     tikTokStart = idx
+                } else {
+                    // В ленте не нашли — открываем статью напрямую по URL
+                    tikTokItems = listOf(NewsItem(
+                        url = url, title = DataBridge.pendingArticleTitle,
+                        summary = "", imageUrl = null, source = "", category = "URGENT"))
+                    tikTokStart = 0
                 }
-                // Очищаем только после того как новости загружены (иначе ждём следующего срабатывания)
+                DataBridge.pendingArticleUrl = ""
+            } else {
+                // Лента ещё грузится (холодный старт из уведомления) — НЕ ждём:
+                // открываем статью сразу, текст подтянет ArticleExtractor.
+                // Раньше здесь ждали ленту → «чёрный экран» на 5-10 секунд
+                tikTokItems = listOf(NewsItem(
+                    url = url, title = DataBridge.pendingArticleTitle,
+                    summary = "", imageUrl = null, source = "", category = "URGENT"))
+                tikTokStart = 0
                 DataBridge.pendingArticleUrl = ""
             }
-            // Если newsItemsState пуст — LaunchedEffect перезапустится когда новости придут
         }
         if (tab.isNotEmpty() && newsItemsState.isNotEmpty()) {
             DataBridge.pendingTab = ""

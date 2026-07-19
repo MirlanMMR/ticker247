@@ -87,8 +87,8 @@ object FirebaseNewsRepository {
                     regions.forEach { region ->
                         val label = when(region) {
                             "kg" -> "🔥 ВИРАЛЬНО В КГ"
-                            "ru" -> "🔥 ВИРАЛЬНО В РФ"
-                            "kz" -> "🔥 ВИРАЛЬНО В КЗ"
+                            "ru" -> "🔥 ВИРАЛЬНО"
+                            "kz" -> "🔥 ВИРАЛЬНО"
                             "mx" -> "🔥 VIRAL"
                             "br" -> "🔥 VIRAL"
                             "gb" -> "🔥 VIRAL"

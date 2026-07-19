@@ -87,8 +87,9 @@ object TelegramParser {
 
     private fun parseHtml(html: String, source: TelegramSource): List<NewsItem> {
         val items = mutableListOf<NewsItem>()
-        // Директивы «#тема: ...» — собираем и регистрируем в конце разбора
+        // Директивы «#тема: ...» и «#удалить: ...» — собираем и регистрируем в конце
         val foundTopics = mutableListOf<Pair<String, Long>>()
+        val foundRemovals = mutableListOf<Pair<String, Long>>()
 
         // Парсим каждый пост как изолированный блок через Jsoup
         val doc = org.jsoup.Jsoup.parse(html)
@@ -118,7 +119,9 @@ object TelegramParser {
                 // Время жизни темы: #Nд/#Nч в том же посте, по умолчанию 3 дня.
                 val topicMatches = Regex("#тема\\s*:\\s*([^#\\n]+)|#topic\\s*:\\s*([^#\\n]+)", RegexOption.IGNORE_CASE)
                     .findAll(cleanText).toList()
-                if (topicMatches.isNotEmpty()) {
+                val removalMatches = Regex("#удалить\\s*:\\s*([^#\\n]+)|#remove\\s*:\\s*([^#\\n]+)", RegexOption.IGNORE_CASE)
+                    .findAll(cleanText).toList()
+                if (topicMatches.isNotEmpty() || removalMatches.isNotEmpty()) {
                     val postDate = block.selectFirst("time[datetime]")?.attr("datetime")
                         ?.let { runCatching { java.time.OffsetDateTime.parse(it).toInstant().toEpochMilli() }.getOrNull() }
                         ?: System.currentTimeMillis()
@@ -131,6 +134,10 @@ object TelegramParser {
                     topicMatches.forEach { m ->
                         val topic = (m.groupValues[1].ifEmpty { m.groupValues[2] }).trim(' ', ',', '.', '-')
                         if (topic.length >= 3) foundTopics.add(topic to (postDate + life))
+                    }
+                    removalMatches.forEach { m ->
+                        val target = (m.groupValues[1].ifEmpty { m.groupValues[2] }).trim(' ', ',', '.', '-')
+                        if (target.length >= 3) foundRemovals.add(target to (postDate + life))
                     }
                     continue  // директива — не новость
                 }
@@ -312,9 +319,10 @@ object TelegramParser {
             } catch (e: Exception) { /* skip bad post */ }
         }
 
-        // Регистрируем найденные темы (пустой список очищает устаревшие)
-        if (source.priority >= 10) {  // только редакторские каналы задают повестку
+        // Регистрируем темы и блокировки (пустой список очищает устаревшие)
+        if (source.priority >= 10) {  // только редакторские каналы управляют лентой
             com.mirlanmamytov.ticker247.util.EditorialTopics.update(source.channel, foundTopics)
+            com.mirlanmamytov.ticker247.util.EditorialTopics.updateRemovals(source.channel, foundRemovals)
         }
 
         return items

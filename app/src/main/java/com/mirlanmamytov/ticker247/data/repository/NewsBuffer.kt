@@ -131,6 +131,8 @@ object NewsBuffer {
             item.category !in setOf("CURRENCY", "CRYPTO") &&
             // Обычные новости живут 24ч; посты с таймером (#3д/#12ч) — до истечения
             (if (item.expiresAt != null) item.expiresAt > now else item.publishedAt >= cutoff) &&
+            // Редакторская цензура (#удалить: в TG-канале)
+            !com.mirlanmamytov.ticker247.util.EditorialTopics.isBlocked(item.title, item.summary) &&
             // Фильтруем контент не на языке пула
             // Исключение: если язык неизвестен ("unknown"/"other") — показываем
             run {

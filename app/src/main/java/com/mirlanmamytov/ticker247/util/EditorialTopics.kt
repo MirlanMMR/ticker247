@@ -50,6 +50,36 @@ object EditorialTopics {
         return topics.filter { it.expiresAt > now }.map { it.raw }
     }
 
+    // ── Редакторская цензура: «#удалить: <слова заголовка>» ──────────────────
+    // Совпавшие новости скрываются из ленты у всех пользователей пула
+
+    private val blockByChannel = java.util.concurrent.ConcurrentHashMap<String, List<Topic>>()
+
+    fun updateRemovals(channel: String, found: List<Pair<String, Long>>) {
+        val now = System.currentTimeMillis()
+        blockByChannel[channel] = found.mapNotNull { (raw, expiresAt) ->
+            val words = topicWords(raw)
+            if (words.isEmpty() || expiresAt <= now) null
+            else Topic(raw, words, expiresAt)
+        }
+        val all = blockByChannel.values.flatten()
+        if (all.isNotEmpty()) {
+            android.util.Log.d("EditorialTopics", "Цензура: ${all.map { it.raw }}")
+        }
+    }
+
+    /** true = новость заблокирована редактором, в ленту не показывать */
+    fun isBlocked(title: String, summary: String): Boolean {
+        val blocks = blockByChannel.values.flatten()
+        if (blocks.isEmpty()) return false
+        val now = System.currentTimeMillis()
+        val text = "$title $summary".lowercase()
+        return blocks.any { b ->
+            b.expiresAt > now &&
+            b.words.count { w -> text.contains(w) } >= (b.words.size + 1) / 2
+        }
+    }
+
     /**
      * Бонус к рейтингу новости, если она совпадает с активной темой.
      * Совпадение: минимум половина слов темы встречается в заголовке+тексте.

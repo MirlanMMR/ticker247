@@ -50,6 +50,7 @@ object DataBridge {
     }
 
     var pendingArticleUrl: String by mutableStateOf("")
+    var pendingArticleTitle: String = ""
     var pendingTab: String by mutableStateOf("")
 
     @Volatile var isAppVisible: Boolean = false
