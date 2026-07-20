@@ -21,6 +21,16 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-6966517821505726~9084025355" />
 
+        <!-- Инициализация рекламного SDK в фоновом потоке: авто-инициализация
+             на старте процесса блокировала главный поток на слабых устройствах →
+             сервис не успевал вызвать startForeground (DidNotStartInTime) -->
+        <meta-data
+            android:name="com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION"
+            android:value="true" />
+        <meta-data
+            android:name="com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING"
+            android:value="true" />
+
         <!-- Конфликт play-services-ads и UMP: оба объявляют AD_SERVICES_CONFIG -->
         <property
             android:name="android.adservices.AD_SERVICES_CONFIG"

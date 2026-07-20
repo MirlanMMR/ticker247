@@ -67,6 +67,8 @@ class MainActivity : ComponentActivity() {
             val consentInfo = com.google.android.ump.UserMessagingPlatform.getConsentInformation(this)
             val params = com.google.android.ump.ConsentRequestParameters.Builder().build()
             consentInfo.requestConsentInfoUpdate(this, params, {
+                // Экран мог закрыться пока шёл сетевой запрос — не показываем форму
+                if (isDestroyed || isFinishing) return@requestConsentInfoUpdate
                 com.google.android.ump.UserMessagingPlatform.loadAndShowConsentFormIfRequired(this) { _ ->
                     if (consentInfo.canRequestAds()) initAdsSdk()
                 }
