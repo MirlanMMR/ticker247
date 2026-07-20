@@ -858,17 +858,23 @@ fun HomeContent(
     Scaffold(
         containerColor = bgColor,
         bottomBar = {
+            // Заметная кнопка-таблетка: контакты, обновление, реклама — всё там
             Box(
-                Modifier.fillMaxWidth().background(bgColor).padding(vertical = 5.dp).clickable { showAbout = true },
+                Modifier.fillMaxWidth().background(bgColor).padding(vertical = 6.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                Row(
+                    Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(Color(0xFF1D4ED8).copy(0.10f))
+                        .clickable { showAbout = true }
+                        .padding(horizontal = 18.dp, vertical = 7.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Box(Modifier.size(4.dp).clip(RoundedCornerShape(50)).background(Color(0xFF1D4ED8).copy(0.4f)))
-                    Text("О приложении", fontSize = 10.sp, color = subColor.copy(0.5f),
-                        fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
-                    Box(Modifier.size(4.dp).clip(RoundedCornerShape(50)).background(Color(0xFF1D4ED8).copy(0.4f)))
+                    Text("⚡", fontSize = 13.sp)
+                    Text("Контакты и обновление", fontSize = 13.sp, color = Color(0xFF1D4ED8),
+                        fontWeight = FontWeight.Bold, letterSpacing = 0.3.sp)
                 }
             }
         }
