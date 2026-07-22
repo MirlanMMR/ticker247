@@ -12,7 +12,7 @@ object CurrencyProfile {
 
     fun current(): Profile {
         val lang = java.util.Locale.getDefault().language
-        val country = java.util.Locale.getDefault().country.uppercase()
+        val country = DeviceCountry.get()
         val cyrillic = setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk")
 
         // КГ (или кириллическая локаль без страны) — домашний профиль

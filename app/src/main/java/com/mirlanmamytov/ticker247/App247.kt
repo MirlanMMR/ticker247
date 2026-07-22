@@ -13,6 +13,7 @@ class App247 : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
+        com.mirlanmamytov.ticker247.util.DeviceCountry.init(this)
         // MobileAds.initialize(this) — подключим перед релизом
     }
 

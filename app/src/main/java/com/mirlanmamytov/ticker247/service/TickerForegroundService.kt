@@ -461,6 +461,12 @@ class TickerForegroundService : Service() {
     // пока не появятся новые (финансовые цифры крутятся всегда)
     private val rotationShownNews = LinkedHashSet<String>()
 
+    // «Липкая» срочная новость: держим в шторке дольше одного тика ротации,
+    // чтобы пользователь успел прочитать (раньше за 6 сек её сменял курс валют)
+    private var stickyLine: String? = null
+    private var stickyUntil: Long = 0L
+    private val STICKY_DURATION_MS = 90_000L
+
     // Крутим уведомление каждые 8 секунд — только цифры и срочные
     private fun startRotationLoop() {
         isRotationLoopRunning = true
@@ -477,21 +483,39 @@ class TickerForegroundService : Service() {
                         continue
                     }
                     run {
-                        // Новость показываем один раз; когда все показаны — в шторке
-                        // остаются только курсы/крипта до появления свежих новостей
-                        val unseen = lines.filter { l ->
-                            newsPrefixes.none { p -> l.startsWith(p) } || l.take(60) !in rotationShownNews
-                        }
-                        val pool = unseen.ifEmpty {
-                            lines.filter { l -> newsPrefixes.none { p -> l.startsWith(p) } }.ifEmpty { lines }
-                        }
-                        val line = pool[index % pool.size]
-                        index++
-                        if (newsPrefixes.any { line.startsWith(it) }) {
-                            rotationShownNews.add(line.take(60))
-                            while (rotationShownNews.size > 300) rotationShownNews.remove(rotationShownNews.first())
-                        }
                         val urgentPrefixes = setOf("⚡","💧","🔌","⛽","♨️","🚧","🚗","🌍","🌊","🔥","🌪️","🚨","🆘","🏥","📈","✈️","📵","📅","🥊","⚠️")
+
+                        // Свежая срочная (ещё не показывалась) → делаем «липкой» на 90 сек,
+                        // вытесняя даже уже активную липкую новость (новее — важнее)
+                        val freshUrgent = lines.firstOrNull { l ->
+                            urgentPrefixes.any { p -> l.startsWith(p) } && l.take(60) !in rotationShownNews
+                        }
+                        val now1 = System.currentTimeMillis()
+                        val line: String
+                        if (freshUrgent != null) {
+                            line = freshUrgent
+                            stickyLine = freshUrgent
+                            stickyUntil = now1 + STICKY_DURATION_MS
+                            rotationShownNews.add(freshUrgent.take(60))
+                            while (rotationShownNews.size > 300) rotationShownNews.remove(rotationShownNews.first())
+                        } else if (stickyUntil > now1 && stickyLine != null && lines.contains(stickyLine)) {
+                            // Липкая новость ещё актуальна — держим её вместо курса валют
+                            line = stickyLine!!
+                        } else {
+                            // Ни свежей, ни липкой новости нет — обычная ротация курсов/крипты
+                            val unseen = lines.filter { l ->
+                                newsPrefixes.none { p -> l.startsWith(p) } || l.take(60) !in rotationShownNews
+                            }
+                            val pool = unseen.ifEmpty {
+                                lines.filter { l -> newsPrefixes.none { p -> l.startsWith(p) } }.ifEmpty { lines }
+                            }
+                            line = pool[index % pool.size]
+                            index++
+                            if (newsPrefixes.any { line.startsWith(it) }) {
+                                rotationShownNews.add(line.take(60))
+                                while (rotationShownNews.size > 300) rotationShownNews.remove(rotationShownNews.first())
+                            }
+                        }
                         val isUrgent = urgentPrefixes.any { line.startsWith(it) }
                         val isImportant = line.startsWith("🏆") || line.startsWith("📰")
 

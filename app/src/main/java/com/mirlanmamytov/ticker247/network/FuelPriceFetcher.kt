@@ -101,12 +101,15 @@ object FuelPriceFetcher {
     }
 
     /**
-     * Парсит таблицу цен из статьи Kaktus: строка «Роснефть» содержит
-     * три цены подряд — АИ-92, АИ-95, ДТ (Роснефть/КНП — ценовой ориентир рынка)
+     * Парсит таблицу цен из статьи Kaktus: строка «Bishkek Petroleum» содержит
+     * 4 цены подряд — АИ-92, АИ-95, ДТ, газ.
+     * «Роснефть» как якорь не годится: в таблице у неё бывает всего 1 позиция
+     * (нет в продаже других марок), из-за чего парсер захватывал числа
+     * из СЛЕДУЮЩЕЙ строки и путал АИ-95 с чужой ценой.
      */
     private fun parseKaktusTable(html: String): FuelPrices? {
         val text = html.replace(Regex("<[^>]+>"), " ")
-        val idx = text.indexOf("Роснефть")
+        val idx = text.indexOf("Bishkek Petroleum")
         if (idx < 0) return null
         val window = text.substring(idx, (idx + 200).coerceAtMost(text.length))
         val nums = Regex("""\d{2,3}[.,]\d{1,2}""").findAll(window)

@@ -50,7 +50,7 @@ object CountryNewsFetcher {
     }
 
     /** Страна устройства (ISO, напр. "UZ"); пустая строка если неизвестна */
-    fun deviceCountry(): String = java.util.Locale.getDefault().country.uppercase()
+    fun deviceCountry(): String = com.mirlanmamytov.ticker247.util.DeviceCountry.get()
 
     /**
      * Нужна ли замена местных: страна известна и это не Кыргызстан
