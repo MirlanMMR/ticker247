@@ -139,7 +139,12 @@ object CountryNewsFetcher {
         "эвакуац|чрезвычайн|крушени|обрушени|эпидеми|перекрыт|" +
         "earthquake|flood|wildfire|explosion|terror|shooting|killed|evacuat|emergency|crash|outbreak|" +
         "terremoto|inundaci|incendio|explosi|tiroteo|muert|evacuaci|emergencia|" +
-        "чемпион|финал|золото|медаль|champion|final|gold medal|campeón|campeão",
+        "чемпион|финал|золото|медаль|champion|final|gold medal|campeón|campeão|" +
+        // Рост цен на жизненно важное — актуально всем странам одинаково
+        "подорожал|дефицит хлеба|дефицит топлива|нехватка продуктов|цены взлетели|скачок цен|" +
+        "price(s)? (rise|rose|surge|soar)|fuel shortage|food shortage|" +
+        "suben los precios|escasez de (combustible|alimentos)|" +
+        "preços? (sobem|disparam)|escassez de (combustível|alimentos)",
         RegexOption.IGNORE_CASE
     )
 
