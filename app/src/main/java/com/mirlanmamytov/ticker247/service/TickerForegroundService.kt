@@ -465,7 +465,7 @@ class TickerForegroundService : Service() {
     // чтобы пользователь успел прочитать (раньше за 6 сек её сменял курс валют)
     private var stickyLine: String? = null
     private var stickyUntil: Long = 0L
-    private val STICKY_DURATION_MS = 90_000L
+    private val STICKY_DURATION_MS = 180_000L  // 3 минуты — больше времени прочитать
 
     // Крутим уведомление каждые 8 секунд — только цифры и срочные
     private fun startRotationLoop() {
@@ -498,8 +498,14 @@ class TickerForegroundService : Service() {
                             stickyUntil = now1 + STICKY_DURATION_MS
                             rotationShownNews.add(freshUrgent.take(60))
                             while (rotationShownNews.size > 300) rotationShownNews.remove(rotationShownNews.first())
-                        } else if (stickyUntil > now1 && stickyLine != null && lines.contains(stickyLine)) {
-                            // Липкая новость ещё актуальна — держим её вместо курса валют
+                        } else if (stickyUntil > now1 && stickyLine != null &&
+                                   dismissedIds.none { stickyLine!!.startsWith(it) }) {
+                            // Липкая новость ещё актуальна — держим её вместо курса валют.
+                            // Проверяем ТОЛЬКО таймер и «не смахнута ли», а не присутствие
+                            // в свежепересчитанном списке: buildRotationLines() берёт top-5
+                            // срочных из ленты, и при активной повестке (много #срочно/новых
+                            // локальных ЧП) нужная новость могла выпасть из выборки раньше
+                            // истечения 90 сек — тогда шторка откатывалась на курс валют.
                             line = stickyLine!!
                         } else {
                             // Ни свежей, ни липкой новости нет — обычная ротация курсов/крипты
