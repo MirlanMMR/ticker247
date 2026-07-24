@@ -999,8 +999,15 @@ class TickerForegroundService : Service() {
     }
 
     override fun onDestroy() {
+        // Снимаем foreground-статус ПЕРВОЙ строкой, до остальной очистки —
+        // START_STICKY может тут же перезапустить сервис (система гасит процесс
+        // раз в сутки при плановой чистке памяти, особенно на Samsung), и если
+        // система не успела зафиксировать явную отвязку от foreground до того,
+        // как придёт restart — ловим ForegroundServiceDidNotStopInTimeException
+        try { ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE) }
+        catch (e: Exception) { /* ignore */ }
         super.onDestroy()
-        serviceScope.cancel()
+        try { serviceScope.cancel() } catch (e: Exception) { /* ignore */ }
         try { unregisterReceiver(dismissReceiver) } catch (e: Exception) { /* ignore */ }
     }
     override fun onBind(intent: Intent?): IBinder? = null
