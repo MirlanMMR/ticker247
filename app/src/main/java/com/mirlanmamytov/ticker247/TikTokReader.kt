@@ -295,6 +295,27 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                 fontSize = 20.sp, fontWeight = FontWeight.ExtraBold,
                 color = Color.White, lineHeight = 28.sp
             )
+            // Прозрачность автоперевода: не латаем конкретные слова
+            // (идиомы/титулы неизбежно иногда переводятся криво), а честно
+            // предупреждаем и даём оригинал по тапу
+            if (item.translated && !item.origTitle.isNullOrBlank()) {
+                var showOriginal by remember(item.url) { mutableStateOf(false) }
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    "🌐 Переведено автоматически, возможны неточности · показать оригинал",
+                    fontSize = 11.sp, color = Color(0xFF00D4FF).copy(0.75f),
+                    modifier = Modifier.clickable { showOriginal = !showOriginal }
+                )
+                if (showOriginal) {
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        item.origTitle,
+                        fontSize = 13.sp, color = Color.White.copy(0.6f),
+                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
             Spacer(Modifier.height(16.dp))
 
                 // ── AI-резюме: ЧТО / ГДЕ / КОГДА ────────────────────────────

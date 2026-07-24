@@ -38,5 +38,8 @@ data class NewsItem(
     // #метка: <текст> — произвольный бейдж на карточке («ВИДЕО ДНЯ», «ИСТОРИЯ»...)
     val editorLabel: String? = null,
     // Время жизни поста (#3д / #12ч): null = стандартные 24 часа
-    val expiresAt: Long? = null
+    val expiresAt: Long? = null,
+    // Прозрачность автоперевода: оригинальный заголовок до перевода (если был)
+    val origTitle: String? = null,
+    val translated: Boolean = false
 )

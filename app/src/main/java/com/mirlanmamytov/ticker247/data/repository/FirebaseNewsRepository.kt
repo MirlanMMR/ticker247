@@ -44,7 +44,9 @@ object FirebaseNewsRepository {
                             publishedAt = child.child("publishedAt").getValue(Long::class.java) ?: System.currentTimeMillis(),
                             priority = child.child("priority").getValue(Int::class.java) ?: 0,
                             language = child.child("language").getValue(String::class.java) ?: "ru",
-                            scope = child.child("scope").getValue(String::class.java) ?: "world"
+                            scope = child.child("scope").getValue(String::class.java) ?: "world",
+                            origTitle = child.child("origTitle").getValue(String::class.java),
+                            translated = child.child("translated").getValue(Boolean::class.java) ?: false
                         )
                         if (item.title.isNotEmpty()) items.add(item)
                     }

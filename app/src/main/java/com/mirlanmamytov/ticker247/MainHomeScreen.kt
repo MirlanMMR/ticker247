@@ -1494,6 +1494,10 @@ fun HeroCard(item: NewsItem, onClick: () -> Unit) {
                 Text(item.source, fontSize = 12.sp, color = style.accent, fontWeight = FontWeight.Medium)
                 Text("·", fontSize = 12.sp, color = Color.White.copy(0.5f))
                 Text(timeAgo(item.publishedAt), fontSize = 12.sp, color = Color.White.copy(0.6f))
+                if (item.translated) {
+                    Text("·", fontSize = 12.sp, color = Color.White.copy(0.5f))
+                    Text("🌐 переведено", fontSize = 11.sp, color = Color.White.copy(0.45f))
+                }
             }
         }
     }
