@@ -144,13 +144,18 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
         }
     }
 
-    // Полный текст статьи — подгружается если summary пустой или равен title
-    val isEmptyBody = item.summary.isBlank() || item.summary.trimEnd('.', ' ') == item.title.trimEnd('.', ' ')
+    // Полный текст статьи — подгружаем если summary пустой, равен title, ИЛИ
+    // просто короткий (мировые источники типа BBC/Reuters дают в RSS одно
+    // предложение-затравку — этого мало, чтобы уловить суть без перехода на сайт)
+    val isEmptyBody = item.summary.isBlank() ||
+        item.summary.trimEnd('.', ' ') == item.title.trimEnd('.', ' ') ||
+        item.summary.length < 250
     var articleBody by remember(item.url) { mutableStateOf(if (isEmptyBody) "" else item.summary) }
     var articleLoading by remember(item.url) { mutableStateOf(false) }
 
     LaunchedEffect(item.url) {
-        // Если тело пустое и есть URL — извлекаем статью (akipress и подобные)
+        // Если тело короткое/пустое и есть URL — извлекаем статью целиком,
+        // чтобы читатель мог остаться в приложении
         if (isEmptyBody && item.url.isNotEmpty() && !item.url.contains("t.me/")) {
             articleLoading = true
             val result = withContext(Dispatchers.IO) {
@@ -174,6 +179,15 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
         }
     }
 
+    // Честное предупреждение вместо фильтрации: деликатные темы (насилие,
+    // эксплицитный контент, суицид) не скрываем из ленты — размываем только
+    // обложку до тапа. Заголовок и текст остаются читаемыми как есть.
+    val isSensitive = remember(item.url) {
+        com.mirlanmamytov.ticker247.util.SensitiveContent.isSensitive(item.title, item.summary)
+    }
+    var revealSensitive by remember(item.url) { mutableStateOf(false) }
+    val imageBlur = if (isSensitive && !revealSensitive) 28.dp else 0.dp
+
     Column(
         Modifier
             .fillMaxSize()
@@ -189,7 +203,7 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                     model = resolvedImage,
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().blur(imageBlur),
                     onError = { _ -> resolvedImage = null }
                 )
             } else {
@@ -246,6 +260,28 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                     Text(readerBadge, fontSize = 11.sp, color = Color.White, fontWeight = FontWeight.ExtraBold)
                 }
             }
+            // Предупреждение о деликатной теме — тап по обложке снимает размытие
+            if (isSensitive && !revealSensitive) {
+                Box(
+                    Modifier.fillMaxSize()
+                        .clickable { revealSensitive = true },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Box(
+                            Modifier.clip(RoundedCornerShape(50))
+                                .background(Color.Black.copy(0.6f))
+                                .padding(horizontal = 14.dp, vertical = 7.dp)
+                        ) {
+                            Text("⚠️ Деликатная тема", fontSize = 13.sp, color = Color.White,
+                                fontWeight = FontWeight.Bold)
+                        }
+                        Spacer(Modifier.height(6.dp))
+                        Text("Нажмите, чтобы посмотреть", fontSize = 11.sp,
+                            color = Color.White.copy(0.7f))
+                    }
+                }
+            }
         }
 
         // ── Текстовый контент на тёмном фоне ────────────────────────────────
@@ -281,7 +317,9 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                 }
 
                 // Тело статьи — сначала загруженное, потом summary
-                val bodyText = articleBody.ifEmpty { if (!isEmptyBody) item.summary else "" }
+                // Если извлечение полной статьи не удалось — не теряем короткое
+                // описание из RSS, показываем хотя бы его
+                val bodyText = articleBody.ifEmpty { item.summary }
                 when {
                     articleLoading && bodyText.isEmpty() -> {
                         Row(
