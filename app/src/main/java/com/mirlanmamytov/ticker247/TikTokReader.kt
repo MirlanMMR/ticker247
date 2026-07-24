@@ -144,12 +144,11 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
         }
     }
 
-    // Полный текст статьи — подгружаем если summary пустой, равен title, ИЛИ
-    // просто короткий (мировые источники типа BBC/Reuters дают в RSS одно
-    // предложение-затравку — этого мало, чтобы уловить суть без перехода на сайт)
+    // Полный текст статьи — подгружаем ТОЛЬКО если summary реально пустой или
+    // дублирует заголовок. Короткие summary расширяет бэкенд (уже с переводом) —
+    // тянуть сырой текст с сайта нельзя: он придёт на языке оригинала
     val isEmptyBody = item.summary.isBlank() ||
-        item.summary.trimEnd('.', ' ') == item.title.trimEnd('.', ' ') ||
-        item.summary.length < 250
+        item.summary.trimEnd('.', ' ') == item.title.trimEnd('.', ' ')
     var articleBody by remember(item.url) { mutableStateOf(if (isEmptyBody) "" else item.summary) }
     var articleLoading by remember(item.url) { mutableStateOf(false) }
 
