@@ -29,6 +29,7 @@ import coil.compose.AsyncImage
 import com.mirlanmamytov.ticker247.data.model.NewsItem
 import com.mirlanmamytov.ticker247.network.GeminiSummarizer
 import com.mirlanmamytov.ticker247.network.OgImageFetcher
+import com.mirlanmamytov.ticker247.network.OnDeviceTranslator
 import com.mirlanmamytov.ticker247.reader.ArticleExtractor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -339,7 +340,10 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                 // Тело статьи — сначала загруженное, потом summary
                 // Если извлечение полной статьи не удалось — не теряем короткое
                 // описание из RSS, показываем хотя бы его
-                val bodyText = articleBody.ifEmpty { item.summary }
+                val rawBodyText = articleBody.ifEmpty { item.summary }
+                var forceTranslated by remember(item.url) { mutableStateOf<String?>(null) }
+                var forceTranslating by remember(item.url) { mutableStateOf(false) }
+                val bodyText = forceTranslated ?: rawBodyText
                 when {
                     articleLoading && bodyText.isEmpty() -> {
                         Row(
@@ -353,6 +357,39 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                     }
                     bodyText.isNotEmpty() -> {
                         Text(bodyText, fontSize = 15.sp, color = Color.White.copy(0.85f), lineHeight = 24.sp)
+                        // Подстраховка: если бэкенд не перевёл текст (сбой/квота
+                        // эндпоинта), даём перевести прямо на устройстве по тапу.
+                        // Показываем только когда похоже на нужду в переводе:
+                        // много латиницы, а язык устройства не английский.
+                        val deviceLang = java.util.Locale.getDefault().language
+                        val looksUntranslated = forceTranslated == null && deviceLang != "en" &&
+                            rawBodyText.count { it in 'a'..'z' || it in 'A'..'Z' }.toFloat() / rawBodyText.length.coerceAtLeast(1) > 0.5f
+                        if (looksUntranslated) {
+                            Spacer(Modifier.height(6.dp))
+                            if (forceTranslating) {
+                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    CircularProgressIndicator(modifier = Modifier.size(12.dp), color = accentCol, strokeWidth = 2.dp)
+                                    Text("Переводим...", fontSize = 12.sp, color = Color.White.copy(0.5f))
+                                }
+                            } else {
+                                Text(
+                                    "🌐 Перевести",
+                                    fontSize = 12.sp, color = Color(0xFF00D4FF).copy(0.8f),
+                                    fontWeight = FontWeight.SemiBold,
+                                    modifier = Modifier.clickable {
+                                        scope.launch {
+                                            forceTranslating = true
+                                            val targetLang = when {
+                                                deviceLang in setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk") -> "ru"
+                                                else -> deviceLang
+                                            }
+                                            forceTranslated = OnDeviceTranslator.translate(rawBodyText, targetLang) ?: rawBodyText
+                                            forceTranslating = false
+                                        }
+                                    }
+                                )
+                            }
+                        }
                         Spacer(Modifier.height(16.dp))
                     }
                 }
