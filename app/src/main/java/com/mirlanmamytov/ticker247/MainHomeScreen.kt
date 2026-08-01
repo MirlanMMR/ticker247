@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -622,6 +623,7 @@ fun MainHomeScreen() {
     var tikTokItems by remember { mutableStateOf<List<NewsItem>>(emptyList()) }
     var tikTokStart by remember { mutableStateOf(0) }
     var youTubeUrl by remember { mutableStateOf<String?>(null) }
+    var showBookmarks by remember { mutableStateOf(false) }
 
     // Deep link из уведомлений
     // Наблюдаем и за newsItems — при тапе приложение может только запускаться,
@@ -687,6 +689,22 @@ fun MainHomeScreen() {
         return
     }
 
+    // Свайп "назад" на Samsung и кнопка Back: закрываем закладки, не приложение
+    androidx.activity.compose.BackHandler(enabled = showBookmarks) {
+        showBookmarks = false
+    }
+
+    if (showBookmarks) {
+        BookmarksScreen(
+            onBack = { showBookmarks = false },
+            onOpenItem = { items, startIdx ->
+                tikTokItems = items
+                tikTokStart = startIdx
+            }
+        )
+        return
+    }
+
     val context = androidx.compose.ui.platform.LocalContext.current
 
     var selectedTab by remember { mutableStateOf(0) }
@@ -704,6 +722,7 @@ fun MainHomeScreen() {
     HomeContent(
         selectedTab = selectedTab,
         onTabSelected = { selectedTab = it },
+        onOpenBookmarks = { showBookmarks = true },
         onOpenTikTok = { items, startIdx ->
             val item = items.getOrNull(startIdx)
             // Отмечаем как прочитанное — уйдёт вниз ленты при следующем рендере
@@ -784,6 +803,7 @@ fun SplashLoadingScreen() {
 fun HomeContent(
     selectedTab: Int,
     onTabSelected: (Int) -> Unit,
+    onOpenBookmarks: () -> Unit,
     onOpenTikTok: (List<NewsItem>, Int) -> Unit
 ) {
     // Тёплый белый фон — карточки "парят"
@@ -859,9 +879,10 @@ fun HomeContent(
         containerColor = bgColor,
         bottomBar = {
             // Заметная кнопка-таблетка: контакты, обновление, реклама — всё там
-            Box(
-                Modifier.fillMaxWidth().background(bgColor).padding(vertical = 6.dp),
-                contentAlignment = Alignment.Center
+            Row(
+                Modifier.fillMaxWidth().background(bgColor).padding(vertical = 6.dp, horizontal = 12.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
                     Modifier
@@ -875,6 +896,19 @@ fun HomeContent(
                     Text("⚡", fontSize = 13.sp)
                     Text("Контакты и обновление", fontSize = 13.sp, color = Color(0xFF1D4ED8),
                         fontWeight = FontWeight.Bold, letterSpacing = 0.3.sp)
+                }
+                Spacer(Modifier.width(8.dp))
+                Box(
+                    Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(Color(0xFF1D4ED8).copy(0.10f))
+                        .clickable { onOpenBookmarks() }
+                        .padding(horizontal = 14.dp, vertical = 7.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Bookmark, contentDescription = "Закладки",
+                        tint = Color(0xFF1D4ED8), modifier = Modifier.size(18.dp)
+                    )
                 }
             }
         }

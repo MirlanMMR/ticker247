@@ -9,8 +9,10 @@ import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -424,6 +426,25 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
             Spacer(Modifier.height(20.dp))
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                var isBookmarked by remember(item.url) { mutableStateOf(false) }
+                val bookmarkScope = rememberCoroutineScope()
+                val dao = remember { com.mirlanmamytov.ticker247.data.db.AppDatabase.getInstance(context).bookmarkDao() }
+                LaunchedEffect(item.url) {
+                    if (item.url.isNotEmpty()) isBookmarked = dao.isBookmarked(item.url)
+                }
+                IconButton(onClick = {
+                    if (item.url.isEmpty()) return@IconButton
+                    bookmarkScope.launch {
+                        if (isBookmarked) dao.delete(item) else dao.insert(item)
+                        isBookmarked = !isBookmarked
+                    }
+                }) {
+                    Icon(
+                        if (isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                        contentDescription = "Закладка",
+                        tint = if (isBookmarked) Color(0xFF00D4FF) else Color.White.copy(0.7f)
+                    )
+                }
                 IconButton(onClick = {
                     val shareText = buildString {
                         append("⚡ ${item.title}\n\n")
