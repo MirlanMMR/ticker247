@@ -554,10 +554,16 @@ class TickerForegroundService : Service() {
                         if (isUrgent && urgentItem == null) return@run
 
                         val now2 = System.currentTimeMillis()
-                        val canAlert = isUrgent && shouldVibrate && now2 - lastAlertTime >= 2 * 60_000L
+                        // Тихие часы 23:00–07:00 по времени устройства — новость всё равно
+                        // появится в уведомлении (важно при плохом зрении — шторка), но без
+                        // звука/вибрации, чтобы не будить ночью
+                        val hourOfDay = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+                        val isQuietHours = hourOfDay >= 23 || hourOfDay < 7
+                        val canAlert = isUrgent && shouldVibrate && !isQuietHours && now2 - lastAlertTime >= 2 * 60_000L
 
                         // Срочная первый раз → используем канал ticker_urgent (heads-up + вибрация)
                         // Остальные → ticker_important или ticker_info
+                        // Ночью срочное тоже идёт молча через ticker_important
                         // Всегда только одно уведомление (1001) — нет дублей в шторке
                         val channelId = when {
                             canAlert -> "ticker_urgent"

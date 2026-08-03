@@ -30,10 +30,13 @@ class TickerMessagingService : FirebaseMessagingService() {
         )
         DataBridge.setNewsItems(listOf(newItem) + DataBridge.newsItems)
 
-        // Показываем уведомление
-        val channelId = when (priority) {
-            2 -> "ticker_urgent"
-            1 -> "ticker_important"
+        // Показываем уведомление. Тихие часы 23:00–07:00 — даже срочное идёт
+        // молча (ticker_important), чтобы не будить звуком/вибрацией ночью
+        val hourOfDay = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+        val isQuietHours = hourOfDay >= 23 || hourOfDay < 7
+        val channelId = when {
+            priority == 2 && !isQuietHours -> "ticker_urgent"
+            priority >= 1 -> "ticker_important"
             else -> "ticker_info"
         }
         val iconRes = when (priority) {
