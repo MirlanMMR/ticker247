@@ -947,6 +947,11 @@ fun HomeContent(
             contentPadding = PaddingValues(bottom = 24.dp)
         ) {
 
+            // 1. Карточка дайджеста (утренний/недельный) — видна ~2 суток или до закрытия
+            item(key = "digest_card") {
+                DigestCard(onOpenItem = onOpenTikTok)
+            }
+
             // 2. Hero-карусель на всю ширину
             item(key = "hero_carousel") {
                 HeroCarousel(onOpenTikTok = onOpenTikTok)
@@ -1399,6 +1404,59 @@ fun selectHeroItems(allItems: List<NewsItem>): List<NewsItem> {
         seenWords += words
         true
     }.take(10)
+}
+
+// ─── Карточка дайджеста (утренний/недельный) ─────────────────────────────────
+
+@Composable
+fun DigestCard(onOpenItem: (List<NewsItem>, Int) -> Unit) {
+    val context = LocalContext.current
+    var digest by remember { mutableStateOf(com.mirlanmamytov.ticker247.util.DigestStore.getLatestDigest(context)) }
+    val d = digest ?: return
+
+    val title = if (d.type == "weekly") "📅 Итоги недели" else "☀️ Утренний дайджест"
+    val newsItems = remember(d) {
+        d.items.map { di ->
+            NewsItem(url = di.url, title = di.title, summary = "", imageUrl = null,
+                source = di.source, category = "URGENT")
+        }
+    }
+
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp, vertical = 6.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color(0xFF1D4ED8).copy(0.06f))
+            .padding(14.dp)
+    ) {
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color(0xFF111827))
+            Text(
+                "✕", fontSize = 15.sp, color = Color(0xFF9CA3AF),
+                modifier = Modifier.clickable {
+                    com.mirlanmamytov.ticker247.util.DigestStore.dismissLatest(context)
+                    digest = null
+                }
+            )
+        }
+        Spacer(Modifier.height(8.dp))
+        d.items.forEachIndexed { idx, item ->
+            Text(
+                "• ${item.title}",
+                fontSize = 13.sp, color = Color(0xFF374151),
+                maxLines = 2, overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onOpenItem(newsItems, idx) }
+                    .padding(vertical = 3.dp)
+            )
+        }
+    }
 }
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
