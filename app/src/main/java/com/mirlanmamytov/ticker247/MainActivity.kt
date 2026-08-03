@@ -139,6 +139,15 @@ class MainActivity : ComponentActivity() {
         intent?.getStringExtra("open_tab")?.takeIf { it.isNotEmpty() }?.let {
             DataBridge.pendingTab = it
         }
+        // App Link: ссылка шаринга (docs/share/?url=...&title=...) — если
+        // приложение установлено, Android открывает его напрямую вместо
+        // веб-страницы; достаём оригинальный URL статьи из параметров
+        intent?.data?.takeIf { it.host == "mirlanmmr.github.io" }?.let { uri ->
+            uri.getQueryParameter("url")?.takeIf { it.isNotEmpty() }?.let { articleUrl ->
+                DataBridge.pendingArticleUrl = articleUrl
+                DataBridge.pendingArticleTitle = uri.getQueryParameter("title") ?: ""
+            }
+        }
     }
 }
 
@@ -156,6 +165,46 @@ fun AppRoot(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         android.util.Log.d("Ticker247", "POST_NOTIFICATIONS granted: $granted")
+    }
+
+    // Разрешение "работать в фоне" (игнорировать оптимизацию батареи для ЭТОГО
+    // приложения) — не то же самое, что отключить общую экономию батареи.
+    // Нужно в первую очередь на Samsung: агрессивный Deep Sleep убивает
+    // foreground-сервис в обход обычного жизненного цикла (см. ForegroundServiceDidNotStopInTimeException)
+    var showBatteryDialog by remember { mutableStateOf(false) }
+    val batteryOptLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { /* принял или отклонил — не настаиваем повторно */ }
+
+    if (showBatteryDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showBatteryDialog = false },
+            title = { androidx.compose.material3.Text("Работа в фоне") },
+            text = {
+                androidx.compose.material3.Text(
+                    "На вашем устройстве Samsung иногда принудительно выгружает " +
+                    "фоновые приложения, из-за чего бегущая строка с новостями и " +
+                    "курсами может пропадать. Разрешите Ticker 24/7 работать в " +
+                    "фоне без ограничений — это не отключает общую экономию " +
+                    "батареи телефона."
+                )
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    showBatteryDialog = false
+                    val intent = Intent(
+                        android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                        android.net.Uri.parse("package:${context.packageName}")
+                    )
+                    try { batteryOptLauncher.launch(intent) } catch (_: Exception) {}
+                }) { androidx.compose.material3.Text("Разрешить") }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showBatteryDialog = false }) {
+                    androidx.compose.material3.Text("Не сейчас")
+                }
+            }
+        )
     }
 
     if (showSplash) {
@@ -177,6 +226,19 @@ fun AppRoot(
                 if (!alreadyGranted) {
                     kotlinx.coroutines.delay(1500)  // даём ленте появиться
                     notifPermLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+            // Только Samsung — именно там наблюдается принудительная выгрузка
+            // (see ForegroundServiceDidNotStopInTimeException). Спрашиваем один раз.
+            if (Build.MANUFACTURER.equals("samsung", ignoreCase = true)) {
+                val prefs = context.getSharedPreferences("ticker247_prefs", android.content.Context.MODE_PRIVATE)
+                val alreadyAsked = prefs.getBoolean("battery_opt_asked", false)
+                val powerManager = context.getSystemService(android.os.PowerManager::class.java)
+                val alreadyIgnoring = powerManager?.isIgnoringBatteryOptimizations(context.packageName) ?: true
+                if (!alreadyAsked && !alreadyIgnoring) {
+                    kotlinx.coroutines.delay(3000)  // после запроса на уведомления
+                    showBatteryDialog = true
+                    prefs.edit().putBoolean("battery_opt_asked", true).apply()
                 }
             }
         }
