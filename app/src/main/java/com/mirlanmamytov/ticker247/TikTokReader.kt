@@ -38,21 +38,21 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * Ссылка для шаринга — TG-канал Ticker 24/7 на языке пользователя:
- * получатель видит живой канал с новостями и ссылкой на приложение.
+ * Ссылка для шаринга — страница-превью конкретной новости (docs/share/,
+ * GitHub Pages). Если у получателя уже установлен Ticker 24/7, App Link
+ * открывает статью прямо в приложении (см. handleDeepLink в MainActivity);
+ * иначе он видит веб-страницу с превью и кнопкой «Скачать в Google Play».
  */
-private fun buildShareUrl(): String {
-    val lang = java.util.Locale.getDefault().language
-    val cyrillic = setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk")
-    val channel = when {
-        lang in cyrillic -> "t247feed"
-        lang == "es" -> "t247feed_es"
-        lang == "pt" -> "t247feed_pt"
-        else -> "t247feed_en"
+private fun buildShareUrl(item: NewsItem): String {
+    fun enc(s: String) = java.net.URLEncoder.encode(s, "UTF-8")
+    val params = buildList {
+        add("title=${enc(item.title)}")
+        if (item.summary.isNotBlank()) add("body=${enc(item.summary.take(600))}")
+        if (item.source.isNotBlank()) add("source=${enc(item.source.trimStart('@'))}")
+        if (item.url.isNotBlank() && !item.url.contains("t.me/")) add("url=${enc(item.url)}")
+        if (!item.imageUrl.isNullOrBlank()) add("img=${enc(item.imageUrl)}")
     }
-    // telegram.me вместо t.me: операторы ряда стран блокируют t.me,
-    // а telegram.me открывается и браузером, и приложением Telegram
-    return "https://telegram.me/$channel"
+    return "https://mirlanmmr.github.io/ticker247/share/?" + params.joinToString("&")
 }
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
@@ -446,21 +446,20 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                     )
                 }
                 IconButton(onClick = {
-                    val shareText = buildString {
-                        append("⚡ ${item.title}\n\n")
-                        if (item.summary.isNotEmpty()) append("${item.summary.take(300)}\n\n")
-                        append("📲 Ticker 24/7 — новости в реальном времени\n")
-                        append(buildShareUrl())
-                    }
-                    context.startActivity(
-                        Intent.createChooser(
-                            Intent(Intent.ACTION_SEND).apply {
-                                type = "text/plain"
-                                putExtra(Intent.EXTRA_TEXT, shareText)
-                                putExtra(Intent.EXTRA_SUBJECT, item.title)
-                            }, "Поделиться новостью"
+                    bookmarkScope.launch {
+                        val longUrl = buildShareUrl(item)
+                        val shortUrl = com.mirlanmamytov.ticker247.network.UrlShortener.shorten(longUrl) ?: longUrl
+                        val shareText = "⚡ ${item.title}\n\n$shortUrl"
+                        context.startActivity(
+                            Intent.createChooser(
+                                Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_TEXT, shareText)
+                                    putExtra(Intent.EXTRA_SUBJECT, item.title)
+                                }, "Поделиться новостью"
+                            )
                         )
-                    )
+                    }
                 }) {
                     Icon(Icons.Default.Share, null, tint = Color.White.copy(0.7f))
                 }
