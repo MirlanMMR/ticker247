@@ -907,10 +907,10 @@ fun HomeContent(
                     HorizontalDivider()
                     Text("Контакты:", fontWeight = FontWeight.SemiBold)
                     Text(
-                        "tarylgan@gmail.com",
+                        "mmr.lab.help@gmail.com",
                         color = Color(0xFF1D4ED8),
                         modifier = Modifier.clickable {
-                            val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:tarylgan@gmail.com"))
+                            val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:mmr.lab.help@gmail.com"))
                             context.startActivity(intent)
                         }
                     )
