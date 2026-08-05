@@ -61,52 +61,87 @@ data class CategoryStyle(
     val label: String
 )
 
+// Подписи категорий на 4 языках — привязаны к языку УСТРОЙСТВА (та же логика,
+// что у timeAgo/about_pill и т.д.), не к переключателю пула. Раньше были
+// зашиты только по-русски — реальный англоязычный пользователь тоже видел
+// "СРОЧНО" вместо "BREAKING" на своём родном языке.
+private val CATEGORY_LABELS: Map<String, Map<String, String>> = mapOf(
+    "KG"      to mapOf("ru" to "🇰🇬 КГ", "en" to "🇰🇬 KG", "es" to "🇰🇬 KG", "pt" to "🇰🇬 KG"),
+    "URGENT"  to mapOf("ru" to "⚡ СРОЧНО", "en" to "⚡ BREAKING", "es" to "⚡ URGENTE", "pt" to "⚡ URGENTE"),
+    "WORLD"   to mapOf("ru" to "🌍 МИР", "en" to "🌍 WORLD", "es" to "🌍 MUNDO", "pt" to "🌍 MUNDO"),
+    "SPORT"   to mapOf("ru" to "⚽ СПОРТ", "en" to "⚽ SPORT", "es" to "⚽ DEPORTE", "pt" to "⚽ ESPORTE"),
+    "CULTURE" to mapOf("ru" to "🎭 КУЛЬТУРА", "en" to "🎭 CULTURE", "es" to "🎭 CULTURA", "pt" to "🎭 CULTURA"),
+    "AUTO"    to mapOf("ru" to "🚗 АВТО", "en" to "🚗 AUTO", "es" to "🚗 AUTOS", "pt" to "🚗 AUTOS"),
+    "FASHION" to mapOf("ru" to "👗 МОДА", "en" to "👗 FASHION", "es" to "👗 MODA", "pt" to "👗 MODA"),
+    "TOURS"   to mapOf("ru" to "✈️ ТУРЫ", "en" to "✈️ TRAVEL", "es" to "✈️ VIAJES", "pt" to "✈️ VIAGENS"),
+    "TECH"    to mapOf("ru" to "📱 ТЕХНО", "en" to "📱 TECH", "es" to "📱 TECNOLOGÍA", "pt" to "📱 TECNOLOGIA"),
+    "GOOD"    to mapOf("ru" to "😊 ХОРОШЕЕ", "en" to "😊 GOOD NEWS", "es" to "😊 BUENAS", "pt" to "😊 BOAS"),
+    "STARS"   to mapOf("ru" to "⭐ ЗВЁЗДЫ", "en" to "⭐ STARS", "es" to "⭐ ESTRELLAS", "pt" to "⭐ FAMOSOS"),
+    "HEALTH"  to mapOf("ru" to "🏥 ЗДОРОВЬЕ", "en" to "🏥 HEALTH", "es" to "🏥 SALUD", "pt" to "🏥 SAÚDE"),
+    "MONEY"   to mapOf("ru" to "💰 ДЕНЬГИ", "en" to "💰 MONEY", "es" to "💰 DINERO", "pt" to "💰 DINHEIRO"),
+    "LIFE"    to mapOf("ru" to "💡 ЛАЙФХАК", "en" to "💡 LIFESTYLE", "es" to "💡 ESTILO", "pt" to "💡 ESTILO"),
+    "NEWS"    to mapOf("ru" to "📰 НОВОСТИ", "en" to "📰 NEWS", "es" to "📰 NOTICIAS", "pt" to "📰 NOTÍCIAS"),
+)
+
+private fun categoryLabel(category: String): String {
+    val lang = java.util.Locale.getDefault().language
+    val cyrillic = setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk")
+    val key = when {
+        lang in cyrillic -> "ru"
+        lang == "es" -> "es"
+        lang == "pt" -> "pt"
+        else -> "en"
+    }
+    val labels = CATEGORY_LABELS[category] ?: CATEGORY_LABELS.getValue("NEWS")
+    return labels[key] ?: labels.getValue("en")
+}
+
 fun newsItemStyle(category: String): CategoryStyle = when (category) {
     // 🇰🇬  Кыргызстан — небесно-синий, флаговый
     "KG"       -> CategoryStyle(Color(0xFF1565C0), Color(0xFFE8F2FF),
-                    listOf(Color(0xFFE8F2FF), Color(0xFFD0E8FF)), Color(0xFF0D1A2E), "🇰🇬 КГ")
+                    listOf(Color(0xFFE8F2FF), Color(0xFFD0E8FF)), Color(0xFF0D1A2E), categoryLabel("KG"))
     // ⚡  Срочно — горячий красно-оранжевый (не кричащий, но тревожный)
     "URGENT"   -> CategoryStyle(Color(0xFFD32F2F), Color(0xFFFFF0EE),
-                    listOf(Color(0xFFFFF0EE), Color(0xFFFFE0DC)), Color(0xFF2E1610), "⚡ СРОЧНО")
+                    listOf(Color(0xFFFFF0EE), Color(0xFFFFE0DC)), Color(0xFF2E1610), categoryLabel("URGENT"))
     // 🌍  Мир — глубокий бирюзовый
     "WORLD"    -> CategoryStyle(Color(0xFF00838F), Color(0xFFE6F7F8),
-                    listOf(Color(0xFFE6F7F8), Color(0xFFCCF0F3)), Color(0xFF0A2126), "🌍 МИР")
+                    listOf(Color(0xFFE6F7F8), Color(0xFFCCF0F3)), Color(0xFF0A2126), categoryLabel("WORLD"))
     // ⚽  Спорт — насыщенный янтарь
     "SPORT"    -> CategoryStyle(Color(0xFFE65100), Color(0xFFFFF8F0),
-                    listOf(Color(0xFFFFF8F0), Color(0xFFFFEDD5)), Color(0xFF2E1C00), "⚽ СПОРТ")
+                    listOf(Color(0xFFFFF8F0), Color(0xFFFFEDD5)), Color(0xFF2E1C00), categoryLabel("SPORT"))
     // 🎬  Кино/культура — глубокий фиолетовый
     "CULTURE"  -> CategoryStyle(Color(0xFF7B1FA2), Color(0xFFF8F0FF),
-                    listOf(Color(0xFFF8F0FF), Color(0xFFEDD5FF)), Color(0xFF220A2E), "🎭 КУЛЬТУРА")
+                    listOf(Color(0xFFF8F0FF), Color(0xFFEDD5FF)), Color(0xFF220A2E), categoryLabel("CULTURE"))
     // 🚗  Авто — нефтяной зелёный
     "AUTO"     -> CategoryStyle(Color(0xFF2E7D32), Color(0xFFF0FBF0),
-                    listOf(Color(0xFFF0FBF0), Color(0xFFDDF5DD)), Color(0xFF0A2010), "🚗 АВТО")
+                    listOf(Color(0xFFF0FBF0), Color(0xFFDDF5DD)), Color(0xFF0A2010), categoryLabel("AUTO"))
     // 👗  Мода — тёплая роза
     "FASHION"  -> CategoryStyle(Color(0xFFC2185B), Color(0xFFFFF0F5),
-                    listOf(Color(0xFFFFF0F5), Color(0xFFFFD6E8)), Color(0xFF2E0018), "👗 МОДА")
+                    listOf(Color(0xFFFFF0F5), Color(0xFFFFD6E8)), Color(0xFF2E0018), categoryLabel("FASHION"))
     // ✈️  Туризм — небо
     "TOURS"    -> CategoryStyle(Color(0xFF0277BD), Color(0xFFEDF6FF),
-                    listOf(Color(0xFFEDF6FF), Color(0xFFD4ECFF)), Color(0xFF0D1E2E), "✈️ ТУРЫ")
+                    listOf(Color(0xFFEDF6FF), Color(0xFFD4ECFF)), Color(0xFF0D1E2E), categoryLabel("TOURS"))
     // 📱  Технологии — электрический синий (как экран телефона)
     "TECH"     -> CategoryStyle(Color(0xFF0066FF), Color(0xFFEEF4FF),
-                    listOf(Color(0xFFEEF4FF), Color(0xFFD0E4FF)), Color(0xFF001433), "📱 ТЕХНО")
+                    listOf(Color(0xFFEEF4FF), Color(0xFFD0E4FF)), Color(0xFF001433), categoryLabel("TECH"))
     // 😊  Хорошие новости — тёплый солнечный жёлто-оранжевый
     "GOOD"     -> CategoryStyle(Color(0xFFF59E0B), Color(0xFFFFFBEB),
-                    listOf(Color(0xFFFFFBEB), Color(0xFFFEF3C7)), Color(0xFF1C1000), "😊 ХОРОШЕЕ")
+                    listOf(Color(0xFFFFFBEB), Color(0xFFFEF3C7)), Color(0xFF1C1000), categoryLabel("GOOD"))
     // ⭐  Звёзды — пурпурный, гламурный
     "STARS"    -> CategoryStyle(Color(0xFF9C27B0), Color(0xFFF9F0FF),
-                    listOf(Color(0xFFF9F0FF), Color(0xFFEDD5FF)), Color(0xFF220033), "⭐ ЗВЁЗДЫ")
+                    listOf(Color(0xFFF9F0FF), Color(0xFFEDD5FF)), Color(0xFF220033), categoryLabel("STARS"))
     // 🏥  Здоровье — свежий зелёный
     "HEALTH"   -> CategoryStyle(Color(0xFF00897B), Color(0xFFE8F8F5),
-                    listOf(Color(0xFFE8F8F5), Color(0xFFCCF0EA)), Color(0xFF00201D), "🏥 ЗДОРОВЬЕ")
+                    listOf(Color(0xFFE8F8F5), Color(0xFFCCF0EA)), Color(0xFF00201D), categoryLabel("HEALTH"))
     // 💰  Деньги — золотой
     "MONEY"    -> CategoryStyle(Color(0xFFFF8F00), Color(0xFFFFF8E1),
-                    listOf(Color(0xFFFFF8E1), Color(0xFFFFECB3)), Color(0xFF1C0F00), "💰 ДЕНЬГИ")
+                    listOf(Color(0xFFFFF8E1), Color(0xFFFFECB3)), Color(0xFF1C0F00), categoryLabel("MONEY"))
     // 💡  Лайфхаки — яркий лимонный
     "LIFE"     -> CategoryStyle(Color(0xFF689F38), Color(0xFFF1F8E9),
-                    listOf(Color(0xFFF1F8E9), Color(0xFFDCEDC8)), Color(0xFF112000), "💡 ЛАЙФХАК")
+                    listOf(Color(0xFFF1F8E9), Color(0xFFDCEDC8)), Color(0xFF112000), categoryLabel("LIFE"))
     // 📰  Новости (дефолт) — тёплый серо-синий
     else       -> CategoryStyle(Color(0xFF37474F), Color(0xFFF4F6F8),
-                    listOf(Color(0xFFF4F6F8), Color(0xFFE8ECF0)), Color(0xFF0D1A2E), "📰 НОВОСТИ")
+                    listOf(Color(0xFFF4F6F8), Color(0xFFE8ECF0)), Color(0xFF0D1A2E), categoryLabel("NEWS"))
 }
 
 fun timeAgo(timestamp: Long): String {
