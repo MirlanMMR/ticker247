@@ -84,7 +84,8 @@ private val CATEGORY_LABELS: Map<String, Map<String, String>> = mapOf(
 )
 
 private fun categoryLabel(category: String): String {
-    val lang = java.util.Locale.getDefault().language
+    val poolOverride = com.mirlanmamytov.ticker247.data.repository.FirebaseNewsRepository.poolOverride
+    val lang = poolOverride ?: java.util.Locale.getDefault().language
     val cyrillic = setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk")
     val key = when {
         lang in cyrillic -> "ru"
@@ -148,7 +149,8 @@ fun timeAgo(timestamp: Long): String {
     val diff = System.currentTimeMillis() - timestamp
     val min  = diff / 60_000
     val h    = min / 60
-    val lang = java.util.Locale.getDefault().language
+    val poolOverride = com.mirlanmamytov.ticker247.data.repository.FirebaseNewsRepository.poolOverride
+    val lang = poolOverride ?: java.util.Locale.getDefault().language
     val cyrillic = setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk")
     return when {
         lang in cyrillic -> when {
@@ -1314,7 +1316,8 @@ fun CurrencyDetailSheet(currency: NewsItem) {
     Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 40.dp)) {
         // Подпись из того же профиля, по которому сервис строит данные
         val sheetBase = remember { com.mirlanmamytov.ticker247.util.CurrencyProfile.current().label }
-        val sheetLang2 = java.util.Locale.getDefault().language
+        val sheetLang2 = com.mirlanmamytov.ticker247.data.repository.FirebaseNewsRepository.poolOverride
+            ?: java.util.Locale.getDefault().language
         val sheetTitle = when {
             sheetLang2 in setOf("ru","ky","kk","uz","tg","be","uk","bg","sr","mk") -> "Курсы валют"
             sheetLang2 == "es" -> "Tipos de cambio"
@@ -1405,7 +1408,8 @@ fun CryptoTile() {
 
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    val cryptoTileLangNow = java.util.Locale.getDefault().language
+                    val cryptoTileLangNow = com.mirlanmamytov.ticker247.data.repository.FirebaseNewsRepository.poolOverride
+                        ?: java.util.Locale.getDefault().language
                     val cryptoTileLabel = when {
                         cryptoTileLangNow in setOf("ru","ky","kk","uz","tg","be","uk","bg","sr","mk") -> "🪙 КРИПТА"
                         cryptoTileLangNow == "es" -> "🪙 CRIPTO"
@@ -1463,7 +1467,8 @@ fun CryptoDetailSheet(cryptos: List<NewsItem>) {
     val subColor  = Color(0xFF6B7280)
 
     Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 40.dp)) {
-        val cryptoSheetLang = java.util.Locale.getDefault().language
+        val cryptoSheetLang = com.mirlanmamytov.ticker247.data.repository.FirebaseNewsRepository.poolOverride
+            ?: java.util.Locale.getDefault().language
         val cryptoSheetTitle = when {
             cryptoSheetLang in setOf("ru","ky","kk","uz","tg","be","uk","bg","sr","mk") -> "🪙 Криптовалюты"
             cryptoSheetLang == "es" -> "🪙 Criptomonedas"
