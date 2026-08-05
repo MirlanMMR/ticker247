@@ -1,5 +1,7 @@
 package com.mirlanmamytov.ticker247.network
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -12,15 +14,15 @@ import okhttp3.Request
 object UrlShortener {
     private val client = OkHttpClient.Builder().build()
 
-    suspend fun shorten(longUrl: String): String? {
-        return try {
+    suspend fun shorten(longUrl: String): String? = withContext(Dispatchers.IO) {
+        try {
             val url = "https://tinyurl.com/api-create.php".toHttpUrl()
                 .newBuilder()
                 .addQueryParameter("url", longUrl)
                 .build()
             val request = Request.Builder().url(url).build()
             client.newCall(request).execute().use { resp ->
-                if (!resp.isSuccessful) return null
+                if (!resp.isSuccessful) return@withContext null
                 resp.body?.string()?.trim()?.takeIf { it.startsWith("http") }
             }
         } catch (_: Exception) {

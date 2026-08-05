@@ -1,5 +1,7 @@
 package com.mirlanmamytov.ticker247.network
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -15,29 +17,31 @@ object OnDeviceTranslator {
 
     suspend fun translate(text: String, targetLang: String): String? {
         if (text.isBlank()) return null
-        return try {
-            val url = "https://translate.googleapis.com/translate_a/single".toHttpUrl()
-                .newBuilder()
-                .addQueryParameter("client", "gtx")
-                .addQueryParameter("sl", "auto")
-                .addQueryParameter("tl", targetLang)
-                .addQueryParameter("dt", "t")
-                .addQueryParameter("q", text.take(1500))
-                .build()
-            val request = Request.Builder().url(url).build()
-            client.newCall(request).execute().use { resp ->
-                if (!resp.isSuccessful) return null
-                val body = resp.body?.string() ?: return null
-                val segments = JSONArray(body).getJSONArray(0)
-                buildString {
-                    for (i in 0 until segments.length()) {
-                        val seg = segments.optJSONArray(i) ?: continue
-                        append(seg.optString(0, ""))
-                    }
-                }.trim().takeIf { it.isNotEmpty() }
+        return withContext(Dispatchers.IO) {
+            try {
+                val url = "https://translate.googleapis.com/translate_a/single".toHttpUrl()
+                    .newBuilder()
+                    .addQueryParameter("client", "gtx")
+                    .addQueryParameter("sl", "auto")
+                    .addQueryParameter("tl", targetLang)
+                    .addQueryParameter("dt", "t")
+                    .addQueryParameter("q", text.take(1500))
+                    .build()
+                val request = Request.Builder().url(url).build()
+                client.newCall(request).execute().use { resp ->
+                    if (!resp.isSuccessful) return@withContext null
+                    val body = resp.body?.string() ?: return@withContext null
+                    val segments = JSONArray(body).getJSONArray(0)
+                    buildString {
+                        for (i in 0 until segments.length()) {
+                            val seg = segments.optJSONArray(i) ?: continue
+                            append(seg.optString(0, ""))
+                        }
+                    }.trim().takeIf { it.isNotEmpty() }
+                }
+            } catch (_: Exception) {
+                null
             }
-        } catch (_: Exception) {
-            null
         }
     }
 }

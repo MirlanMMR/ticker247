@@ -361,30 +361,45 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                         Text(bodyText, fontSize = 15.sp, color = Color.White.copy(0.85f), lineHeight = 24.sp)
                         // Подстраховка: если бэкенд не перевёл текст (сбой/квота
                         // эндпоинта), даём перевести прямо на устройстве по тапу.
-                        // Показываем только когда похоже на нужду в переводе:
-                        // много латиницы, а язык устройства не английский.
+                        // Целевой язык — АКТИВНЫЙ ПУЛ (учитывает админ-переключатель),
+                        // а не сырой язык телефона — иначе на английском пуле кнопка
+                        // ложно считает нормальный английский текст "непереведённым"
+                        val poolOverride = com.mirlanmamytov.ticker247.data.repository.FirebaseNewsRepository.poolOverride
                         val deviceLang = java.util.Locale.getDefault().language
-                        val looksUntranslated = forceTranslated == null && deviceLang != "en" &&
+                        val cyrillicLangs = setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk")
+                        val targetLang = poolOverride ?: when {
+                            deviceLang in cyrillicLangs -> "ru"
+                            deviceLang in setOf("es", "pt") -> deviceLang
+                            else -> "en"
+                        }
+                        val translateLabel = when (targetLang) {
+                            "es" -> "🌐 Traducir"
+                            "pt" -> "🌐 Traduzir"
+                            else -> "🌐 Перевести"
+                        }
+                        val translatingLabel = when (targetLang) {
+                            "es" -> "Traduciendo..."
+                            "pt" -> "Traduzindo..."
+                            else -> "Переводим..."
+                        }
+                        // Английский пул не нуждается в переводе вообще
+                        val looksUntranslated = targetLang != "en" && forceTranslated == null &&
                             rawBodyText.count { it in 'a'..'z' || it in 'A'..'Z' }.toFloat() / rawBodyText.length.coerceAtLeast(1) > 0.5f
                         if (looksUntranslated) {
                             Spacer(Modifier.height(6.dp))
                             if (forceTranslating) {
                                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                     CircularProgressIndicator(modifier = Modifier.size(12.dp), color = accentCol, strokeWidth = 2.dp)
-                                    Text("Переводим...", fontSize = 12.sp, color = Color.White.copy(0.5f))
+                                    Text(translatingLabel, fontSize = 12.sp, color = Color.White.copy(0.5f))
                                 }
                             } else {
                                 Text(
-                                    "🌐 Перевести",
+                                    translateLabel,
                                     fontSize = 12.sp, color = Color(0xFF00D4FF).copy(0.8f),
                                     fontWeight = FontWeight.SemiBold,
                                     modifier = Modifier.clickable {
                                         scope.launch {
                                             forceTranslating = true
-                                            val targetLang = when {
-                                                deviceLang in setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk") -> "ru"
-                                                else -> deviceLang
-                                            }
                                             forceTranslated = OnDeviceTranslator.translate(rawBodyText, targetLang) ?: rawBodyText
                                             forceTranslating = false
                                         }

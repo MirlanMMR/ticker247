@@ -10,9 +10,15 @@ object CurrencyProfile {
     data class Quote(val code: String, val emoji: String)
     data class Profile(val base: String, val label: String, val quotes: List<Quote>)
 
+    // Админ-переключатель пулов (см. FirebaseNewsRepository.poolOverride) —
+    // та же условная "домашняя" страна, что и для местных новостей, чтобы
+    // валюта тоже честно отражала выбранный пул, а не реальный телефон
+    private val OVERRIDE_COUNTRY = mapOf("ru" to "KG", "en" to "GB", "es" to "MX", "pt" to "BR")
+
     fun current(): Profile {
-        val lang = java.util.Locale.getDefault().language
-        val country = DeviceCountry.get()
+        val poolOverride = com.mirlanmamytov.ticker247.data.repository.FirebaseNewsRepository.poolOverride
+        val lang = poolOverride ?: java.util.Locale.getDefault().language
+        val country = poolOverride?.let { OVERRIDE_COUNTRY[it] } ?: DeviceCountry.get()
         val cyrillic = setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk")
 
         // КГ (или кириллическая локаль без страны) — домашний профиль
