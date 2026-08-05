@@ -841,6 +841,10 @@ fun HomeContent(
                         fontWeight = if (current == null) FontWeight.Bold else FontWeight.Normal,
                         modifier = Modifier.fillMaxWidth().clickable {
                             com.mirlanmamytov.ticker247.data.repository.FirebaseNewsRepository.poolOverride = null
+                            // NewsBuffer фильтрует по своему deviceLanguage — тоже сбрасываем,
+                            // иначе загруженные из другого пула новости отсеются как "чужой язык"
+                            com.mirlanmamytov.ticker247.data.repository.NewsBuffer.deviceLanguage =
+                                java.util.Locale.getDefault().language
                             showPoolPicker = false
                             refreshScope.launch {
                                 DataBridge.clearSeen()
@@ -855,6 +859,7 @@ fun HomeContent(
                             fontWeight = if (current == code) FontWeight.Bold else FontWeight.Normal,
                             modifier = Modifier.fillMaxWidth().clickable {
                                 com.mirlanmamytov.ticker247.data.repository.FirebaseNewsRepository.poolOverride = code
+                                com.mirlanmamytov.ticker247.data.repository.NewsBuffer.deviceLanguage = code
                                 showPoolPicker = false
                                 refreshScope.launch {
                                     DataBridge.clearSeen()
