@@ -58,4 +58,9 @@
     <string name="about_contacts">Contact:</string>
     <string name="about_privacy_policy">Privacy Policy</string>
     <string name="about_close">Close</string>
+    <string name="scope_local">Local</string>
+    <string name="scope_world">World</string>
+    <string name="ad_label">ad</string>
+    <string name="ad_placeholder_title">Your ad could be here</string>
+    <string name="ad_placeholder_sub">Promote your business to Ticker 24/7 readers</string>
 </resources>

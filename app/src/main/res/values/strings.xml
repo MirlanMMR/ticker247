@@ -62,4 +62,9 @@
     <string name="about_contacts">Контакты:</string>
     <string name="about_privacy_policy">Политика конфиденциальности</string>
     <string name="about_close">Закрыть</string>
+    <string name="scope_local">Местные</string>
+    <string name="scope_world">Мировые</string>
+    <string name="ad_label">реклама</string>
+    <string name="ad_placeholder_title">Здесь может быть ваша реклама</string>
+    <string name="ad_placeholder_sub">Продвигайте бизнес среди читателей Ticker 24/7</string>
 </resources>

@@ -58,4 +58,9 @@
     <string name="about_contacts">Contato:</string>
     <string name="about_privacy_policy">Política de privacidade</string>
     <string name="about_close">Fechar</string>
+    <string name="scope_local">Locais</string>
+    <string name="scope_world">Mundo</string>
+    <string name="ad_label">anúncio</string>
+    <string name="ad_placeholder_title">Seu anúncio pode estar aqui</string>
+    <string name="ad_placeholder_sub">Promova seu negócio para os leitores do Ticker 24/7</string>
 </resources>

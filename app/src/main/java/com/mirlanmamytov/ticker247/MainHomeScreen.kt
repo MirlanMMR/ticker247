@@ -113,11 +113,33 @@ fun timeAgo(timestamp: Long): String {
     val diff = System.currentTimeMillis() - timestamp
     val min  = diff / 60_000
     val h    = min / 60
+    val lang = java.util.Locale.getDefault().language
+    val cyrillic = setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk")
     return when {
-        min < 1  -> "только что"
-        min < 60 -> "$min мин"
-        h < 24   -> "$h ч"
-        else     -> "${h / 24} дн"
+        lang in cyrillic -> when {
+            min < 1  -> "только что"
+            min < 60 -> "$min мин"
+            h < 24   -> "$h ч"
+            else     -> "${h / 24} дн"
+        }
+        lang == "es" -> when {
+            min < 1  -> "ahora"
+            min < 60 -> "${min}min"
+            h < 24   -> "${h}h"
+            else     -> "${h / 24}d"
+        }
+        lang == "pt" -> when {
+            min < 1  -> "agora"
+            min < 60 -> "${min}min"
+            h < 24   -> "${h}h"
+            else     -> "${h / 24}d"
+        }
+        else -> when {
+            min < 1  -> "just now"
+            min < 60 -> "${min}m"
+            h < 24   -> "${h}h"
+            else     -> "${h / 24}d"
+        }
     }
 }
 
@@ -1349,7 +1371,14 @@ fun CryptoTile() {
 
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("🪙 КРИПТА", fontSize = 9.sp, color = Color.White.copy(0.6f),
+                    val cryptoTileLangNow = java.util.Locale.getDefault().language
+                    val cryptoTileLabel = when {
+                        cryptoTileLangNow in setOf("ru","ky","kk","uz","tg","be","uk","bg","sr","mk") -> "🪙 КРИПТА"
+                        cryptoTileLangNow == "es" -> "🪙 CRIPTO"
+                        cryptoTileLangNow == "pt" -> "🪙 CRIPTO"
+                        else -> "🪙 CRYPTO"
+                    }
+                    Text(cryptoTileLabel, fontSize = 9.sp, color = Color.White.copy(0.6f),
                         fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                     Spacer(Modifier.height(4.dp))
                     if (coin.cryptoIconUrl != null) {
@@ -1400,7 +1429,14 @@ fun CryptoDetailSheet(cryptos: List<NewsItem>) {
     val subColor  = Color(0xFF6B7280)
 
     Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 40.dp)) {
-        Text("🪙 Криптовалюты", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold,
+        val cryptoSheetLang = java.util.Locale.getDefault().language
+        val cryptoSheetTitle = when {
+            cryptoSheetLang in setOf("ru","ky","kk","uz","tg","be","uk","bg","sr","mk") -> "🪙 Криптовалюты"
+            cryptoSheetLang == "es" -> "🪙 Criptomonedas"
+            cryptoSheetLang == "pt" -> "🪙 Criptomoedas"
+            else -> "🪙 Cryptocurrencies"
+        }
+        Text(cryptoSheetTitle, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold,
             color = textColor, modifier = Modifier.padding(bottom = 16.dp))
 
         cryptos.forEach { coin ->
@@ -1840,11 +1876,11 @@ fun NewsTileGrid(
         val worldItems = sorted.filter { it.scope == "world" && !it.isVideo }
         Column(Modifier.fillMaxWidth()) {
             if (localItems.isNotEmpty()) {
-                ScopeSectionHeader(emoji = "📍", title = "Местные")
+                ScopeSectionHeader(emoji = "📍", title = stringResource(R.string.scope_local))
                 NewsTileBlock(localItems, textColor, subColor, shuffledPatterns, onOpenTikTok, adOffset = 0)
             }
             if (worldItems.isNotEmpty()) {
-                ScopeSectionHeader(emoji = "🌍", title = "Мировые")
+                ScopeSectionHeader(emoji = "🌍", title = stringResource(R.string.scope_world))
                 NewsTileBlock(worldItems, textColor, subColor, shuffledPatterns, onOpenTikTok, adOffset = 3)
             }
         }
@@ -2331,7 +2367,7 @@ fun AdPlaceholderCard() {
             }
         }
         Text(
-            "реклама",
+            stringResource(R.string.ad_label),
             fontSize = 9.sp,
             color = Color(0xFF9CA3AF),
             modifier = Modifier.align(Alignment.TopEnd).padding(6.dp)
