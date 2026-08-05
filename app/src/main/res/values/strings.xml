@@ -36,4 +36,30 @@
     <string name="headline">⚡ Главное</string>
     <string name="video_load_error">Не удалось загрузить видео</string>
     <string name="feed_end_sub">новые новости подгружаются автоматически</string>
+
+    <!-- Reader -->
+    <string name="reader_read_on_site">Читать на сайте →</string>
+    <string name="reader_loading_article">Загружаем статью…</string>
+    <string name="reader_sensitive_topic">⚠️ Деликатная тема</string>
+    <string name="reader_sensitive_tap">Нажмите, чтобы посмотреть</string>
+    <string name="reader_translated_notice">🌐 Переведено автоматически, возможны неточности · показать оригинал</string>
+    <string name="reader_show_original">показать оригинал</string>
+    <string name="reader_translate_button">🌐 Перевести</string>
+    <string name="reader_translating">Переводим…</string>
+    <string name="reader_bookmark_desc">Закладка</string>
+    <string name="reader_share_chooser_title">Поделиться новостью</string>
+    <string name="reader_share_bookmark_remove">Удалить</string>
+    <string name="reader_ai_loading">AI анализирует…</string>
+    <string name="bookmarks_title">Закладки</string>
+    <string name="bookmarks_empty_title">Пока нет сохранённых новостей</string>
+    <string name="bookmarks_empty_sub">Нажмите на 🔖 в читалке, чтобы сохранить</string>
+    <string name="digest_daily_title">☀️ Утренний дайджест</string>
+    <string name="digest_weekly_title">📅 Итоги недели</string>
+    <string name="about_pill">⚡ Контакты и обновление</string>
+    <string name="about_tagline">Агрегатор новостей от MMR Lab®</string>
+    <string name="about_version">Версия %1$s</string>
+    <string name="about_update_play">Обновить в Google Play</string>
+    <string name="about_contacts">Контакты:</string>
+    <string name="about_privacy_policy">Политика конфиденциальности</string>
+    <string name="about_close">Закрыть</string>
 </resources>

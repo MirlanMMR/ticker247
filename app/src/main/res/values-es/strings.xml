@@ -32,4 +32,30 @@
     <string name="headline">⚡ Destacado</string>
     <string name="video_load_error">No se pudo cargar el video</string>
     <string name="feed_end_sub">las noticias se actualizan automáticamente</string>
+
+    <!-- Reader -->
+    <string name="reader_read_on_site">Leer en el sitio →</string>
+    <string name="reader_loading_article">Cargando artículo…</string>
+    <string name="reader_sensitive_topic">⚠️ Tema sensible</string>
+    <string name="reader_sensitive_tap">Toca para ver</string>
+    <string name="reader_translated_notice">🌐 Traducido automáticamente, puede haber imprecisiones · mostrar original</string>
+    <string name="reader_show_original">mostrar original</string>
+    <string name="reader_translate_button">🌐 Traducir</string>
+    <string name="reader_translating">Traduciendo…</string>
+    <string name="reader_bookmark_desc">Guardar</string>
+    <string name="reader_share_chooser_title">Compartir noticia</string>
+    <string name="reader_share_bookmark_remove">Eliminar</string>
+    <string name="reader_ai_loading">La IA está analizando…</string>
+    <string name="bookmarks_title">Guardados</string>
+    <string name="bookmarks_empty_title">Aún no hay noticias guardadas</string>
+    <string name="bookmarks_empty_sub">Toca 🔖 en el lector para guardar una noticia</string>
+    <string name="digest_daily_title">☀️ Resumen matutino</string>
+    <string name="digest_weekly_title">📅 Resumen semanal</string>
+    <string name="about_pill">⚡ Contacto y actualización</string>
+    <string name="about_tagline">Agregador de noticias de MMR Lab®</string>
+    <string name="about_version">Versión %1$s</string>
+    <string name="about_update_play">Actualizar en Google Play</string>
+    <string name="about_contacts">Contacto:</string>
+    <string name="about_privacy_policy">Política de privacidad</string>
+    <string name="about_close">Cerrar</string>
 </resources>

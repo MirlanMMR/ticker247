@@ -898,10 +898,10 @@ fun HomeContent(
             },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Агрегатор новостей от MMR Lab®")
-                    Text("Версия ${com.mirlanmamytov.ticker247.BuildConfig.VERSION_NAME}")
+                    Text(stringResource(R.string.about_tagline))
+                    Text(stringResource(R.string.about_version, com.mirlanmamytov.ticker247.BuildConfig.VERSION_NAME))
                     Text(
-                        "Обновить в Google Play",
+                        stringResource(R.string.about_update_play),
                         color = Color(0xFF1D4ED8),
                         modifier = Modifier.clickable {
                             try {
@@ -916,7 +916,7 @@ fun HomeContent(
                         }
                     )
                     HorizontalDivider()
-                    Text("Контакты:", fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.about_contacts), fontWeight = FontWeight.SemiBold)
                     Text(
                         "mmr.lab.help@gmail.com",
                         color = Color(0xFF1D4ED8),
@@ -927,7 +927,7 @@ fun HomeContent(
                     )
                     HorizontalDivider()
                     Text(
-                        "Политика конфиденциальности",
+                        stringResource(R.string.about_privacy_policy),
                         color = Color(0xFF1D4ED8),
                         modifier = Modifier.clickable {
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://mirlanmmr.github.io/ticker247/privacy-policy.html"))
@@ -937,7 +937,7 @@ fun HomeContent(
                 }
             },
             confirmButton = {
-                TextButton(onClick = { showAbout = false }) { Text("Закрыть") }
+                TextButton(onClick = { showAbout = false }) { Text(stringResource(R.string.about_close)) }
             }
         )
     }
@@ -960,8 +960,7 @@ fun HomeContent(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Text("⚡", fontSize = 13.sp)
-                    Text("Контакты и обновление", fontSize = 13.sp, color = Color(0xFF1D4ED8),
+                    Text(stringResource(R.string.about_pill), fontSize = 13.sp, color = Color(0xFF1D4ED8),
                         fontWeight = FontWeight.Bold, letterSpacing = 0.3.sp)
                 }
                 Spacer(Modifier.width(8.dp))
@@ -1481,7 +1480,7 @@ fun DigestCard(onOpenItem: (List<NewsItem>, Int) -> Unit) {
     var digest by remember { mutableStateOf(com.mirlanmamytov.ticker247.util.DigestStore.getLatestDigest(context)) }
     val d = digest ?: return
 
-    val title = if (d.type == "weekly") "📅 Итоги недели" else "☀️ Утренний дайджест"
+    val title = stringResource(if (d.type == "weekly") R.string.digest_weekly_title else R.string.digest_daily_title)
     val newsItems = remember(d) {
         d.items.map { di ->
             NewsItem(url = di.url, title = di.title, summary = "", imageUrl = null,

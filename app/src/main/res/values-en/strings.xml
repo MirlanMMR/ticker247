@@ -32,4 +32,30 @@
     <string name="headline">⚡ Top Stories</string>
     <string name="video_load_error">Failed to load video</string>
     <string name="feed_end_sub">new stories load automatically</string>
+
+    <!-- Reader -->
+    <string name="reader_read_on_site">Read on site →</string>
+    <string name="reader_loading_article">Loading article…</string>
+    <string name="reader_sensitive_topic">⚠️ Sensitive topic</string>
+    <string name="reader_sensitive_tap">Tap to view</string>
+    <string name="reader_translated_notice">🌐 Automatically translated, may be inaccurate · show original</string>
+    <string name="reader_show_original">show original</string>
+    <string name="reader_translate_button">🌐 Translate</string>
+    <string name="reader_translating">Translating…</string>
+    <string name="reader_bookmark_desc">Bookmark</string>
+    <string name="reader_share_chooser_title">Share news</string>
+    <string name="reader_share_bookmark_remove">Remove</string>
+    <string name="reader_ai_loading">AI is analyzing…</string>
+    <string name="bookmarks_title">Bookmarks</string>
+    <string name="bookmarks_empty_title">No saved news yet</string>
+    <string name="bookmarks_empty_sub">Tap 🔖 in the reader to save an article</string>
+    <string name="digest_daily_title">☀️ Morning Digest</string>
+    <string name="digest_weekly_title">📅 Weekly Recap</string>
+    <string name="about_pill">⚡ Contact &amp; Update</string>
+    <string name="about_tagline">News aggregator by MMR Lab®</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_update_play">Update on Google Play</string>
+    <string name="about_contacts">Contact:</string>
+    <string name="about_privacy_policy">Privacy Policy</string>
+    <string name="about_close">Close</string>
 </resources>

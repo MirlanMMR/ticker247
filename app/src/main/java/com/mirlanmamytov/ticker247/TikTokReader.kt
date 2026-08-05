@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -275,11 +276,11 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                                 .background(Color.Black.copy(0.6f))
                                 .padding(horizontal = 14.dp, vertical = 7.dp)
                         ) {
-                            Text("⚠️ Деликатная тема", fontSize = 13.sp, color = Color.White,
+                            Text(stringResource(R.string.reader_sensitive_topic), fontSize = 13.sp, color = Color.White,
                                 fontWeight = FontWeight.Bold)
                         }
                         Spacer(Modifier.height(6.dp))
-                        Text("Нажмите, чтобы посмотреть", fontSize = 11.sp,
+                        Text(stringResource(R.string.reader_sensitive_tap), fontSize = 11.sp,
                             color = Color.White.copy(0.7f))
                     }
                 }
@@ -304,7 +305,7 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                 var showOriginal by remember(item.url) { mutableStateOf(false) }
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "🌐 Переведено автоматически, возможны неточности · показать оригинал",
+                    stringResource(R.string.reader_translated_notice),
                     fontSize = 11.sp, color = Color(0xFF00D4FF).copy(0.75f),
                     modifier = Modifier.clickable { showOriginal = !showOriginal }
                 )
@@ -329,7 +330,7 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                             modifier = Modifier.padding(vertical = 8.dp)
                         ) {
                             CircularProgressIndicator(modifier = Modifier.size(14.dp), color = accentCol, strokeWidth = 2.dp)
-                            Text("AI анализирует...", fontSize = 13.sp, color = Color.White.copy(0.5f))
+                            Text(stringResource(R.string.reader_ai_loading), fontSize = 13.sp, color = Color.White.copy(0.5f))
                         }
                     }
                     aiSummary != null -> {
@@ -354,7 +355,7 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                             modifier = Modifier.padding(vertical = 8.dp)
                         ) {
                             CircularProgressIndicator(modifier = Modifier.size(14.dp), color = accentCol, strokeWidth = 2.dp)
-                            Text("Загружаем статью...", fontSize = 13.sp, color = Color.White.copy(0.5f))
+                            Text(stringResource(R.string.reader_loading_article), fontSize = 13.sp, color = Color.White.copy(0.5f))
                         }
                     }
                     bodyText.isNotEmpty() -> {
@@ -434,7 +435,7 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                         border = BorderStroke(1.dp, accentCol.copy(0.5f)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("Читать на сайте →", fontSize = 13.sp)
+                        Text(stringResource(R.string.reader_read_on_site), fontSize = 13.sp)
                     }
                 }
 
@@ -443,6 +444,7 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 var isBookmarked by remember(item.url) { mutableStateOf(false) }
                 val bookmarkScope = rememberCoroutineScope()
+                val shareChooserTitle = stringResource(R.string.reader_share_chooser_title)
                 val dao = remember { com.mirlanmamytov.ticker247.data.db.AppDatabase.getInstance(context).bookmarkDao() }
                 LaunchedEffect(item.url) {
                     if (item.url.isNotEmpty()) isBookmarked = dao.isBookmarked(item.url)
@@ -456,7 +458,7 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                 }) {
                     Icon(
                         if (isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                        contentDescription = "Закладка",
+                        contentDescription = stringResource(R.string.reader_bookmark_desc),
                         tint = if (isBookmarked) Color(0xFF00D4FF) else Color.White.copy(0.7f)
                     )
                 }
@@ -471,7 +473,7 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                                     type = "text/plain"
                                     putExtra(Intent.EXTRA_TEXT, shareText)
                                     putExtra(Intent.EXTRA_SUBJECT, item.title)
-                                }, "Поделиться новостью"
+                                }, shareChooserTitle
                             )
                         )
                     }
