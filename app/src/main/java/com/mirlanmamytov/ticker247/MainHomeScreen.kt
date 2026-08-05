@@ -824,11 +824,67 @@ fun HomeContent(
     var isRefreshing by remember { mutableStateOf(false) }
     val refreshScope = rememberCoroutineScope()
     var showAbout by remember { mutableStateOf(false) }
+    var showPoolPicker by remember { mutableStateOf(false) }
+
+    // Скрытый переключатель пула (долгий тап на заголовок) — контроль контента
+    // во всех языках без смены языка устройства, напр. проверка платного поста
+    if (showPoolPicker) {
+        val pools = listOf("ru" to "🇷🇺 Русский", "en" to "🇬🇧 English", "es" to "🇪🇸 Español", "pt" to "🇧🇷 Português")
+        AlertDialog(
+            onDismissRequest = { showPoolPicker = false },
+            title = { Text("Пул для просмотра (админ)") },
+            text = {
+                Column {
+                    val current = com.mirlanmamytov.ticker247.data.repository.FirebaseNewsRepository.poolOverride
+                    Text(
+                        "Авто (по языку устройства)" + if (current == null) " ✓" else "",
+                        fontWeight = if (current == null) FontWeight.Bold else FontWeight.Normal,
+                        modifier = Modifier.fillMaxWidth().clickable {
+                            com.mirlanmamytov.ticker247.data.repository.FirebaseNewsRepository.poolOverride = null
+                            showPoolPicker = false
+                            refreshScope.launch {
+                                DataBridge.clearSeen()
+                                com.mirlanmamytov.ticker247.service.TickerForegroundService.refresh(context)
+                            }
+                        }.padding(vertical = 10.dp)
+                    )
+                    HorizontalDivider()
+                    pools.forEach { (code, label) ->
+                        Text(
+                            label + if (current == code) " ✓" else "",
+                            fontWeight = if (current == code) FontWeight.Bold else FontWeight.Normal,
+                            modifier = Modifier.fillMaxWidth().clickable {
+                                com.mirlanmamytov.ticker247.data.repository.FirebaseNewsRepository.poolOverride = code
+                                showPoolPicker = false
+                                refreshScope.launch {
+                                    DataBridge.clearSeen()
+                                    com.mirlanmamytov.ticker247.service.TickerForegroundService.refresh(context)
+                                }
+                            }.padding(vertical = 10.dp)
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showPoolPicker = false }) { Text("Закрыть") }
+            }
+        )
+    }
 
     if (showAbout) {
         AlertDialog(
             onDismissRequest = { showAbout = false },
-            title = { Text("Ticker 24/7") },
+            title = {
+                Text(
+                    "Ticker 24/7",
+                    modifier = Modifier.pointerInput(Unit) {
+                        detectTapGestures(onLongPress = {
+                            showAbout = false
+                            showPoolPicker = true
+                        })
+                    }
+                )
+            },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Агрегатор новостей от MMR Lab®")

@@ -15,7 +15,13 @@ object FirebaseNewsRepository {
 
     private val database = FirebaseDatabase.getInstance("https://ticker247-default-rtdb.asia-southeast1.firebasedatabase.app")
 
+    // Скрытое переопределение пула для контроля контента (напр. проверка
+    // платного размещения во всех языках) — не завязано на язык устройства.
+    // Ставится через AdminPoolOverride (долгий тап на "Ticker 24/7" в About).
+    @Volatile var poolOverride: String? = null
+
     private fun newsLangPath(): String {
+        poolOverride?.let { return "news/$it" }
         val lang = java.util.Locale.getDefault().language
         val cyrillicLangs = setOf("ru", "ky", "uk", "be", "bg", "sr", "mk")
         return when {
