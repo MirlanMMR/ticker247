@@ -38,7 +38,13 @@ object CountryNewsFetcher {
         "TH" to "th", "JP" to "ja", "KR" to "ko", "IN" to "hi", "HT" to "fr"
     )
 
+    // Админ-переопределение (см. FirebaseNewsRepository.poolOverride) — при
+    // переключении пула подставляем условную "домашнюю" страну этого языка,
+    // чтобы видеть и местный слой новостей, а не только мировой
+    private val OVERRIDE_COUNTRY = mapOf("ru" to "KG", "en" to "GB", "es" to "MX", "pt" to "BR")
+
     private fun poolLang(): String {
+        com.mirlanmamytov.ticker247.data.repository.FirebaseNewsRepository.poolOverride?.let { return it }
         val lang = java.util.Locale.getDefault().language
         val cyrillic = setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk")
         return when {
@@ -50,7 +56,11 @@ object CountryNewsFetcher {
     }
 
     /** Страна устройства (ISO, напр. "UZ"); пустая строка если неизвестна */
-    fun deviceCountry(): String = com.mirlanmamytov.ticker247.util.DeviceCountry.get()
+    fun deviceCountry(): String {
+        val override = com.mirlanmamytov.ticker247.data.repository.FirebaseNewsRepository.poolOverride
+        if (override != null) return OVERRIDE_COUNTRY[override] ?: "GB"
+        return com.mirlanmamytov.ticker247.util.DeviceCountry.get()
+    }
 
     /**
      * Нужна ли замена местных: страна известна и это не Кыргызстан
