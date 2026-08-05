@@ -964,42 +964,9 @@ fun HomeContent(
         )
     }
 
+    Box(Modifier.fillMaxSize()) {
     Scaffold(
-        containerColor = bgColor,
-        bottomBar = {
-            // Заметная кнопка-таблетка: контакты, обновление, реклама — всё там
-            Row(
-                Modifier.fillMaxWidth().background(bgColor).padding(vertical = 6.dp, horizontal = 12.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(Color(0xFF1D4ED8).copy(0.10f))
-                        .clickable { showAbout = true }
-                        .padding(horizontal = 18.dp, vertical = 7.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Text(stringResource(R.string.about_pill), fontSize = 13.sp, color = Color(0xFF1D4ED8),
-                        fontWeight = FontWeight.Bold, letterSpacing = 0.3.sp)
-                }
-                Spacer(Modifier.width(8.dp))
-                Box(
-                    Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(Color(0xFF1D4ED8).copy(0.10f))
-                        .clickable { onOpenBookmarks() }
-                        .padding(horizontal = 14.dp, vertical = 7.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Bookmark, contentDescription = "Закладки",
-                        tint = Color(0xFF1D4ED8), modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
-        }
+        containerColor = bgColor
     ) { padding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(padding)
@@ -1032,7 +999,7 @@ fun HomeContent(
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             state = lazyListState,
-            contentPadding = PaddingValues(bottom = 24.dp)
+            contentPadding = PaddingValues(bottom = 90.dp)
         ) {
 
             // 1. Карточка дайджеста (утренний/недельный) — видна ~2 суток или до закрытия
@@ -1066,13 +1033,45 @@ fun HomeContent(
                 )
             }
 
-            // 5. Финал ленты
-            item(key = "feed_end") {
-                FeedEndCard()
-            }
         }
         } // конец PullToRefreshBox
         } // конец Column
+    }
+
+        // Плавающая карточка внизу — бренд + контакты/обновление + закладки,
+        // объединены в одну полупрозрачную панель поверх ленты
+        Row(
+            Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 14.dp, start = 16.dp, end = 16.dp)
+                .fillMaxWidth()
+                .shadow(6.dp, RoundedCornerShape(50))
+                .clip(RoundedCornerShape(50))
+                .background(Color(0xFF1E1B4B).copy(alpha = 0.88f))
+                .clickable { showAbout = true }
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                stringResource(R.string.about_pill),
+                fontSize = 13.sp, color = Color.White,
+                fontWeight = FontWeight.Bold, letterSpacing = 0.3.sp,
+                modifier = Modifier.weight(1f)
+            )
+            Box(
+                Modifier
+                    .clip(RoundedCornerShape(50))
+                    .background(Color.White.copy(0.12f))
+                    .clickable { onOpenBookmarks() }
+                    .padding(horizontal = 10.dp, vertical = 6.dp)
+            ) {
+                Icon(
+                    Icons.Default.Bookmark, contentDescription = stringResource(R.string.bookmarks_title),
+                    tint = Color.White, modifier = Modifier.size(16.dp)
+                )
+            }
+        }
     }
 }
 
@@ -2498,7 +2497,7 @@ fun AdBannerPlaceholder() {
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Box(Modifier.size(4.dp).clip(RoundedCornerShape(50)).background(Color(0xFFCBD5E1)))
-            Text("РЕКЛАМА", fontSize = 9.sp, color = Color(0xFFB0B8C4),
+            Text(stringResource(R.string.ad_label).uppercase(), fontSize = 9.sp, color = Color(0xFFB0B8C4),
                 fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
             Box(Modifier.size(4.dp).clip(RoundedCornerShape(50)).background(Color(0xFFCBD5E1)))
         }

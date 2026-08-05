@@ -13,7 +13,10 @@ object CurrencyProfile {
     // Админ-переключатель пулов (см. FirebaseNewsRepository.poolOverride) —
     // та же условная "домашняя" страна, что и для местных новостей, чтобы
     // валюта тоже честно отражала выбранный пул, а не реальный телефон
-    private val OVERRIDE_COUNTRY = mapOf("ru" to "KG", "en" to "GB", "es" to "MX", "pt" to "BR")
+    // en -> US (доллар как база, широкая англоязычная аудитория) — не совпадает
+    // с CountryNewsFetcher (там en -> GB, т.к. местные источники пула
+    // преимущественно британские: BBC/Sky/Guardian), это ожидаемо и раздельно
+    private val OVERRIDE_COUNTRY = mapOf("ru" to "KG", "en" to "US", "es" to "MX", "pt" to "BR")
 
     fun current(): Profile {
         val poolOverride = com.mirlanmamytov.ticker247.data.repository.FirebaseNewsRepository.poolOverride
