@@ -879,8 +879,14 @@ fun HomeContent(
                     "Ticker 24/7",
                     modifier = Modifier.pointerInput(Unit) {
                         detectTapGestures(onLongPress = {
-                            showAbout = false
-                            showPoolPicker = true
+                            // Переключатель пулов — только для владельца аккаунта,
+                            // у остальных долгий тап ничего не делает
+                            val ownerEmail = com.google.firebase.auth.FirebaseAuth.getInstance()
+                                .currentUser?.email
+                            if (ownerEmail == "mmr.lab.help@gmail.com" || ownerEmail == "tarylgan@gmail.com") {
+                                showAbout = false
+                                showPoolPicker = true
+                            }
                         })
                     }
                 )
