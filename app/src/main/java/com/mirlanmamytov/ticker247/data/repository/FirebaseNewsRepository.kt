@@ -52,7 +52,8 @@ object FirebaseNewsRepository {
                             language = child.child("language").getValue(String::class.java) ?: "ru",
                             scope = child.child("scope").getValue(String::class.java) ?: "world",
                             origTitle = child.child("origTitle").getValue(String::class.java),
-                            translated = child.child("translated").getValue(Boolean::class.java) ?: false
+                            translated = child.child("translated").getValue(Boolean::class.java) ?: false,
+                            expiresAt = child.child("expiresAt").getValue(Long::class.java)
                         )
                         if (item.title.isNotEmpty()) items.add(item)
                     }
