@@ -85,18 +85,22 @@ object DigestStore {
         prefs(context).edit().putString(KEY_LATEST, obj.toString()).apply()
     }
 
-    /** Последний дайджест — null если его нет, он старше 2 суток, или пользователь его закрыл */
+    /** Последний дайджест — null если его нет, срок истёк, или пользователь его закрыл.
+     * Утренний живёт до вечера того же дня (не "завтрак после полудня"),
+     * недельный — все выходные, естественно дольше */
     fun getLatestDigest(context: Context): LatestDigest? {
         val p = prefs(context)
         val json = p.getString(KEY_LATEST, null) ?: return null
         return try {
             val o = JSONObject(json)
             val ts = o.optLong("ts", 0L)
+            val type = o.optString("type", "daily")
             val dismissedTs = p.getLong(KEY_DISMISSED_TS, 0L)
             if (ts <= dismissedTs) return null
-            if (System.currentTimeMillis() - ts > 48 * 3600_000L) return null
+            val maxAgeMs = if (type == "weekly") 48 * 3600_000L else 14 * 3600_000L
+            if (System.currentTimeMillis() - ts > maxAgeMs) return null
             LatestDigest(
-                type = o.optString("type", "daily"),
+                type = type,
                 timestampMs = ts,
                 items = itemsFromJson(o.optJSONArray("items")?.toString())
             )
