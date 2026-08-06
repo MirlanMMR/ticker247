@@ -86,7 +86,7 @@ object DigestStore {
     }
 
     /** Последний дайджест — null если его нет, срок истёк, или пользователь его закрыл.
-     * Утренний живёт до вечера того же дня (не "завтрак после полудня"),
+     * Утренний живёт с 8:00 до 12:00 (как завтрак — не после полудня),
      * недельный — все выходные, естественно дольше */
     fun getLatestDigest(context: Context): LatestDigest? {
         val p = prefs(context)
@@ -97,7 +97,7 @@ object DigestStore {
             val type = o.optString("type", "daily")
             val dismissedTs = p.getLong(KEY_DISMISSED_TS, 0L)
             if (ts <= dismissedTs) return null
-            val maxAgeMs = if (type == "weekly") 48 * 3600_000L else 14 * 3600_000L
+            val maxAgeMs = if (type == "weekly") 48 * 3600_000L else 4 * 3600_000L
             if (System.currentTimeMillis() - ts > maxAgeMs) return null
             LatestDigest(
                 type = type,
