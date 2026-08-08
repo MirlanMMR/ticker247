@@ -1,6 +1,5 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
@@ -9,14 +8,14 @@ plugins {
 
 android {
     namespace = "com.mirlanmamytov.ticker247"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.mirlanmamytov.ticker247"
         minSdk = 24
-        targetSdk = 35
-        versionCode = 22
-        versionName = "1.5.7"
+        targetSdk = 36
+        versionCode = 23
+        versionName = "1.6.0"
 
         // Gemini API key — добавь GEMINI_API_KEY=your_key в local.properties
         val geminiKey = rootProject.file("local.properties")
@@ -31,10 +30,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
     }
 
     buildFeatures {
@@ -67,8 +62,8 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:1.7.6")
 
     // Hilt (Версия 2.51.1 строго по твоему корневому файлу)
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    ksp("com.google.dagger:hilt-compiler:2.51.1")
+    implementation("com.google.dagger:hilt-android:2.60.1")
+    ksp("com.google.dagger:hilt-compiler:2.60.1")
 
     implementation("androidx.hilt:hilt-work:1.2.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
@@ -94,9 +89,9 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.6.0")
 
     // Room (закладки)
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    ksp("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-runtime:2.8.4")
+    implementation("androidx.room:room-ktx:2.8.4")
+    ksp("androidx.room:room-compiler:2.8.4")
 
     // Chrome Custom Tabs
     implementation("androidx.browser:browser:1.8.0")
