@@ -9,7 +9,12 @@ import com.mirlanmamytov.ticker247.data.model.YouTubeChannel
 
 @Database(
     entities = [NewsItem::class, YouTubeChannel::class],
-    version = 5,
+    // Версия поднята из-за апгрейда Room 2.6→2.8: компилятор чуть иначе
+    // генерирует identity hash даже без изменений в самих @Entity, из-за
+    // этого Room не узнаёт старую базу и падает вместо того, чтобы применить
+    // fallbackToDestructiveMigration (тот срабатывает только при смене
+    // номера версии, не сам по себе при расхождении хэша)
+    version = 6,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
