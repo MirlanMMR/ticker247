@@ -193,7 +193,7 @@ fun SignInScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    listOf(Color(0xFF080810), Color(0xFF0A0A1A), Color(0xFF0D1020))
+                    listOf(Color(0xFF24262C), Color(0xFF2A2D34), Color(0xFF2E313A))
                 )
             ),
         contentAlignment = Alignment.Center

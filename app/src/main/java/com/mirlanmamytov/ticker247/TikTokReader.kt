@@ -72,7 +72,7 @@ fun TikTokReader(
         pageCount = { LOOP }
     )
 
-    Box(Modifier.fillMaxSize().background(Color.Black)) {
+    Box(Modifier.fillMaxSize().background(Color(0xFF2A2D34))) {
             VerticalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
@@ -196,7 +196,7 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
     Column(
         Modifier
             .fillMaxSize()
-            .background(Color(0xFF0A0A0F))
+            .background(Color(0xFF2A2D34))
             .verticalScroll(rememberScrollState())
     ) {
         // ── Фото отдельным блоком сверху ────────────────────────────────────
@@ -235,7 +235,7 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                     Modifier.fillMaxSize()
                         .background(
                             Brush.verticalGradient(
-                                listOf(accentCol.copy(0.4f), Color(0xFF0A0A0F))
+                                listOf(accentCol.copy(0.4f), Color(0xFF2A2D34))
                             )
                         ),
                     contentAlignment = Alignment.Center
@@ -249,7 +249,7 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                     Brush.verticalGradient(
                         0f to Color.Transparent,
                         0.7f to Color.Transparent,
-                        1f to Color(0xFF0A0A0F)
+                        1f to Color(0xFF2A2D34)
                     )
                 )
             )

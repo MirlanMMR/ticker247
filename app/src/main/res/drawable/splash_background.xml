@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Фон: индиго → фиолетовый градиент -->
+    <!-- Фон: графитовый градиент — в тон остальному приложению -->
     <item>
         <shape android:shape="rectangle">
             <gradient
                 android:angle="135"
-                android:startColor="#1E1B4B"
-                android:centerColor="#312E81"
-                android:endColor="#4C1D95"
+                android:startColor="#24262C"
+                android:centerColor="#2A2D34"
+                android:endColor="#2E313A"
                 android:type="linear" />
         </shape>
     </item>
@@ -22,7 +22,7 @@
             <!-- Круг с мягким свечением -->
             <item>
                 <shape android:shape="oval">
-                    <solid android:color="#33A78BFA" />
+                    <solid android:color="#3300D4FF" />
                 </shape>
             </item>
             <item
@@ -31,7 +31,7 @@
                 android:right="8dp"
                 android:bottom="8dp">
                 <shape android:shape="oval">
-                    <solid android:color="#663730A3" />
+                    <solid android:color="#664A4E58" />
                 </shape>
             </item>
             <item
@@ -40,7 +40,7 @@
                 android:right="16dp"
                 android:bottom="16dp">
                 <shape android:shape="oval">
-                    <solid android:color="#FF3730A3" />
+                    <solid android:color="#FF4A4E58" />
                 </shape>
             </item>
         </layer-list>

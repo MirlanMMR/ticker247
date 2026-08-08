@@ -11,6 +11,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
@@ -108,6 +109,7 @@ class MainActivity : ComponentActivity() {
         // Обе панели — light-иконки над dark(): весь интерфейс теперь
         // нейтрально-серый/тёмный (переход со светлой темы), под каждой
         // системной панелью лежит тёмный контент
+        installSplashScreen()
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(0xFF050508.toInt()),
             navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
@@ -117,8 +119,10 @@ class MainActivity : ComponentActivity() {
         // статус-бара/навигации "для контраста", независимо от цвета,
         // который мы уже задали выше через enableEdgeToEdge — та самая
         // белёсая полоска. Отключаем: контраст мы обеспечиваем сами.
-        window.isStatusBarContrastEnforced = false
-        window.isNavigationBarContrastEnforced = false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isStatusBarContrastEnforced = false
+            window.isNavigationBarContrastEnforced = false
+        }
         prefs = getSharedPreferences("ticker247_prefs", MODE_PRIVATE)
         handleDeepLink(intent)
         // Тяжёлую инициализацию (обновления, реклама) откладываем — сначала

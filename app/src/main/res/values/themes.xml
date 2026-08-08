@@ -1,16 +1,22 @@
 <resources>
     <!-- Основная тема приложения -->
     <style name="Theme.Ticker247" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:windowBackground">#FF1E1B4B</item>
+        <item name="android:windowBackground">#FF2A2D34</item>
         <!-- statusBarColor / navigationBarColor / windowLightStatusBar убраны:
              с targetSdk 36 они игнорируются (edge-to-edge включён всегда).
              Цветом иконок управляет Theme.kt через WindowInsetsController. -->
     </style>
 
-    <!-- Сплэш-тема: показывается пока грузится Compose -->
-    <style name="Theme.Ticker247.Splash" parent="Theme.Ticker247">
-        <item name="android:windowBackground">@drawable/splash_background</item>
-        <item name="android:windowFullscreen">false</item>
-        <!-- windowSplashScreenBackground requires API 31, handled in values-v31/themes.xml -->
+    <!-- Сплэш-тема: показывается пока грузится Compose. На части прошивок
+         (замечено на Samsung/One UI) ручная настройка через android:windowBackground
+         ненадёжна и системный сплэш всё равно рисуется чёрным — поэтому вместо
+         этого используем официальный androidx SplashScreen API (Theme.SplashScreen),
+         он работает предсказуемо на всех OEM. Фон — сплошной графитовый (API не
+         поддерживает градиенты), после сплэша сразу подхватывает Compose с тем же
+         градиентом, разницы не видно. -->
+    <style name="Theme.Ticker247.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_bg</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.Ticker247</item>
     </style>
 </resources>

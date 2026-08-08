@@ -99,50 +99,50 @@ private fun categoryLabel(category: String): String {
 
 fun newsItemStyle(category: String): CategoryStyle = when (category) {
     // 🇰🇬  Кыргызстан — небесно-синий, флаговый
-    "KG"       -> CategoryStyle(Color(0xFF1565C0), Color(0xFF363940),
-                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("KG"))
+    "KG"       -> CategoryStyle(Color(0xFF1565C0), Color(0xFF1565C0),
+                    listOf(Color(0xFF1565C0), Color(0xFF3F80CB)), Color(0xFF1565C0), categoryLabel("KG"))
     // ⚡  Срочно — горячий красно-оранжевый (не кричащий, но тревожный)
-    "URGENT"   -> CategoryStyle(Color(0xFFD32F2F), Color(0xFF363940),
-                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("URGENT"))
+    "URGENT"   -> CategoryStyle(Color(0xFFD32F2F), Color(0xFFD32F2F),
+                    listOf(Color(0xFFD32F2F), Color(0xFFDA5454)), Color(0xFFD32F2F), categoryLabel("URGENT"))
     // 🌍  Мир — глубокий бирюзовый
-    "WORLD"    -> CategoryStyle(Color(0xFF00838F), Color(0xFF363940),
-                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("WORLD"))
+    "WORLD"    -> CategoryStyle(Color(0xFF00838F), Color(0xFF00838F),
+                    listOf(Color(0xFF00838F), Color(0xFF2D99A3)), Color(0xFF00838F), categoryLabel("WORLD"))
     // ⚽  Спорт — насыщенный янтарь
-    "SPORT"    -> CategoryStyle(Color(0xFFE65100), Color(0xFF363940),
-                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("SPORT"))
+    "SPORT"    -> CategoryStyle(Color(0xFFE65100), Color(0xFFE65100),
+                    listOf(Color(0xFFE65100), Color(0xFFEA702D)), Color(0xFFE65100), categoryLabel("SPORT"))
     // 🎬  Кино/культура — глубокий фиолетовый
-    "CULTURE"  -> CategoryStyle(Color(0xFF7B1FA2), Color(0xFF363940),
-                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("CULTURE"))
+    "CULTURE"  -> CategoryStyle(Color(0xFF7B1FA2), Color(0xFF7B1FA2),
+                    listOf(Color(0xFF7B1FA2), Color(0xFF9247B2)), Color(0xFF7B1FA2), categoryLabel("CULTURE"))
     // 🚗  Авто — нефтяной зелёный
-    "AUTO"     -> CategoryStyle(Color(0xFF2E7D32), Color(0xFF363940),
-                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("AUTO"))
+    "AUTO"     -> CategoryStyle(Color(0xFF2E7D32), Color(0xFF2E7D32),
+                    listOf(Color(0xFF2E7D32), Color(0xFF539456)), Color(0xFF2E7D32), categoryLabel("AUTO"))
     // 👗  Мода — тёплая роза
-    "FASHION"  -> CategoryStyle(Color(0xFFC2185B), Color(0xFF363940),
-                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("FASHION"))
+    "FASHION"  -> CategoryStyle(Color(0xFFC2185B), Color(0xFFC2185B),
+                    listOf(Color(0xFFC2185B), Color(0xFFCC4178)), Color(0xFFC2185B), categoryLabel("FASHION"))
     // ✈️  Туризм — небо
-    "TOURS"    -> CategoryStyle(Color(0xFF0277BD), Color(0xFF363940),
-                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("TOURS"))
+    "TOURS"    -> CategoryStyle(Color(0xFF0277BD), Color(0xFF0277BD),
+                    listOf(Color(0xFF0277BD), Color(0xFF2F8FC8)), Color(0xFF0277BD), categoryLabel("TOURS"))
     // 📱  Технологии — электрический синий (как экран телефона)
-    "TECH"     -> CategoryStyle(Color(0xFF0066FF), Color(0xFF363940),
-                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("TECH"))
+    "TECH"     -> CategoryStyle(Color(0xFF0066FF), Color(0xFF0066FF),
+                    listOf(Color(0xFF0066FF), Color(0xFF2D81FF)), Color(0xFF0066FF), categoryLabel("TECH"))
     // 😊  Хорошие новости — тёплый солнечный жёлто-оранжевый
-    "GOOD"     -> CategoryStyle(Color(0xFFF59E0B), Color(0xFF363940),
-                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("GOOD"))
+    "GOOD"     -> CategoryStyle(Color(0xFFF59E0B), Color(0xFFF59E0B),
+                    listOf(Color(0xFFF59E0B), Color(0xFFF6AF36)), Color(0xFFF59E0B), categoryLabel("GOOD"))
     // ⭐  Звёзды — пурпурный, гламурный
-    "STARS"    -> CategoryStyle(Color(0xFF9C27B0), Color(0xFF363940),
-                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("STARS"))
+    "STARS"    -> CategoryStyle(Color(0xFF9C27B0), Color(0xFF9C27B0),
+                    listOf(Color(0xFF9C27B0), Color(0xFFAD4DBE)), Color(0xFF9C27B0), categoryLabel("STARS"))
     // 🏥  Здоровье — свежий зелёный
-    "HEALTH"   -> CategoryStyle(Color(0xFF00897B), Color(0xFF363940),
-                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("HEALTH"))
+    "HEALTH"   -> CategoryStyle(Color(0xFF00897B), Color(0xFF00897B),
+                    listOf(Color(0xFF00897B), Color(0xFF2D9E92)), Color(0xFF00897B), categoryLabel("HEALTH"))
     // 💰  Деньги — золотой
-    "MONEY"    -> CategoryStyle(Color(0xFFFF8F00), Color(0xFF363940),
-                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("MONEY"))
+    "MONEY"    -> CategoryStyle(Color(0xFFFF8F00), Color(0xFFFF8F00),
+                    listOf(Color(0xFFFF8F00), Color(0xFFFFA32D)), Color(0xFFFF8F00), categoryLabel("MONEY"))
     // 💡  Лайфхаки — яркий лимонный
-    "LIFE"     -> CategoryStyle(Color(0xFF689F38), Color(0xFF363940),
-                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("LIFE"))
+    "LIFE"     -> CategoryStyle(Color(0xFF689F38), Color(0xFF689F38),
+                    listOf(Color(0xFF689F38), Color(0xFF83B05B)), Color(0xFF689F38), categoryLabel("LIFE"))
     // 📰  Новости (дефолт) — тёплый серо-синий
-    else       -> CategoryStyle(Color(0xFF37474F), Color(0xFF363940),
-                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("NEWS"))
+    else       -> CategoryStyle(Color(0xFF37474F), Color(0xFF37474F),
+                    listOf(Color(0xFF37474F), Color(0xFF5B686E)), Color(0xFF37474F), categoryLabel("NEWS"))
 }
 
 fun timeAgo(timestamp: Long): String {
@@ -817,45 +817,55 @@ fun MainHomeScreen() {
     )
 }
 
-// ─── Полноэкранный загрузчик — единый бренд-цвет ─────────────────────────────
+// ─── Загрузка ленты ───────────────────────────────────────────────────────────
 
+/**
+ * Пока новости не пришли. Намеренно НЕ брендовый экран: логотип со слоганом уже
+ * показал SignInScreen прямо перед этим, и второй такой же экран читался как
+ * «приложение стартует дважды». Вместо пустоты — скелетон будущей ленты:
+ * сразу видно, что контент подгружается, и куда он встанет.
+ */
 @Composable
 fun SplashLoadingScreen() {
-    val inf = rememberInfiniteTransition(label = "splash")
-    val pulseAlpha by inf.animateFloat(
-        initialValue = 0.3f, targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(900, easing = FastOutSlowInEasing), RepeatMode.Reverse),
-        label = "dot"
-    )
-
-    Box(
-        Modifier.fillMaxSize().background(
-            Brush.verticalGradient(listOf(Color(0xFF080810), Color(0xFF0A0A1A), Color(0xFF0D1020)))
+    val inf = rememberInfiniteTransition(label = "skeleton")
+    val shimmer by inf.animateFloat(
+        initialValue = 0.35f, targetValue = 0.75f,
+        animationSpec = infiniteRepeatable(
+            tween(1100, easing = FastOutSlowInEasing), RepeatMode.Reverse
         ),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("⚡", fontSize = 52.sp)
-            Spacer(Modifier.height(16.dp))
-            Text("Ticker 24/7", fontSize = 36.sp, fontWeight = FontWeight.Black, color = Color.White, letterSpacing = (-0.5).sp)
-            Spacer(Modifier.height(12.dp))
-            Text("Коротко о важном", fontSize = 17.sp, fontWeight = FontWeight.Medium, color = Color(0xFF00D4FF), letterSpacing = 1.5.sp)
-            Spacer(Modifier.height(48.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                repeat(3) { i ->
-                    Box(
-                        Modifier.size(5.dp).alpha(if (i == 1) pulseAlpha else pulseAlpha * 0.6f)
-                            .background(Color(0xFF00D4FF), androidx.compose.foundation.shape.CircleShape)
-                    )
-                }
-            }
-        }
-        Text(
-            "Created by MMR Lab®",
-            fontSize = 13.sp, color = Color(0xFF00E676),
-            fontWeight = FontWeight.Bold, letterSpacing = 0.5.sp,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 40.dp)
+        label = "shimmer"
+    )
+    // Плейсхолдер плитки — тот же тон и скругление, что у настоящих карточек
+    @Composable
+    fun Skeleton(modifier: Modifier) {
+        Box(
+            modifier
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFF4A4E58).copy(shimmer))
         )
+    }
+
+    Column(
+        Modifier
+            .fillMaxSize()
+            .background(Color(0xFF2A2D34))
+            .statusBarsPadding()
+            .padding(horizontal = 10.dp)
+    ) {
+        // Бегущая строка
+        Skeleton(Modifier.fillMaxWidth().height(36.dp))
+        Spacer(Modifier.height(12.dp))
+        // Крупная карточка карусели
+        Skeleton(Modifier.fillMaxWidth().height(150.dp))
+        Spacer(Modifier.height(10.dp))
+        // Сетка плиток
+        repeat(3) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Skeleton(Modifier.weight(1f).height(110.dp))
+                Skeleton(Modifier.weight(1f).height(110.dp))
+            }
+            Spacer(Modifier.height(8.dp))
+        }
     }
 }
 
@@ -874,7 +884,7 @@ fun HomeContent(
     // при долгом чтении ленты (не слепит, и не даёт резких ореолов текста,
     // как бывает на чистом чёрном при астигматизме)
     val bgColor     = Color(0xFF2A2D34)
-    val textColor   = Color(0xFFE4E6EB)
+    val textColor   = Color(0xFFFFFFFF)
     val subColor    = Color(0xFFB4B2A9)
     val accentColor = Color(0xFF00D4FF)
     val lazyListState = rememberLazyListState()
@@ -1040,7 +1050,7 @@ fun HomeContent(
                     androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator(
                         state = pullState,
                         isRefreshing = isRefreshing,
-                        color = Color(0xFF7C3AED),
+                        color = accentColor,
                         containerColor = bgColor,
                         modifier = Modifier.align(Alignment.TopCenter)
                     )
@@ -1335,7 +1345,7 @@ fun CurrencyTile() {
 
 @Composable
 fun CurrencyDetailSheet(currency: NewsItem) {
-    val textColor = Color(0xFFE4E6EB)
+    val textColor = Color(0xFFFFFFFF)
     val subColor  = Color(0xFFB4B2A9)
     val rates = currency.title.split("|").map { it.trim() }.filter { it.isNotEmpty() }
 
@@ -1375,7 +1385,7 @@ fun CurrencyDetailSheet(currency: NewsItem) {
                 }
                 Text("$value $sheetBase", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
             }
-            Box(Modifier.fillMaxWidth().height(0.5.dp).background(Color(0xFF3D4048)))
+            Box(Modifier.fillMaxWidth().height(0.5.dp).background(Color(0xFF545862)))
         }
     }
 }
@@ -1489,7 +1499,7 @@ fun CryptoTile() {
 
 @Composable
 fun CryptoDetailSheet(cryptos: List<NewsItem>) {
-    val textColor = Color(0xFFE4E6EB)
+    val textColor = Color(0xFFFFFFFF)
     val subColor  = Color(0xFFB4B2A9)
 
     Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 40.dp)) {
@@ -1542,7 +1552,7 @@ fun CryptoDetailSheet(cryptos: List<NewsItem>) {
                         fontSize = 11.sp, color = changeColor)
                 }
             }
-            Box(Modifier.fillMaxWidth().height(0.5.dp).background(Color(0xFF3D4048)))
+            Box(Modifier.fillMaxWidth().height(0.5.dp).background(Color(0xFF545862)))
         }
     }
 }
@@ -1602,7 +1612,7 @@ fun DigestCard(onOpenItem: (List<NewsItem>, Int) -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color(0xFF111827))
+            Text(title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
             Text(
                 "✕", fontSize = 15.sp, color = Color(0xFF9CA3AF),
                 modifier = Modifier.clickable {
@@ -1636,15 +1646,22 @@ fun HeroCarousel(onOpenTikTok: (List<NewsItem>, Int) -> Unit) {
 
     if (heroItems.isEmpty()) return
 
-    val pagerState = androidx.compose.foundation.pager.rememberPagerState(pageCount = { heroItems.size })
+    // Бесконечная карусель: страниц заведомо больше, чем пролистают за сессию,
+    // стартуем из середины — вперёд и назад одинаково «без края». Раньше был
+    // pageCount = size, и переход с последней на первую отматывал всю ленту
+    // назад рывком вместо продолжения по кругу.
+    val LOOP = 10_000
+    val pagerState = androidx.compose.foundation.pager.rememberPagerState(
+        initialPage = LOOP / 2 - (LOOP / 2 % heroItems.size),
+        pageCount = { LOOP }
+    )
     val coroutineScope = rememberCoroutineScope()
 
-    // Автопрокрутка каждые 5 секунд
+    // Автопрокрутка: 9с — успеть прочитать заголовок и не «убегать» из-под руки
     LaunchedEffect(pagerState) {
         while (isActive) {
-            kotlinx.coroutines.delay(5000)
-            val next = (pagerState.currentPage + 1) % heroItems.size
-            try { pagerState.animateScrollToPage(next) } catch (_: Exception) {}
+            kotlinx.coroutines.delay(9000)
+            try { pagerState.animateScrollToPage(pagerState.currentPage + 1) } catch (_: Exception) {}
         }
     }
 
@@ -1656,10 +1673,10 @@ fun HeroCarousel(onOpenTikTok: (List<NewsItem>, Int) -> Unit) {
                 modifier = Modifier.fillMaxSize(),
                 pageSpacing = 0.dp
             ) { page ->
-                val item = heroItems[page]
+                val idx = page % heroItems.size
                 HeroCard(
-                    item = item,
-                    onClick = { onOpenTikTok(heroItems, page) }
+                    item = heroItems[idx],
+                    onClick = { onOpenTikTok(heroItems, idx) }
                 )
             }
         }
@@ -1670,8 +1687,9 @@ fun HeroCarousel(onOpenTikTok: (List<NewsItem>, Int) -> Unit) {
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val activeIdx = pagerState.currentPage % heroItems.size
             heroItems.forEachIndexed { i, _ ->
-                val isSelected = i == pagerState.currentPage
+                val isSelected = i == activeIdx
                 val dotSize by androidx.compose.animation.core.animateDpAsState(
                     targetValue = if (isSelected) 20.dp else 6.dp,
                     animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
@@ -1683,7 +1701,7 @@ fun HeroCarousel(onOpenTikTok: (List<NewsItem>, Int) -> Unit) {
                         .height(6.dp).width(dotSize)
                         .clip(RoundedCornerShape(50))
                         .background(
-                            if (isSelected) Color(0xFF6366F1) else Color(0xFFCBD5E1)
+                            if (isSelected) Color(0xFF00D4FF) else Color(0xFF545862)
                         )
                 )
             }
@@ -1716,7 +1734,7 @@ fun HeroCard(item: NewsItem, onClick: () -> Unit) {
             )
         } else {
             Box(Modifier.fillMaxSize().background(
-                Brush.linearGradient(listOf(style.accent.copy(0.5f), Color(0xFF0A0A1A)))
+                Brush.linearGradient(listOf(style.accent.copy(0.5f), Color(0xFF2A2D34)))
             ))
         }
         // Градиент снизу
@@ -1833,7 +1851,7 @@ fun CarouselCard(item: NewsItem, onClick: () -> Unit) {
             )
         } else {
             Box(Modifier.fillMaxSize().background(
-                Brush.linearGradient(listOf(style.accent.copy(0.4f), Color(0xFF0A0A0F)))
+                Brush.linearGradient(listOf(style.accent.copy(0.4f), Color(0xFF2A2D34)))
             ))
         }
         // Тёмный градиент
@@ -1896,19 +1914,61 @@ fun CategoryTabRow(
 
 // ─── Сетка плиток — Nokia Lumia стиль ────────────────────────────────────────
 
-// Паттерны рядов: случайный микс (seed от дня = каждый день другой порядок)
-private val TILE_PATTERNS = listOf(
-    listOf(TileSize.LARGE),
-    listOf(TileSize.MEDIUM, TileSize.MEDIUM),
-    listOf(TileSize.LARGE),
-    listOf(TileSize.MEDIUM, TileSize.MEDIUM),
-    listOf(TileSize.MEDIUM, TileSize.MEDIUM),
-    listOf(TileSize.LARGE),
-    listOf(TileSize.MEDIUM, TileSize.MEDIUM),
-    listOf(TileSize.LARGE),
-    listOf(TileSize.MEDIUM, TileSize.MEDIUM),
-    listOf(TileSize.MEDIUM, TileSize.MEDIUM),
-)
+/** Готовый ряд: одна большая плитка либо пара средних */
+private data class TileRow(val indices: List<Int>, val size: TileSize)
+
+/**
+ * Крупная плитка — свойство САМОЙ новости, а не её позиции в списке.
+ *
+ * Раньше размер задавался позиционными паттернами рядов: новости просто
+ * заливались в слоты по порядку, и стоило списку сдвинуться (пришли свежие,
+ * прочитанные опустились вниз) — одна и та же новость то большая, то средняя.
+ * Теперь признак стабилен: важная новость всегда крупная.
+ */
+private fun isFeatureWorthy(item: NewsItem): Boolean =
+    item.category == "URGENT" ||
+    item.editorLabel != null ||
+    item.isEditorImportant ||
+    item.priority >= 2 ||
+    item.isVideo ||
+    item.sourceCount >= 3 ||       // о теме написали многие — значит, крупная
+    item.imageUrl != null          // хорошее фото раскрывается только на всю ширину
+
+/**
+ * Раскладка: важные — во всю ширину, остальные — парами.
+ * Порядок новостей строго сохраняется (лента читается сверху вниз),
+ * поэтому одиночка, оставшийся перед крупной плиткой, тоже идёт во всю ширину —
+ * иначе в ряду зияла бы пустая половина.
+ */
+private fun buildTileRows(items: List<NewsItem>): List<TileRow> {
+    val rows = mutableListOf<TileRow>()
+    val pending = mutableListOf<Int>()
+
+    fun flush() {
+        while (pending.size >= 2) {
+            rows += TileRow(listOf(pending.removeAt(0), pending.removeAt(0)), TileSize.MEDIUM)
+        }
+        if (pending.isNotEmpty()) {
+            rows += TileRow(listOf(pending.removeAt(0)), TileSize.LARGE)
+        }
+    }
+
+    items.forEachIndexed { idx, item ->
+        // Первая новость — всегда крупная: сразу под курсами валют и крипты
+        // большая плитка задаёт ленте ритм (проверено на живой вёрстке)
+        if (idx == 0 || isFeatureWorthy(item)) {
+            flush()
+            rows += TileRow(listOf(idx), TileSize.LARGE)
+        } else {
+            pending += idx
+            while (pending.size >= 2) {
+                rows += TileRow(listOf(pending.removeAt(0), pending.removeAt(0)), TileSize.MEDIUM)
+            }
+        }
+    }
+    flush()
+    return rows
+}
 
 @Composable
 fun NewsTileGrid(
@@ -1928,12 +1988,6 @@ fun NewsTileGrid(
 
     if (allItems.isEmpty()) return  // HomeContent уже показал SplashLoadingScreen
 
-    // Случайный порядок паттернов — seed от дня, стабилен в рамках дня
-    val shuffledPatterns = remember {
-        val daySeed = System.currentTimeMillis() / (24 * 60 * 60 * 1000)
-        TILE_PATTERNS.shuffled(java.util.Random(daySeed))
-    }
-
     // Для вкладки ALL — показываем две секции: Местные и Мировые
     // YouTube/VIRAL без scope идут в local (вирусы региональные по природе)
     if (category == "ALL") {
@@ -1942,88 +1996,42 @@ fun NewsTileGrid(
         Column(Modifier.fillMaxWidth()) {
             if (localItems.isNotEmpty()) {
                 ScopeSectionHeader(emoji = "📍", title = stringResource(R.string.scope_local))
-                NewsTileBlock(localItems, textColor, subColor, shuffledPatterns, onOpenTikTok, adOffset = 0)
+                NewsTileBlock(localItems, textColor, subColor, onOpenTikTok, adOffset = 0)
             }
             if (worldItems.isNotEmpty()) {
                 ScopeSectionHeader(emoji = "🌍", title = stringResource(R.string.scope_world))
-                NewsTileBlock(worldItems, textColor, subColor, shuffledPatterns, onOpenTikTok, adOffset = 3)
+                NewsTileBlock(worldItems, textColor, subColor, onOpenTikTok, adOffset = 3)
             }
         }
         return
     }
 
+    val rows = remember(sorted) { buildTileRows(sorted) }
+
     Column(Modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
-        var itemIdx = 0
-        var rowCount = 0
-        while (itemIdx < sorted.size) {
-            // Ряд 4: первый слот контекстной рекламы (AdMob)
-            if (rowCount == 4) {
+        rows.forEachIndexed { rowCount, row ->
+            // Ряд 7: единственный слот рекламы — AdMob, при отсутствии
+            // заполнения показывает контакт для рекламодателей (не дублируем
+            // несколько промо-карточек подряд, как раньше)
+            if (rowCount == 7) {
                 ContextualAdSlot(com.mirlanmamytov.ticker247.ads.AdsConfig.FEED_SLOT_1)
                 Spacer(Modifier.height(8.dp))
             }
-            // Ряд 7: партнёрский слот "Реклама · Сотрудничество"
-            if (rowCount == 7) {
-                PromoSlot()
-                Spacer(Modifier.height(8.dp))
-            }
-            // Ряд 10: второй слот контекстной рекламы (AdMob)
-            if (rowCount == 10) {
-                ContextualAdSlot(com.mirlanmamytov.ticker247.ads.AdsConfig.FEED_SLOT_2)
-                Spacer(Modifier.height(8.dp))
-            }
 
-            val pattern = shuffledPatterns[rowCount % shuffledPatterns.size]
-            val available = sorted.size - itemIdx
-
-            // Достаточно ли новостей для этого паттерна?
-            if (available < pattern.size) {
-                // Добиваем оставшиеся как MEDIUM
-                val remaining = sorted.subList(itemIdx, sorted.size)
-                if (remaining.isNotEmpty()) {
-                    if (remaining.size == 1) {
-                        val i0 = itemIdx
-                        LiveTile(remaining[0], TileSize.MEDIUM, textColor, subColor) { onOpenTikTok(sorted, i0) }
-                    } else {
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            remaining.forEachIndexed { offset, item ->
-                                val capturedIdx = itemIdx + offset
-                                Box(Modifier.weight(1f)) {
-                                    LiveTile(item, TileSize.MEDIUM, textColor, subColor) { onOpenTikTok(sorted, capturedIdx) }
-                                }
-                            }
+            // ВАЖНО: индекс захвачен в val до лямбды — иначе тап открывает не ту новость
+            if (row.indices.size == 1) {
+                val i0 = row.indices[0]
+                LiveTile(sorted[i0], row.size, textColor, subColor) { onOpenTikTok(sorted, i0) }
+            } else {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    row.indices.forEach { idx ->
+                        Box(Modifier.weight(1f)) {
+                            LiveTile(sorted[idx], row.size, textColor, subColor) { onOpenTikTok(sorted, idx) }
                         }
                     }
                 }
-                break
-            }
-
-            // ВАЖНО: захватываем itemIdx в val до лямбды — иначе тап открывает не ту новость
-            when (pattern.size) {
-                1 -> {
-                    val i0 = itemIdx
-                    LiveTile(sorted[i0], pattern[0], textColor, subColor) { onOpenTikTok(sorted, i0) }
-                    itemIdx++
-                }
-                2 -> {
-                    val i0 = itemIdx; val i1 = itemIdx + 1
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Box(Modifier.weight(1f)) { LiveTile(sorted[i0], pattern[0], textColor, subColor) { onOpenTikTok(sorted, i0) } }
-                        Box(Modifier.weight(1f)) { LiveTile(sorted[i1], pattern[1], textColor, subColor) { onOpenTikTok(sorted, i1) } }
-                    }
-                    itemIdx += 2
-                }
-                3 -> {
-                    val i0 = itemIdx; val i1 = itemIdx + 1; val i2 = itemIdx + 2
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Box(Modifier.weight(1f)) { LiveTile(sorted[i0], pattern[0], textColor, subColor) { onOpenTikTok(sorted, i0) } }
-                        Box(Modifier.weight(1f)) { LiveTile(sorted[i1], pattern[1], textColor, subColor) { onOpenTikTok(sorted, i1) } }
-                        Box(Modifier.weight(1f)) { LiveTile(sorted[i2], pattern[2], textColor, subColor) { onOpenTikTok(sorted, i2) } }
-                    }
-                    itemIdx += 3
-                }
             }
             Spacer(Modifier.height(8.dp))
-            rowCount++
         }
     }
 }
@@ -2062,68 +2070,31 @@ fun NewsTileBlock(
     items: List<NewsItem>,
     textColor: Color,
     subColor: Color,
-    shuffledPatterns: List<List<TileSize>>,
     onOpenTikTok: (List<NewsItem>, Int) -> Unit,
     adOffset: Int = 0
 ) {
+    val rows = remember(items) { buildTileRows(items) }
+
     Column(Modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
-        var itemIdx = 0
-        var rowCount = 0
-        while (itemIdx < items.size) {
+        rows.forEachIndexed { rowCount, row ->
             val absRow = rowCount + adOffset
             if (absRow == 4) { ContextualAdSlot(com.mirlanmamytov.ticker247.ads.AdsConfig.FEED_SLOT_1); Spacer(Modifier.height(8.dp)) }
             if (absRow == 7) { PromoSlot(); Spacer(Modifier.height(8.dp)) }
             if (absRow == 10) { ContextualAdSlot(com.mirlanmamytov.ticker247.ads.AdsConfig.FEED_SLOT_2); Spacer(Modifier.height(8.dp)) }
 
-            val pattern = shuffledPatterns[rowCount % shuffledPatterns.size]
-            val available = items.size - itemIdx
-
-            if (available < pattern.size) {
-                val remaining = items.subList(itemIdx, items.size)
-                if (remaining.isNotEmpty()) {
-                    if (remaining.size == 1) {
-                        val i0 = itemIdx
-                        LiveTile(remaining[0], TileSize.MEDIUM, textColor, subColor) { onOpenTikTok(items, i0) }
-                    } else {
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            remaining.forEachIndexed { offset, item ->
-                                val capturedIdx = itemIdx + offset
-                                Box(Modifier.weight(1f)) {
-                                    LiveTile(item, TileSize.MEDIUM, textColor, subColor) { onOpenTikTok(items, capturedIdx) }
-                                }
-                            }
+            if (row.indices.size == 1) {
+                val i0 = row.indices[0]
+                LiveTile(items[i0], row.size, textColor, subColor) { onOpenTikTok(items, i0) }
+            } else {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    row.indices.forEach { idx ->
+                        Box(Modifier.weight(1f)) {
+                            LiveTile(items[idx], row.size, textColor, subColor) { onOpenTikTok(items, idx) }
                         }
                     }
                 }
-                break
-            }
-
-            when (pattern.size) {
-                1 -> {
-                    val i0 = itemIdx
-                    LiveTile(items[i0], pattern[0], textColor, subColor) { onOpenTikTok(items, i0) }
-                    itemIdx++
-                }
-                2 -> {
-                    val i0 = itemIdx; val i1 = itemIdx + 1
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Box(Modifier.weight(1f)) { LiveTile(items[i0], pattern[0], textColor, subColor) { onOpenTikTok(items, i0) } }
-                        Box(Modifier.weight(1f)) { LiveTile(items[i1], pattern[1], textColor, subColor) { onOpenTikTok(items, i1) } }
-                    }
-                    itemIdx += 2
-                }
-                3 -> {
-                    val i0 = itemIdx; val i1 = itemIdx + 1; val i2 = itemIdx + 2
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Box(Modifier.weight(1f)) { LiveTile(items[i0], pattern[0], textColor, subColor) { onOpenTikTok(items, i0) } }
-                        Box(Modifier.weight(1f)) { LiveTile(items[i1], pattern[1], textColor, subColor) { onOpenTikTok(items, i1) } }
-                        Box(Modifier.weight(1f)) { LiveTile(items[i2], pattern[2], textColor, subColor) { onOpenTikTok(items, i2) } }
-                    }
-                    itemIdx += 3
-                }
             }
             Spacer(Modifier.height(8.dp))
-            rowCount++
         }
     }
 }
@@ -2250,12 +2221,12 @@ fun LiveTile(
                         val tileBadge = item.editorLabel ?: style.label.takeIf { item.category == "URGENT" }
                         if (tileBadge != null) {
                             Box(Modifier.clip(RoundedCornerShape(50))
-                                .background(style.accent.copy(0.12f))
+                                .background(Color.White.copy(0.22f))
                                 .padding(horizontal = 7.dp, vertical = 2.dp)
                             ) {
                                 Text(tileBadge,
                                     fontSize = if (size == TileSize.SMALL) 8.sp else 9.sp,
-                                    color = style.accent, fontWeight = FontWeight.ExtraBold,
+                                    color = Color.White, fontWeight = FontWeight.ExtraBold,
                                     letterSpacing = 0.3.sp)
                             }
                             Spacer(Modifier.height(5.dp))
@@ -2264,7 +2235,7 @@ fun LiveTile(
                             item.title,
                             fontSize = when (size) { TileSize.LARGE -> 14.sp; TileSize.MEDIUM -> 12.sp; TileSize.SMALL -> 11.sp },
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF111827),
+                            color = Color.White,
                             lineHeight = when (size) { TileSize.LARGE -> 21.sp; TileSize.MEDIUM -> 17.sp; TileSize.SMALL -> 15.sp },
                             maxLines = when (size) { TileSize.LARGE -> 4; TileSize.MEDIUM -> 3; TileSize.SMALL -> 2 },
                             overflow = TextOverflow.Ellipsis,
@@ -2282,9 +2253,9 @@ fun LiveTile(
                                 ) { Text("▶", fontSize = 8.sp, color = Color.White) }
                             }
                             Text(item.source.trimStart('@'), fontSize = 9.sp,
-                                color = style.accent.copy(0.8f), fontWeight = FontWeight.SemiBold)
-                            Text("·", fontSize = 9.sp, color = subColor.copy(0.5f))
-                            Text(timeAgo(item.publishedAt), fontSize = 9.sp, color = subColor)
+                                color = Color.White.copy(0.85f), fontWeight = FontWeight.SemiBold)
+                            Text("·", fontSize = 9.sp, color = Color.White.copy(0.5f))
+                            Text(timeAgo(item.publishedAt), fontSize = 9.sp, color = Color.White.copy(0.7f))
                         }
                     }
                 }
@@ -2342,19 +2313,19 @@ private fun promoStrings(): PromoStrings {
         lang in cyrillic -> PromoStrings(
             "Реклама · Сотрудничество", "Напишите нам — ответим в течение дня",
             "Есть интересная публикация?", "Разместим ваш материал в ленте — статья, анонс, интервью",
-            "Здесь может быть ваша реклама", "Продвигайте бизнес среди читателей Ticker 24/7")
+            "По вопросам рекламы", "Telegram: @$ADS_CONTACT_USER")
         lang == "es" -> PromoStrings(
             "Publicidad · Colaboración", "Escríbenos — respondemos en un día",
             "¿Tienes una publicación interesante?", "Publicamos tu material en el feed: artículo, anuncio, entrevista",
-            "Tu anuncio podría estar aquí", "Promociona tu negocio entre los lectores de Ticker 24/7")
+            "Para publicidad", "Telegram: @$ADS_CONTACT_USER")
         lang == "pt" -> PromoStrings(
             "Publicidade · Parceria", "Escreva para nós — respondemos em um dia",
             "Tem uma publicação interessante?", "Publicamos seu material no feed: artigo, anúncio, entrevista",
-            "Seu anúncio poderia estar aqui", "Promova seu negócio entre os leitores do Ticker 24/7")
+            "Para publicidade", "Telegram: @$ADS_CONTACT_USER")
         else -> PromoStrings(
             "Advertising · Partnership", "Message us — we reply within a day",
             "Got an interesting story?", "We'll feature your content: article, announcement, interview",
-            "Your ad could be here", "Promote your business to Ticker 24/7 readers")
+            "For advertising inquiries", "Telegram: @$ADS_CONTACT_USER")
     }
 }
 
@@ -2406,7 +2377,8 @@ fun AdPlaceholderCard() {
             .fillMaxWidth()
             .height(90.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFFF8F4FF))
+            .background(Color(0xFF4A4E58))
+            .border(1.dp, Color(0xFF545862), RoundedCornerShape(12.dp))
             .clickable { openTelegramContact(context) }
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center
@@ -2422,19 +2394,19 @@ fun AdPlaceholderCard() {
                     promo.slotTitle,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF6366F1)
+                    color = Color(0xFF00D4FF)
                 )
                 Text(
                     promo.slotSubtitle,
                     fontSize = 11.sp,
-                    color = Color(0xFF6B7280)
+                    color = Color(0xFFB4B2A9)
                 )
             }
         }
         Text(
             stringResource(R.string.ad_label),
             fontSize = 9.sp,
-            color = Color(0xFF9CA3AF),
+            color = Color(0xFFB4B2A9),
             modifier = Modifier.align(Alignment.TopEnd).padding(6.dp)
         )
     }
@@ -2514,7 +2486,7 @@ fun PromoSlot() {
                         Text(
                             slide.title,
                             fontSize = 12.sp, fontWeight = FontWeight.Bold,
-                            color = Color(0xFF111827), maxLines = 1,
+                            color = Color.White, maxLines = 1,
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                         Text(

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Ticker247.Splash" parent="Theme.Ticker247">
-        <item name="android:windowBackground">@drawable/splash_background</item>
-        <item name="android:windowFullscreen">false</item>
-        <item name="android:windowSplashScreenBackground">#1E1B4B</item>
-    </style>
+    <!-- Пусто: core-splashscreen сам обрабатывает разницу версий через
+         values/themes.xml — отдельный оверрайд для API 31+ больше не нужен
+         и конфликтовал бы с родителем Theme.SplashScreen. -->
 </resources>

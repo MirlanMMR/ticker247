@@ -49,7 +49,7 @@ fun BookmarksScreen(
                         Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF2A2D34), titleContentColor = Color(0xFFE4E6EB), navigationIconContentColor = Color(0xFFE4E6EB))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF2A2D34), titleContentColor = Color(0xFFFFFFFF), navigationIconContentColor = Color(0xFFFFFFFF))
             )
         }
     ) { padding ->
@@ -92,7 +92,7 @@ private fun BookmarkCard(item: NewsItem, onClick: () -> Unit, onRemove: () -> Un
         Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .background(Color(0xFF363940))
+            .background(Color(0xFF4A4E58))
             .clickable(onClick = onClick)
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -108,7 +108,7 @@ private fun BookmarkCard(item: NewsItem, onClick: () -> Unit, onRemove: () -> Un
         Column(Modifier.weight(1f)) {
             Text(
                 item.title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
-                color = Color(0xFFE4E6EB), maxLines = 2, overflow = TextOverflow.Ellipsis
+                color = Color(0xFFFFFFFF), maxLines = 2, overflow = TextOverflow.Ellipsis
             )
             Spacer(Modifier.height(4.dp))
             Text(item.source.trimStart('@'), fontSize = 12.sp, color = Color(0xFFB4B2A9))

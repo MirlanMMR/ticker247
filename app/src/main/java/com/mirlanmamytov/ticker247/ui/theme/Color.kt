@@ -15,11 +15,11 @@ val TickerGreen       = Color(0xFF63C583)   // рост крипты/валют�
 val TickerAmber       = Color(0xFFEF9F27)   // предупреждения
 
 val TickerBackground  = Color(0xFF2A2D34)   // основной фон
-val TickerSurface     = Color(0xFF363940)   // карточки, диалоги, bottom sheet
-val TickerSurfaceVar  = Color(0xFF3D4048)   // разделители, плейсхолдеры
+val TickerSurface     = Color(0xFF4A4E58)   // карточки, диалоги, bottom sheet
+val TickerSurfaceVar  = Color(0xFF545862)   // разделители, плейсхолдеры
 
-val TickerOnBg        = Color(0xFFE4E6EB)   // основной текст
-val TickerOnSurface   = Color(0xFFE4E6EB)   // текст на карточках
+val TickerOnBg        = Color(0xFFFFFFFF)   // основной текст
+val TickerOnSurface   = Color(0xFFFFFFFF)   // текст на карточках
 val TickerSecondary   = Color(0xFFB4B2A9)   // подписи, метки времени
 
 val TickerBarBg       = Color(0xFF050508)   // бегущая строка — темнее фона, контраст
