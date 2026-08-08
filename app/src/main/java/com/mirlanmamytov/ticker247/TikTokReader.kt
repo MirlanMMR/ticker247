@@ -430,8 +430,16 @@ private fun TikTokPage(item: NewsItem, onBack: () -> Unit) {
                     Spacer(Modifier.height(16.dp))
                     OutlinedButton(
                         onClick = {
-                            try { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(item.url))) }
-                            catch (_: Exception) {}
+                            // Резкий скачок на сайт заменён на fade — плавно
+                            // и в браузер, и обратно (Android сама проигрывает
+                            // ту же анимацию в реверсе при возврате назад)
+                            try {
+                                val options = androidx.core.app.ActivityOptionsCompat
+                                    .makeCustomAnimation(context, R.anim.fade_in, R.anim.fade_out)
+                                androidx.core.content.ContextCompat.startActivity(
+                                    context, Intent(Intent.ACTION_VIEW, Uri.parse(item.url)), options.toBundle()
+                                )
+                            } catch (_: Exception) {}
                         },
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = accentCol),
                         border = BorderStroke(1.dp, accentCol.copy(0.5f)),

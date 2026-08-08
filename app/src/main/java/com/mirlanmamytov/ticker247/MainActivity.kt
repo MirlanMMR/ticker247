@@ -111,6 +111,12 @@ class MainActivity : ComponentActivity() {
                                                       android.graphics.Color.TRANSPARENT)
         )
         super.onCreate(savedInstanceState)
+        // Система по умолчанию рисует свою полупрозрачную подложку поверх
+        // статус-бара/навигации "для контраста", независимо от цвета,
+        // который мы уже задали выше через enableEdgeToEdge — та самая
+        // белёсая полоска. Отключаем: контраст мы обеспечиваем сами.
+        window.isStatusBarContrastEnforced = false
+        window.isNavigationBarContrastEnforced = false
         prefs = getSharedPreferences("ticker247_prefs", MODE_PRIVATE)
         handleDeepLink(intent)
         // Тяжёлую инициализацию (обновления, реклама) откладываем — сначала
