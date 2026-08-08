@@ -43,15 +43,12 @@ fun Ticker247Theme(
             // navigationBarColor — no-op начиная с targetSdk 36, панели
             // всегда прозрачные (edge-to-edge). Управляем только цветом иконок.
             //
-            // Статус-бар лежит поверх тёмной бегущей строки (0xFF050508) —
-            // ему нужны СВЕТЛЫЕ иконки (isAppearanceLightStatusBars = false).
-            // Если поставить true, как раньше, система решает, что тёмные
-            // иконки на тёмном фоне нечитаемы, и сама подставляет полупрозрачную
-            // светлую подложку для контраста — та самая белёсая полоска.
-            // Навигация внизу — над светлой лентой, там всё как было.
+            // И статус-бар (над тёмной бегущей строкой), и навигация внизу
+            // (над тёмным фоном ленты после перехода на серую тему) — обе
+            // панели теперь над тёмным контентом, обеим нужны светлые иконки.
             val controller = WindowCompat.getInsetsController(window, view)
             controller.isAppearanceLightStatusBars = false
-            controller.isAppearanceLightNavigationBars = true
+            controller.isAppearanceLightNavigationBars = false
         }
     }
 

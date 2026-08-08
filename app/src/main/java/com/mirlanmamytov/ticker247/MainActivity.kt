@@ -105,10 +105,12 @@ class MainActivity : ComponentActivity() {
         // прозрачную панель, разрывала бы её белой полосой. dark() заодно
         // делает иконки светлыми — читаются на чёрном.
         // Навигация внизу — наоборот, светлая: там фон ленты.
+        // Обе панели — light-иконки над dark(): весь интерфейс теперь
+        // нейтрально-серый/тёмный (переход со светлой темы), под каждой
+        // системной панелью лежит тёмный контент
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(0xFF050508.toInt()),
-            navigationBarStyle = SystemBarStyle.light(android.graphics.Color.TRANSPARENT,
-                                                      android.graphics.Color.TRANSPARENT)
+            navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
         )
         super.onCreate(savedInstanceState)
         // Система по умолчанию рисует свою полупрозрачную подложку поверх

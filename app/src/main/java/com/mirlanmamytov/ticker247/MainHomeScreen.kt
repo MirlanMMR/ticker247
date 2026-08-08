@@ -99,50 +99,50 @@ private fun categoryLabel(category: String): String {
 
 fun newsItemStyle(category: String): CategoryStyle = when (category) {
     // 🇰🇬  Кыргызстан — небесно-синий, флаговый
-    "KG"       -> CategoryStyle(Color(0xFF1565C0), Color(0xFFE8F2FF),
-                    listOf(Color(0xFFE8F2FF), Color(0xFFD0E8FF)), Color(0xFF0D1A2E), categoryLabel("KG"))
+    "KG"       -> CategoryStyle(Color(0xFF1565C0), Color(0xFF363940),
+                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("KG"))
     // ⚡  Срочно — горячий красно-оранжевый (не кричащий, но тревожный)
-    "URGENT"   -> CategoryStyle(Color(0xFFD32F2F), Color(0xFFFFF0EE),
-                    listOf(Color(0xFFFFF0EE), Color(0xFFFFE0DC)), Color(0xFF2E1610), categoryLabel("URGENT"))
+    "URGENT"   -> CategoryStyle(Color(0xFFD32F2F), Color(0xFF363940),
+                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("URGENT"))
     // 🌍  Мир — глубокий бирюзовый
-    "WORLD"    -> CategoryStyle(Color(0xFF00838F), Color(0xFFE6F7F8),
-                    listOf(Color(0xFFE6F7F8), Color(0xFFCCF0F3)), Color(0xFF0A2126), categoryLabel("WORLD"))
+    "WORLD"    -> CategoryStyle(Color(0xFF00838F), Color(0xFF363940),
+                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("WORLD"))
     // ⚽  Спорт — насыщенный янтарь
-    "SPORT"    -> CategoryStyle(Color(0xFFE65100), Color(0xFFFFF8F0),
-                    listOf(Color(0xFFFFF8F0), Color(0xFFFFEDD5)), Color(0xFF2E1C00), categoryLabel("SPORT"))
+    "SPORT"    -> CategoryStyle(Color(0xFFE65100), Color(0xFF363940),
+                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("SPORT"))
     // 🎬  Кино/культура — глубокий фиолетовый
-    "CULTURE"  -> CategoryStyle(Color(0xFF7B1FA2), Color(0xFFF8F0FF),
-                    listOf(Color(0xFFF8F0FF), Color(0xFFEDD5FF)), Color(0xFF220A2E), categoryLabel("CULTURE"))
+    "CULTURE"  -> CategoryStyle(Color(0xFF7B1FA2), Color(0xFF363940),
+                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("CULTURE"))
     // 🚗  Авто — нефтяной зелёный
-    "AUTO"     -> CategoryStyle(Color(0xFF2E7D32), Color(0xFFF0FBF0),
-                    listOf(Color(0xFFF0FBF0), Color(0xFFDDF5DD)), Color(0xFF0A2010), categoryLabel("AUTO"))
+    "AUTO"     -> CategoryStyle(Color(0xFF2E7D32), Color(0xFF363940),
+                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("AUTO"))
     // 👗  Мода — тёплая роза
-    "FASHION"  -> CategoryStyle(Color(0xFFC2185B), Color(0xFFFFF0F5),
-                    listOf(Color(0xFFFFF0F5), Color(0xFFFFD6E8)), Color(0xFF2E0018), categoryLabel("FASHION"))
+    "FASHION"  -> CategoryStyle(Color(0xFFC2185B), Color(0xFF363940),
+                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("FASHION"))
     // ✈️  Туризм — небо
-    "TOURS"    -> CategoryStyle(Color(0xFF0277BD), Color(0xFFEDF6FF),
-                    listOf(Color(0xFFEDF6FF), Color(0xFFD4ECFF)), Color(0xFF0D1E2E), categoryLabel("TOURS"))
+    "TOURS"    -> CategoryStyle(Color(0xFF0277BD), Color(0xFF363940),
+                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("TOURS"))
     // 📱  Технологии — электрический синий (как экран телефона)
-    "TECH"     -> CategoryStyle(Color(0xFF0066FF), Color(0xFFEEF4FF),
-                    listOf(Color(0xFFEEF4FF), Color(0xFFD0E4FF)), Color(0xFF001433), categoryLabel("TECH"))
+    "TECH"     -> CategoryStyle(Color(0xFF0066FF), Color(0xFF363940),
+                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("TECH"))
     // 😊  Хорошие новости — тёплый солнечный жёлто-оранжевый
-    "GOOD"     -> CategoryStyle(Color(0xFFF59E0B), Color(0xFFFFFBEB),
-                    listOf(Color(0xFFFFFBEB), Color(0xFFFEF3C7)), Color(0xFF1C1000), categoryLabel("GOOD"))
+    "GOOD"     -> CategoryStyle(Color(0xFFF59E0B), Color(0xFF363940),
+                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("GOOD"))
     // ⭐  Звёзды — пурпурный, гламурный
-    "STARS"    -> CategoryStyle(Color(0xFF9C27B0), Color(0xFFF9F0FF),
-                    listOf(Color(0xFFF9F0FF), Color(0xFFEDD5FF)), Color(0xFF220033), categoryLabel("STARS"))
+    "STARS"    -> CategoryStyle(Color(0xFF9C27B0), Color(0xFF363940),
+                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("STARS"))
     // 🏥  Здоровье — свежий зелёный
-    "HEALTH"   -> CategoryStyle(Color(0xFF00897B), Color(0xFFE8F8F5),
-                    listOf(Color(0xFFE8F8F5), Color(0xFFCCF0EA)), Color(0xFF00201D), categoryLabel("HEALTH"))
+    "HEALTH"   -> CategoryStyle(Color(0xFF00897B), Color(0xFF363940),
+                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("HEALTH"))
     // 💰  Деньги — золотой
-    "MONEY"    -> CategoryStyle(Color(0xFFFF8F00), Color(0xFFFFF8E1),
-                    listOf(Color(0xFFFFF8E1), Color(0xFFFFECB3)), Color(0xFF1C0F00), categoryLabel("MONEY"))
+    "MONEY"    -> CategoryStyle(Color(0xFFFF8F00), Color(0xFF363940),
+                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("MONEY"))
     // 💡  Лайфхаки — яркий лимонный
-    "LIFE"     -> CategoryStyle(Color(0xFF689F38), Color(0xFFF1F8E9),
-                    listOf(Color(0xFFF1F8E9), Color(0xFFDCEDC8)), Color(0xFF112000), categoryLabel("LIFE"))
+    "LIFE"     -> CategoryStyle(Color(0xFF689F38), Color(0xFF363940),
+                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("LIFE"))
     // 📰  Новости (дефолт) — тёплый серо-синий
-    else       -> CategoryStyle(Color(0xFF37474F), Color(0xFFF4F6F8),
-                    listOf(Color(0xFFF4F6F8), Color(0xFFE8ECF0)), Color(0xFF0D1A2E), categoryLabel("NEWS"))
+    else       -> CategoryStyle(Color(0xFF37474F), Color(0xFF363940),
+                    listOf(Color(0xFF363940), Color(0xFF3D4048)), Color(0xFF3D4048), categoryLabel("NEWS"))
 }
 
 fun timeAgo(timestamp: Long): String {
@@ -870,10 +870,13 @@ fun HomeContent(
     onOpenTikTok: (List<NewsItem>, Int) -> Unit
 ) {
     // Тёплый белый фон — карточки "парят"
-    val bgColor     = Color(0xFFF0F4F8)
-    val textColor   = Color(0xFF111827)
-    val subColor    = Color(0xFF6B7280)
-    val accentColor = Color(0xFF1D4ED8)
+    // Нейтральный серый вместо чисто белого/чёрного — меньше устают глаза
+    // при долгом чтении ленты (не слепит, и не даёт резких ореолов текста,
+    // как бывает на чистом чёрном при астигматизме)
+    val bgColor     = Color(0xFF2A2D34)
+    val textColor   = Color(0xFFE4E6EB)
+    val subColor    = Color(0xFFB4B2A9)
+    val accentColor = Color(0xFF00D4FF)
     val lazyListState = rememberLazyListState()
 
     // Полноэкранный загрузчик — пока нет новостей показываем весь экран в бренд-цвете
@@ -1007,7 +1010,13 @@ fun HomeContent(
 
     Box(Modifier.fillMaxSize()) {
     Scaffold(
-        containerColor = bgColor
+        containerColor = bgColor,
+        // Отступ сверху не резервируем: TickerBar сама красит фон под
+        // статус-бар и подкладывает под содержимое statusBarsPadding.
+        // Если бы Scaffold ЕЩЁ и добавлял свой верхний инсет, светлый
+        // containerColor Scaffold успевал бы мелькнуть в щели ДО того, как
+        // отрисуется тёмная плашка — та самая белёсая полоска.
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0)
     ) { padding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(padding)
@@ -1171,7 +1180,16 @@ fun TickerBar(text: String) {
         }
     }
 
-    Column(Modifier.fillMaxWidth()) {
+    // Фон — на всю ширину, начиная от истинного верха экрана (заходит под
+    // статус-бар); сам контент бара сдвинут вниз через statusBarsPadding
+    // на дочернем Box. Так тёмный фон бесшовно продолжается под прозрачным
+    // статус-баром, а не обрывается в месте, где Compose обычно ставит отступ.
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .background(barBg)
+            .statusBarsPadding()
+    ) {
         Box(
             Modifier
                 .fillMaxWidth()
@@ -1317,8 +1335,8 @@ fun CurrencyTile() {
 
 @Composable
 fun CurrencyDetailSheet(currency: NewsItem) {
-    val textColor = Color(0xFF0A0A0A)
-    val subColor  = Color(0xFF6B7280)
+    val textColor = Color(0xFFE4E6EB)
+    val subColor  = Color(0xFFB4B2A9)
     val rates = currency.title.split("|").map { it.trim() }.filter { it.isNotEmpty() }
 
     Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 40.dp)) {
@@ -1350,14 +1368,14 @@ fun CurrencyDetailSheet(currency: NewsItem) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(Modifier.size(40.dp).clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFFE8F5E9)), contentAlignment = Alignment.Center) {
+                        .background(Color(0xFF163540)), contentAlignment = Alignment.Center) {
                         Text(code, fontSize = 12.sp, color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold)
                     }
                     Text(code, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = textColor)
                 }
                 Text("$value $sheetBase", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
             }
-            Box(Modifier.fillMaxWidth().height(0.5.dp).background(Color(0xFFE5E7EB)))
+            Box(Modifier.fillMaxWidth().height(0.5.dp).background(Color(0xFF3D4048)))
         }
     }
 }
@@ -1471,8 +1489,8 @@ fun CryptoTile() {
 
 @Composable
 fun CryptoDetailSheet(cryptos: List<NewsItem>) {
-    val textColor = Color(0xFF0A0A0A)
-    val subColor  = Color(0xFF6B7280)
+    val textColor = Color(0xFFE4E6EB)
+    val subColor  = Color(0xFFB4B2A9)
 
     Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 40.dp)) {
         val cryptoSheetLang = com.mirlanmamytov.ticker247.data.repository.FirebaseNewsRepository.poolOverride
@@ -1505,7 +1523,7 @@ fun CryptoDetailSheet(cryptos: List<NewsItem>) {
                             contentScale = ContentScale.Crop)
                     } else {
                         Box(Modifier.size(36.dp).clip(RoundedCornerShape(50))
-                            .background(Color(0xFFEDE7F6)), contentAlignment = Alignment.Center) {
+                            .background(Color(0xFF3D3550)), contentAlignment = Alignment.Center) {
                             Text(coin.cryptoSymbol?.take(2) ?: "?", fontSize = 12.sp)
                         }
                     }
@@ -1524,7 +1542,7 @@ fun CryptoDetailSheet(cryptos: List<NewsItem>) {
                         fontSize = 11.sp, color = changeColor)
                 }
             }
-            Box(Modifier.fillMaxWidth().height(0.5.dp).background(Color(0xFFE5E7EB)))
+            Box(Modifier.fillMaxWidth().height(0.5.dp).background(Color(0xFF3D4048)))
         }
     }
 }

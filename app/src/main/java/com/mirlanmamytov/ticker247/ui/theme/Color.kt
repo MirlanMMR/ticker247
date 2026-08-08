@@ -2,25 +2,26 @@ package com.mirlanmamytov.ticker247.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ── Ticker 24/7 — Light theme palette ────────────────────────────────────────
-// Inspired by Bloomberg / Apple News: crisp white, bold blue accent, dark text
+// ── Ticker 24/7 — Neutral gray palette ───────────────────────────────────────
+// Не чисто белый (слепит) и не чисто чёрный (резкий контраст, ореолы текста
+// при астигматизме) — средний тёплый графитовый серый, мягче для долгого чтения
 
-val TickerBlue        = Color(0xFF0070F3)   // primary — кнопки, ссылки, badges
-val TickerBlueDark    = Color(0xFF0052CC)   // primary variant
-val TickerBlueLight   = Color(0xFFE8F1FF)   // primary container
+val TickerBlue        = Color(0xFF00D4FF)   // primary — кнопки, ссылки, badges
+val TickerBlueDark    = Color(0xFF0091B0)   // primary variant
+val TickerBlueLight   = Color(0xFF163540)   // primary container (тёмный, не светлый)
 
-val TickerRed         = Color(0xFFE53935)   // URGENT badge, ошибки
-val TickerGreen       = Color(0xFF2E7D32)   // рост крипты/валюты ▲
-val TickerAmber       = Color(0xFFF57C00)   // предупреждения
+val TickerRed         = Color(0xFFE24B4A)   // URGENT badge, ошибки
+val TickerGreen       = Color(0xFF63C583)   // рост крипты/валюты ▲
+val TickerAmber       = Color(0xFFEF9F27)   // предупреждения
 
-val TickerBackground  = Color(0xFFF5F7FA)   // основной фон — слегка серый, не слепит
-val TickerSurface     = Color(0xFFFFFFFF)   // карточки
-val TickerSurfaceVar  = Color(0xFFEEF2F7)   // разделители, плейсхолдеры
+val TickerBackground  = Color(0xFF2A2D34)   // основной фон
+val TickerSurface     = Color(0xFF363940)   // карточки, диалоги, bottom sheet
+val TickerSurfaceVar  = Color(0xFF3D4048)   // разделители, плейсхолдеры
 
-val TickerOnBg        = Color(0xFF0A0A0A)   // основной текст
-val TickerOnSurface   = Color(0xFF1A1A1A)   // текст на карточках
-val TickerSecondary   = Color(0xFF6B7280)   // подписи, метки времени
+val TickerOnBg        = Color(0xFFE4E6EB)   // основной текст
+val TickerOnSurface   = Color(0xFFE4E6EB)   // текст на карточках
+val TickerSecondary   = Color(0xFFB4B2A9)   // подписи, метки времени
 
-val TickerBarBg       = Color(0xFF0A0A1A)   // бегущая строка — остаётся тёмной (контраст)
+val TickerBarBg       = Color(0xFF050508)   // бегущая строка — темнее фона, контраст
 val TickerBarText     = Color(0xFFFFFFFF)
 val TickerBarAccent   = Color(0xFF00D4FF)   // cyan для $, BTC и т.д.

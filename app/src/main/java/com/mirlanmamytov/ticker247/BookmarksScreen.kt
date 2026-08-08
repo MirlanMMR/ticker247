@@ -40,7 +40,7 @@ fun BookmarksScreen(
     val scope = rememberCoroutineScope()
 
     Scaffold(
-        containerColor = Color(0xFFF0F4F8),
+        containerColor = Color(0xFF2A2D34),
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.bookmarks_title), fontWeight = FontWeight.Bold) },
@@ -49,7 +49,7 @@ fun BookmarksScreen(
                         Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFF0F4F8))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF2A2D34), titleContentColor = Color(0xFFE4E6EB), navigationIconContentColor = Color(0xFFE4E6EB))
             )
         }
     ) { padding ->
@@ -60,12 +60,12 @@ fun BookmarksScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 Icon(Icons.Default.Bookmark, contentDescription = null,
-                    tint = Color(0xFF1D4ED8).copy(0.25f), modifier = Modifier.size(56.dp))
+                    tint = Color(0xFF00D4FF).copy(0.25f), modifier = Modifier.size(56.dp))
                 Spacer(Modifier.height(12.dp))
-                Text(stringResource(R.string.bookmarks_empty_title), fontSize = 15.sp, color = Color(0xFF6B7280))
+                Text(stringResource(R.string.bookmarks_empty_title), fontSize = 15.sp, color = Color(0xFFB4B2A9))
                 Spacer(Modifier.height(4.dp))
                 Text(stringResource(R.string.bookmarks_empty_sub),
-                    fontSize = 13.sp, color = Color(0xFF9CA3AF))
+                    fontSize = 13.sp, color = Color(0xFF888780))
             }
             return@Scaffold
         }
@@ -92,7 +92,7 @@ private fun BookmarkCard(item: NewsItem, onClick: () -> Unit, onRemove: () -> Un
         Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .background(Color.White)
+            .background(Color(0xFF363940))
             .clickable(onClick = onClick)
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -108,13 +108,13 @@ private fun BookmarkCard(item: NewsItem, onClick: () -> Unit, onRemove: () -> Un
         Column(Modifier.weight(1f)) {
             Text(
                 item.title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF111827), maxLines = 2, overflow = TextOverflow.Ellipsis
+                color = Color(0xFFE4E6EB), maxLines = 2, overflow = TextOverflow.Ellipsis
             )
             Spacer(Modifier.height(4.dp))
-            Text(item.source.trimStart('@'), fontSize = 12.sp, color = Color(0xFF6B7280))
+            Text(item.source.trimStart('@'), fontSize = 12.sp, color = Color(0xFFB4B2A9))
         }
         IconButton(onClick = onRemove) {
-            Icon(Icons.Default.DeleteOutline, contentDescription = stringResource(R.string.reader_share_bookmark_remove), tint = Color(0xFF9CA3AF))
+            Icon(Icons.Default.DeleteOutline, contentDescription = stringResource(R.string.reader_share_bookmark_remove), tint = Color(0xFF888780))
         }
     }
 }
