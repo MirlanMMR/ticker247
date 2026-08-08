@@ -787,11 +787,15 @@ fun MainHomeScreen() {
             // Отмечаем как прочитанное — уйдёт вниз ленты при следующем рендере
             if (item != null) DataBridge.markSeen(item.url)
             when {
-                // YouTube-видео → встроенный плеер
-                item != null && item.isVideo && item.url.isNotEmpty() &&
+                // YouTube-видео, встраивание разрешено → встроенный плеер.
+                // Если запрещено (embeddable=false) — не пробуем вообще,
+                // плеер там гарантированно упадёт с ошибкой после долгой
+                // попытки; сразу открываем приложение YouTube
+                item != null && item.isVideo && item.url.isNotEmpty() && item.embeddable &&
                 (item.url.contains("youtube.com") || item.url.contains("youtu.be")) ->
                     youTubeUrl = item.url
-                // Видео других платформ (TikTok/Instagram/VK) → родное приложение
+                // Видео других платформ (TikTok/Instagram/VK) и невстраиваемый
+                // YouTube → родное приложение, без задержки
                 item != null && item.isVideo && item.url.isNotEmpty() -> {
                     try {
                         context.startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse(item.url)))

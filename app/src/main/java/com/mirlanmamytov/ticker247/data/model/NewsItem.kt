@@ -15,6 +15,9 @@ data class NewsItem(
     val priority: Int = 0,
     // Тип контента
     val isVideo: Boolean = false,
+    // YouTube: часть видео запрещает встраивание — тогда встроенный плеер
+    // не пробуем вообще, сразу открываем приложение YouTube
+    val embeddable: Boolean = true,
     // Крипта
     val cryptoName: String? = null,
     val cryptoSymbol: String? = null,

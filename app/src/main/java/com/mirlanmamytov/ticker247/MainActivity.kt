@@ -99,10 +99,14 @@ class MainActivity : ComponentActivity() {
         // Edge-to-edge объявляем явно: с Android 15 он и так принудительный
         // для targetSdk 35+, но явный вызов даёт то же поведение и на старых
         // версиях — интерфейс выглядит одинаково везде.
-        // light() = светлый фон панелей → тёмные иконки, под наш светлый UI.
+        //
+        // Статус-бар — тёмный под цвет бегущей строки (0xFF050508): она идёт
+        // первой на экране, и светлая подложка Scaffold, просвечивая сквозь
+        // прозрачную панель, разрывала бы её белой полосой. dark() заодно
+        // делает иконки светлыми — читаются на чёрном.
+        // Навигация внизу — наоборот, светлая: там фон ленты.
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(android.graphics.Color.TRANSPARENT,
-                                                  android.graphics.Color.TRANSPARENT),
+            statusBarStyle = SystemBarStyle.dark(0xFF050508.toInt()),
             navigationBarStyle = SystemBarStyle.light(android.graphics.Color.TRANSPARENT,
                                                       android.graphics.Color.TRANSPARENT)
         )

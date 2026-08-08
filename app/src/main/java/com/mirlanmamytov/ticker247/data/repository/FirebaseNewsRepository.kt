@@ -83,14 +83,17 @@ object FirebaseNewsRepository {
                     val sysLang = java.util.Locale.getDefault().language
                     val sysCountry = java.util.Locale.getDefault().country
                     val cyrillicLangs = setOf("ru", "ky", "kk", "uz", "tg", "be", "uk", "bg", "sr", "mk")
+                    // world_ru/world_es/world_pt — та же подборка (тренды США),
+                    // но с переведёнными заголовками; "world" (английский)
+                    // оставлен только для англоязычного пула
                     val regions = when {
                         sysLang == "ky" -> listOf("kg", "ru")
-                        sysCountry == "KG" -> listOf("kg", "ru", "world")
+                        sysCountry == "KG" -> listOf("kg", "ru", "world_ru")
                         sysCountry == "KZ" -> listOf("kz", "kg", "ru")
-                        sysCountry == "RU" -> listOf("ru", "kg", "world")
-                        sysLang in cyrillicLangs -> listOf("ru", "kg", "world")
-                        sysLang == "es" -> listOf("mx", "world")
-                        sysLang == "pt" -> listOf("br", "world")
+                        sysCountry == "RU" -> listOf("ru", "kg", "world_ru")
+                        sysLang in cyrillicLangs -> listOf("ru", "kg", "world_ru")
+                        sysLang == "es" -> listOf("mx", "world_es")
+                        sysLang == "pt" -> listOf("br", "world_pt")
                         else -> listOf("gb", "world")
                     }
                     regions.forEach { region ->
@@ -114,7 +117,8 @@ object FirebaseNewsRepository {
                                 category = "VIRAL",
                                 publishedAt = child.child("publishedAt").getValue(Long::class.java) ?: System.currentTimeMillis(),
                                 priority = 1,
-                                isVideo = url.contains("youtube.com") || url.contains("youtu.be")
+                                isVideo = url.contains("youtube.com") || url.contains("youtu.be"),
+                                embeddable = child.child("embeddable").getValue(Boolean::class.java) ?: true
                             )
                             if (item.title.isNotEmpty()) items.add(item)
                         }
