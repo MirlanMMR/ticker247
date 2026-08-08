@@ -1080,6 +1080,10 @@ fun HomeContent(
         Row(
             Modifier
                 .align(Alignment.BottomCenter)
+                // Панель плавает поверх ленты, вне Scaffold — отступ под
+                // навигационную панель приходится задавать самим, иначе с
+                // edge-to-edge она ляжет на системные кнопки/жест-бар
+                .navigationBarsPadding()
                 .padding(bottom = 14.dp, start = 16.dp, end = 16.dp)
                 .fillMaxWidth()
                 .shadow(6.dp, RoundedCornerShape(50))

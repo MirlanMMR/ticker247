@@ -90,6 +90,8 @@ fun TikTokReader(
                 onClick = onBack,
                 modifier = Modifier
                     .align(Alignment.TopStart)
+                    // Иначе с edge-to-edge кнопка окажется под часами/иконками
+                    .statusBarsPadding()
                     .padding(top = 8.dp, start = 12.dp)
             ) {
                 Box(

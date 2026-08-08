@@ -7,8 +7,10 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
@@ -94,6 +96,16 @@ class MainActivity : ComponentActivity() {
         // Тему НЕ переключаем: брендовый сплэш (лого) виден до первого кадра
         // Compose — раньше здесь был сплошной тёмный фон = «чёрный экран»
         // на холодном старте
+        // Edge-to-edge объявляем явно: с Android 15 он и так принудительный
+        // для targetSdk 35+, но явный вызов даёт то же поведение и на старых
+        // версиях — интерфейс выглядит одинаково везде.
+        // light() = светлый фон панелей → тёмные иконки, под наш светлый UI.
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(android.graphics.Color.TRANSPARENT,
+                                                  android.graphics.Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.light(android.graphics.Color.TRANSPARENT,
+                                                      android.graphics.Color.TRANSPARENT)
+        )
         super.onCreate(savedInstanceState)
         prefs = getSharedPreferences("ticker247_prefs", MODE_PRIVATE)
         handleDeepLink(intent)

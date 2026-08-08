@@ -91,6 +91,7 @@ fun YouTubePlayerScreen(url: String, onClose: () -> Unit) {
             onClick = onClose,
             modifier = Modifier
                 .align(Alignment.TopEnd)
+                .statusBarsPadding()
                 .padding(12.dp)
                 .size(40.dp)
                 .background(Color.Black.copy(alpha = 0.6f), CircleShape)

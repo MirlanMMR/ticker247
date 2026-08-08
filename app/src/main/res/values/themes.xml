@@ -2,9 +2,9 @@
     <!-- Основная тема приложения -->
     <style name="Theme.Ticker247" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">#FF1E1B4B</item>
-        <item name="android:statusBarColor">#FF1E1B4B</item>
-        <item name="android:navigationBarColor">#FF1E1B4B</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <!-- statusBarColor / navigationBarColor / windowLightStatusBar убраны:
+             с targetSdk 36 они игнорируются (edge-to-edge включён всегда).
+             Цветом иконок управляет Theme.kt через WindowInsetsController. -->
     </style>
 
     <!-- Сплэш-тема: показывается пока грузится Compose -->

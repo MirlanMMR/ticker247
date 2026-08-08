@@ -39,11 +39,14 @@ fun Ticker247Theme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            // Светлый статус-бар с тёмными иконками
-            window.statusBarColor = TickerBackground.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
-            window.navigationBarColor = TickerBackground.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = true
+            // Цвета панелей больше не выставляем: statusBarColor и
+            // navigationBarColor — no-op начиная с targetSdk 36, панели
+            // всегда прозрачные (edge-to-edge). Управляем только тем, что
+            // продолжает работать — цветом иконок: у нас светлый интерфейс,
+            // поэтому иконки тёмные.
+            val controller = WindowCompat.getInsetsController(window, view)
+            controller.isAppearanceLightStatusBars = true
+            controller.isAppearanceLightNavigationBars = true
         }
     }
 
